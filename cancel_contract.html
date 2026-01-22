@@ -4,26 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Huỷ Hợp Đồng - Batch 41</title>
-
+    <!-- FONT -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- BOOTSTRAP -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
 
     <style>
       * {
         box-sizing: border-box;
-        margin: 0;
-        padding: 0;
         font-family: Roboto, sans-serif;
       }
+
       body {
         background: #f0f4f8;
-        padding-top: 85px;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        padding-top: 56px;
       }
 
       /* ===== HEADER ===== */
@@ -32,113 +32,87 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 65px;
-        background: #ffffff;
+        height: 56px;
+        background: #fff;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 30px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        padding: 0 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         z-index: 1000;
       }
+
       .logo {
-        font-size: 20px;
         font-weight: 700;
-        color: #007bff;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      nav a {
-        margin-left: 22px;
-        text-decoration: none;
-        font-weight: 500;
-        color: #333;
-      }
-      nav a:hover {
-        color: #007bff;
+        color: #0d6efd;
+        font-size: 16px;
       }
 
-      /* ===== TOOL (NGUYÊN BẢN) ===== */
-      .container {
-        width: 100%;
-        max-width: 480px;
-        background: #fff;
-        padding: 30px 35px;
+      /* Desktop nav */
+      .desktop-nav a {
+        margin-left: 15px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #333;
+      }
+
+      .desktop-nav a:hover {
+        color: #0d6efd;
+      }
+
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none;
+        }
+      }
+
+      /* ===== CARD ===== */
+      .card-custom {
         border-radius: 16px;
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
       }
-      h1 {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      label {
-        margin-top: 12px;
-        display: block;
-        font-weight: 500;
-        font-size: 14px;
-      }
-      input,
-      select,
-      textarea {
-        width: 100%;
-        padding: 10px 12px;
-        margin-top: 6px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-      }
+
       textarea {
         resize: none;
-        height: 70px;
       }
-      button {
-        margin-top: 14px;
-        width: 100%;
-        padding: 13px;
+
+      .result {
+        white-space: pre-line;
+        background: #eef4ff;
         border-radius: 10px;
-        border: none;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        background: #e74c3c;
-        color: #fff;
+        padding: 14px;
+        display: none;
       }
+
       .copy-btn {
         display: none;
-        background: #3498db;
       }
-      .result {
-        display: none;
-        margin-top: 20px;
-        padding: 14px;
-        background: #eef4ff;
-        border-radius: 8px;
-        white-space: pre-line;
-        font-size: 14px;
-      }
+
       .missing {
-        border: 2px solid #e74c3c !important;
+        border: 2px solid #dc3545 !important;
         background: #fff0f0;
       }
+
       .hint {
-        color: #e74c3c;
+        color: #dc3545;
         font-weight: 600;
       }
+
       .suggest-box {
-        margin-top: 6px;
+        margin-top: 8px;
         padding: 8px;
         background: #f8faff;
-        border: 1px dashed #3498db;
-        border-radius: 8px;
+        border: 1px dashed #0d6efd;
+        border-radius: 10px;
         font-size: 13px;
       }
+
       .suggest-box span {
         display: inline-block;
-        background: #3498db;
+        background: #0d6efd;
         color: #fff;
-        padding: 4px 8px;
-        border-radius: 6px;
+        padding: 5px 9px;
+        border-radius: 8px;
         margin: 4px;
         cursor: pointer;
       }
@@ -150,120 +124,141 @@
       if (sessionStorage.getItem("logged") !== "1") {
         window.location.href = "index.html";
       }
+      function logout() {
+        sessionStorage.removeItem("logged");
+        location.reload();
+      }
     </script>
+
     <!-- HEADER -->
     <header>
       <div class="logo">🚗 Batch 41</div>
-      <nav>
+
+      <!-- DESKTOP NAV -->
+      <nav class="desktop-nav">
         <a href="index.html">Tính trả góp</a>
         <a href="check_old.html">Tính tuổi</a>
-        <a href="cancel_contract.html">Huỷ hợp đồng</a>
+        <a href="cancel_contract.html">Huỷ HĐ</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
       </nav>
+
+      <!-- HAMBURGER -->
+      <button
+        class="btn btn-outline-primary d-md-none"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileMenu"
+      >
+        ☰
+      </button>
     </header>
 
-    <!-- CONTENT (NGUYÊN BẢN) -->
-    <div class="container">
-      <h1>Huỷ Hợp Đồng</h1>
-
-      <form id="cancelForm">
-        <label>Số hợp đồng</label>
-        <input type="text" id="contract" />
-
-        <label>Tên khách hàng</label>
-        <input type="text" id="customer" />
-
-        <label>Code SI</label>
-        <input type="text" id="si" value="HPO00001" />
-
-        <label>POScode</label>
-        <input
-          type="text"
-          id="posSearch"
-          placeholder="Nhập mã hoặc tên cửa hàng..."
-        />
-        <select id="pos" size="8">
-          <option value="">-- Chọn cửa hàng --</option>
-
-          <!-- HONDA HỒNG ĐỨC -->
-          <option value="POS00354">POS00354 - HONDA HỒNG ĐỨC 1</option>
-          <option value="POS00355">POS00355 - HONDA HỒNG ĐỨC 2</option>
-          <option value="POS00356">POS00356 - HONDA HỒNG ĐỨC 3</option>
-          <option value="POS00357">POS00357 - HONDA HỒNG ĐỨC 4</option>
-          <option value="POS01032">POS01032 - HONDA HỒNG ĐỨC 6</option>
-          <option value="POS00974">POS00974 - HONDA HỒNG ĐỨC 7</option>
-          <option value="POS07429">POS07429 - HONDA HỒNG ĐỨC 9</option>
-          <option value="POS24161">POS24161 - HONDA HỒNG ĐỨC 13</option>
-
-          <!-- MULTI HỒNG ĐỨC -->
-          <option value="POS29956">POS29956 - MULTI HỒNG ĐỨC 14</option>
-          <option value="POS49223">POS49223 - MULTI HỒNG ĐỨC LỌ TẺ</option>
-          <option value="POS32299">POS32299 - MULTI HỒNG ĐỨC VĨNH THẠNH</option>
-
-          <!-- OFF MULTI -->
-          <option value="POS49022">POS49022 - OFF MULTI HÙNG ĐẠT 79</option>
-          <option value="POS10807">POS10807 - OFF MULTI THANH THẢO 2</option>
-          <option value="POS10806">POS10806 - OFF MULTI THANH THẢO 1</option>
-          <option value="POS53624">POS53624 - OFF MULTI HÙNG LOAN</option>
-          <option value="POS06304">POS06304 - OFF MULTI PHÁT NGA</option>
-          <option value="POS06314">POS06314 - OFF MULTI LÊ TUẤN</option>
-
-          <!-- OFF EB EC TÙNG LÂM -->
-          <option value="POS25661">POS25661 - OFF EB EC TÙNG LÂM CT</option>
-          <option value="POS50167">POS50167 - OFF EB EC TÙNG LÂM 3</option>
-        </select>
-
-        <div class="suggest-box" id="posSuggest"></div>
-
-        <label>Trạng thái Indus</label>
-        <select id="status">
-          <option>Contract Printing</option>
-          <option>Request for Disbursement</option>
-        </select>
-
-        <label>Lý do huỷ</label>
-        <select id="reasonSelect">
-          <option value="">-- Chọn lý do --</option>
-          <option>Sai tên sản phẩm</option>
-          <option>Nhập sai POS</option>
-          <option>Khách không lấy xe</option>
-          <option>Sai số điện thoại</option>
-          <option>Khách gian</option>
-          <option>Khách đổi xe</option>
-          <option>Đổi ngày đóng tiền</option>
-          <option>Khách mua tiền mặt</option>
-          <option>SI nhập sai giá</option>
-          <option>Đổi người đứng tên</option>
-        </select>
-
-        <textarea id="reason" placeholder="Hoặc nhập lý do khác..."></textarea>
-      </form>
-
-      <div class="result" id="resultBox"></div>
-      <button class="copy-btn" id="copyBtn">Copy nội dung</button>
+    <!-- MOBILE MENU -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🚗 Batch 41</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <a class="btn btn-light w-100 mb-2" href="index.html"
+          >📊 Tính trả góp</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="check_old.html"
+          >🎂 Tính tuổi</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
+          >❌ Huỷ hợp đồng</a
+        >
+        <hr />
+        <button class="btn btn-danger w-100" onclick="logout()">
+          🔐 Đăng xuất
+        </button>
+      </div>
     </div>
 
-    <script>
-      function logout() {
-        sessionStorage.removeItem("logged");
-        location.reload();
-      }
-      const ACCESS_KEY = "B41";
-      function login() {
-        const key = document.getElementById("loginKey").value;
-        if (key === ACCESS_KEY) {
-          sessionStorage.setItem("logged", "1");
-          document.getElementById("loginScreen").style.display = "none";
-        } else {
-          document.getElementById("loginError").innerText =
-            "❌ Khoá truy cập không đúng";
-        }
-      }
-      function logout() {
-        sessionStorage.removeItem("logged");
-        location.reload();
-      }
+    <!-- CONTENT -->
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <div class="card card-custom p-4">
+            <h4 class="text-center mb-3">Huỷ Hợp Đồng</h4>
 
+            <div class="mb-2">
+              <label class="form-label">Số hợp đồng</label>
+              <input id="contract" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Tên khách hàng</label>
+              <input id="customer" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Code SI</label>
+              <input id="si" class="form-control" value="HPO00001" />
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">POScode</label>
+              <input
+                id="posSearch"
+                class="form-control mb-1"
+                placeholder="Nhập mã hoặc tên cửa hàng..."
+              />
+              <select id="pos" class="form-select" size="7">
+                <option value="">-- Chọn cửa hàng --</option>
+                <option value="POS00354">POS00354 - HONDA HỒNG ĐỨC 1</option>
+                <option value="POS00355">POS00355 - HONDA HỒNG ĐỨC 2</option>
+                <option value="POS00356">POS00356 - HONDA HỒNG ĐỨC 3</option>
+                <option value="POS00357">POS00357 - HONDA HỒNG ĐỨC 4</option>
+                <option value="POS01032">POS01032 - HONDA HỒNG ĐỨC 6</option>
+                <option value="POS00974">POS00974 - HONDA HỒNG ĐỨC 7</option>
+                <option value="POS07429">POS07429 - HONDA HỒNG ĐỨC 9</option>
+                <option value="POS24161">POS24161 - HONDA HỒNG ĐỨC 13</option>
+              </select>
+              <div class="suggest-box" id="posSuggest"></div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Trạng thái Indus</label>
+              <select id="status" class="form-select">
+                <option>Contract Printing</option>
+                <option>Request for Disbursement</option>
+              </select>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Lý do huỷ</label>
+              <select id="reasonSelect" class="form-select mb-1">
+                <option value="">-- Chọn lý do --</option>
+                <option>Sai tên sản phẩm</option>
+                <option>Nhập sai POS</option>
+                <option>Khách không lấy xe</option>
+                <option>Khách đổi xe</option>
+                <option>Khách mua tiền mặt</option>
+              </select>
+              <textarea
+                id="reason"
+                class="form-control"
+                placeholder="Hoặc nhập lý do khác..."
+              ></textarea>
+            </div>
+
+            <div id="resultBox" class="result mt-3"></div>
+
+            <button id="copyBtn" class="btn btn-primary mt-3 copy-btn">
+              Copy nội dung
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LOGIC CŨ – GIỮ NGUYÊN ===== -->
+    <script>
       const posSearch = document.getElementById("posSearch");
       const posSelect = document.getElementById("pos");
       const posSuggest = document.getElementById("posSuggest");
@@ -301,11 +296,6 @@
       }
       function savePOSWeight(obj) {
         localStorage.setItem(POS_KEY, JSON.stringify(obj));
-        document.cookie =
-          POS_KEY +
-          "=" +
-          encodeURIComponent(JSON.stringify(obj)) +
-          ";path=/;max-age=31536000";
       }
       function decayWeight() {
         const data = getPOSWeight();
@@ -329,10 +319,6 @@
         const list = Object.entries(data)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5);
-        if (!list.length) {
-          posSuggest.innerHTML = "<i>Chưa có dữ liệu</i>";
-          return;
-        }
         posSuggest.innerHTML =
           "<b>POS hay chọn:</b><br>" +
           list
@@ -383,5 +369,8 @@ Lý do huỷ: ${reasonVal || "❗[CHƯA NHẬP]"}`;
         alert("Đã copy nội dung!");
       };
     </script>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

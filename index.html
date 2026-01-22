@@ -1,483 +1,270 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Công cụ HD SaiSon</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Công cụ HD SaiSon</title>
 
-    <!-- FONT -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Roboto", sans-serif;
-      }
+<style>
+*{box-sizing:border-box;font-family:Roboto}
+body{background:#f0f4f8;padding-top:56px}
 
-      body {
-        background: #f0f4f8;
-        padding-top: 85px;
-      }
+/* LOGIN */
+#loginScreen{
+  position:fixed;inset:0;
+  background:linear-gradient(135deg,#007bff,#00c6ff);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999
+}
+.login-box{
+  background:#fff;padding:30px;width:320px;border-radius:16px;
+  box-shadow:0 15px 40px rgba(0,0,0,.25);text-align:center
+}
 
-      /* ===== LOGIN ===== */
-      #loginScreen {
-        position: fixed;
-        inset: 0;
-        background: linear-gradient(135deg, #007bff, #00c6ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-      }
+/* HEADER */
+header{
+  position:fixed;top:0;left:0;right:0;height:56px;
+  background:#fff;display:flex;align-items:center;
+  justify-content:space-between;padding:0 15px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:1000
+}
+.logo{font-weight:700;color:#007bff}
+.desktop-nav a{margin-left:15px;text-decoration:none;color:#333}
+@media(max-width:768px){.desktop-nav{display:none}}
 
-      .login-box {
-        background: #fff;
-        padding: 30px 35px;
-        width: 320px;
-        border-radius: 14px;
-        text-align: center;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-      }
+/* CONTENT */
+.container-custom{
+  max-width:520px;margin:auto;background:#fff;padding:20px;
+  border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,.1)
+}
+label{font-weight:500}
+input{text-align:right;font-size:16px;padding:12px}
 
-      .login-box h2 {
-        margin-bottom: 20px;
-        color: #007bff;
-      }
+.result{
+  margin-top:20px;padding:15px;background:#e7f3ff;
+  border-left:5px solid #007bff;border-radius:12px
+}
+.plan-box{
+  background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;
+  border:1px solid #e3eaf3;box-shadow:0 4px 12px rgba(0,0,0,.08);
+  position:relative;
+  cursor:pointer;
+  transition:.25s;
+}
+.plan-row{display:flex;justify-content:space-between;font-size:14px}
+.plan-row .value{font-weight:600;color:#0d47a1}
+.plan-row.total .value{color:#e53935;font-weight:700}
+.divider{height:1px;background:#e0e0e0;margin:8px 0}
 
-      .login-box input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        margin-bottom: 15px;
-        text-align: center;
-        font-size: 16px;
-      }
+/* BEST PLAN */
+.best-plan{
+  border:2px solid #2e7d32!important;
+  background:#e8f5e9
+}
+.best-plan::before{
+  content:"💰 RẺ NHẤT";
+  position:absolute;top:-10px;right:10px;
+  background:#2e7d32;color:#fff;
+  font-size:12px;padding:2px 8px;border-radius:12px
+}
 
-      .login-box button {
-        width: 100%;
-        padding: 12px;
-        background: #007bff;
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-      }
+/* CLICK HIGHLIGHT */
+.plan-box.active{
+  border:3px solid #ff9800 !important;
+  background:#fff3e0;
+  box-shadow:0 6px 18px rgba(255,152,0,.4);
+}
+.plan-box.active::after{
+  content:"👉 KHÁCH CHỌN";
+  position:absolute;
+  top:-10px;
+  left:10px;
+  background:#ff9800;
+  color:#fff;
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:12px;
+}
+</style>
+</head>
 
-      #loginError {
-        color: red;
-        margin-top: 10px;
-        font-size: 14px;
-      }
+<body>
 
-      /* ===== HEADER ===== */
-      header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 65px;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 30px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        z-index: 1000;
-      }
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h4>🔐 Đăng nhập</h4>
+    <input id="loginKey" type="password" class="form-control mb-3" placeholder="Nhập khoá">
+    <button class="btn btn-primary w-100" onclick="login()">Xác nhận</button>
+    <p id="loginError" class="text-danger mt-2"></p>
+  </div>
+</div>
 
-      .logo {
-        font-size: 20px;
-        font-weight: 700;
-        color: #007bff;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      nav a {
-        margin-left: 22px;
-        text-decoration: none;
-        font-weight: 500;
-        color: #333;
-        padding-bottom: 4px;
-      }
-
-      nav a:hover {
-        color: #007bff;
-      }
-
-      /* ===== CONTAINER ===== */
-      .container {
-        max-width: 520px;
-        margin: auto;
-        background: #ffffff;
-        padding: 30px 40px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      }
-
-      h1 {
-        text-align: center;
-        margin-bottom: 30px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-      }
-
-      input {
-        width: 100%;
-        padding: 12px 15px;
-        margin-bottom: 18px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 16px;
-        text-align: right;
-      }
-
-      button {
-        width: 100%;
-        padding: 15px;
-        background: #007bff;
-        color: #fff;
-        font-size: 16px;
-        font-weight: 500;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-      }
-
-      .switch-box {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-      }
-
-      .switch-box button {
-        flex: 1;
-      }
-
-      .result {
-        margin-top: 25px;
-        padding: 20px;
-        background: #e7f3ff;
-        border-left: 6px solid #007bff;
-        border-radius: 10px;
-      }
-
-      .result ul {
-        list-style: none;
-        margin-top: 10px;
-      }
-
-      .result li {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-        background: #f5f9ff;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        font-weight: 500;
-      }
-
-      .month {
-        color: #007bff;
-      }
-
-      .plan-item {
-        list-style: none;
-        margin-bottom: 12px;
-      }
-
-      .plan-box {
-        background: white;
-        border-radius: 14px;
-        padding: 16px 20px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e3eaf3;
-
-        width: 100%;
-      }
-
-      .plan-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 15px;
-      }
-
-      .plan-row .label {
-        color: #555;
-      }
-
-      .plan-row .value {
-        font-weight: 600;
-        color: #0d47a1;
-      }
-
-      .plan-row.total .value {
-        color: #e53935;
-        font-weight: 700;
-      }
-
-      .divider {
-        height: 1px;
-        background: #e0e0e0;
-        margin: 10px 0;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- LOGIN -->
-    <div id="loginScreen">
-      <div class="login-box">
-        <h2>🔐 Đăng nhập</h2>
-        <input type="password" id="loginKey" placeholder="Nhập khoá truy cập" />
-        <button onclick="login()">Xác nhận</button>
-        <p id="loginError"></p>
-      </div>
-    </div>
-
-    <!-- HEADER -->
+<!-- ===== HEADER ===== -->
     <header>
       <div class="logo">🚗 Batch 41</div>
-      <nav>
+
+      <!-- DESKTOP NAV -->
+      <nav class="desktop-nav">
         <a href="index.html">Tính trả góp</a>
         <a href="check_old.html">Tính tuổi</a>
-        <a href="cancel_contract.html">Huỷ hợp đồng</a>
+        <a href="cancel_contract.html">Huỷ HĐ</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
       </nav>
+
+      <!-- HAMBURGER -->
+      <button
+        class="btn btn-outline-primary d-md-none"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileMenu"
+      >
+        ☰
+      </button>
     </header>
 
-    <!-- CONTENT -->
-    <div class="container">
-      <h1>Tính Trả Góp Xe</h1>
-
-      <label>Giá xe (VNĐ)</label>
-      <input
-        type="text"
-        id="giaXe"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        placeholder="Nhập giá xe"
-      />
-
-      <label>Trả trước (VNĐ)</label>
-
-      <input
-        type="text"
-        id="traTien"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        placeholder="Nhập số tiền trả trước"
-      />
-
-      <label>Trả trước (%)</label>
-      <input
-        type="text"
-        id="traPercent"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        placeholder="Nhập %"
-      />
-
-      <!-- SWITCH -->
-      <div class="switch-box">
-        <button id="btn099" onclick="setPackage(0.99)">Gói 0.99</button>
-        <button id="btn089" onclick="setPackage(0.89)" style="background: #aaa">
-          Gói 0.89
-        </button>
-        <button id="btn166" onclick="setPackage(1.66)" style="background: #aaa">
-          Gói 1.66
-        </button>
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🚗 Batch 41</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+        ></button>
       </div>
-
-      <button onclick="tinhTraGop()">Tính trả góp</button>
-
-      <div class="result" id="result" style="display: none"></div>
+      <div class="offcanvas-body">
+        <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
+        <a class="btn btn-light w-100 mb-2" href="check_old.html">🎂 Tính tuổi</a>
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
+        <hr />
+        <button class="btn btn-danger w-100" onclick="logout()">🔐 Đăng xuất</button>
+      </div>
     </div>
 
-    <script>
-      /* ===== LOGIN LOGIC ===== */
-      const ACCESS_KEY = "B41";
+<!-- CONTENT -->
+<div class="container-custom mt-3">
+<h5 class="text-center">TÍNH TRẢ GÓP XE</h5>
 
-      function login() {
-        const key = document.getElementById("loginKey").value;
-        if (key === ACCESS_KEY) {
-          sessionStorage.setItem("logged", "1");
-          document.getElementById("loginScreen").style.display = "none";
-        } else {
-          document.getElementById("loginError").innerText =
-            "❌ Khoá truy cập không đúng";
-        }
-      }
+<label>Giá xe</label>
+<input id="giaXe" class="form-control mb-3" oninput="onGiaXeChange()">
 
-      function logout() {
-        sessionStorage.removeItem("logged");
-        location.reload();
-      }
+<label>Trả trước (VNĐ)</label>
+<input id="traTien" class="form-control mb-3" oninput="onTraTienChange()">
 
-      window.onload = () => {
-        if (sessionStorage.getItem("logged") === "1") {
-          document.getElementById("loginScreen").style.display = "none";
-        }
-      };
+<label>Trả trước (%)</label>
+<input id="traPercent" class="form-control mb-2" oninput="onTraPercentChange()">
 
-      /* ===== TOOL LOGIC (GIỮ NGUYÊN + BỔ SUNG) ===== */
-      const giaXeInput = document.getElementById("giaXe");
-      const traTienInput = document.getElementById("traTien");
-      const traPercentInput = document.getElementById("traPercent");
+<div class="d-flex gap-2 mb-3">
+  <button class="btn btn-outline-secondary w-100" onclick="setPercent(20)">20%</button>
+  <button class="btn btn-outline-secondary w-100" onclick="setPercent(30)">30%</button>
+  <button class="btn btn-outline-secondary w-100" onclick="setPercent(40)">40%</button>
+</div>
 
-      let currentPackage = 0.99;
+<div class="d-flex gap-2 mb-3">
+  <button id="btn099" class="btn btn-primary w-100" onclick="setPackage(0.99)">0.99</button>
+  <button id="btn089" class="btn btn-secondary w-100" onclick="setPackage(0.89)">0.89</button>
+  <button id="btn166" class="btn btn-secondary w-100" onclick="setPackage(1.66)">1.66</button>
+</div>
 
-      function formatNumber(n) {
-        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      }
+<div id="result" class="result" style="display:none"></div>
 
-      function parseNumber(v) {
-        return parseFloat(v.replace(/\./g, "")) || 0;
-      }
+<button class="btn btn-warning w-100 mt-2" onclick="exportImage()">📸 Xuất ảnh gửi Zalo</button>
+</div>
 
-      giaXeInput.addEventListener("input", (e) => {
-        let v = e.target.value.replace(/\D/g, "");
-        e.target.value = v ? formatNumber(v) : "";
-        updatePercent();
-      });
+<script>
+const ACCESS_KEY="B41";
+function login(){loginKey.value===ACCESS_KEY?(loginScreen.style.display="none",sessionStorage.setItem("logged","1")):loginError.innerText="Sai khoá"}
+function logout(){sessionStorage.clear();location.reload()}
+window.onload=()=>{if(sessionStorage.getItem("logged")==="1")loginScreen.style.display="none"}
 
-      traTienInput.addEventListener("input", (e) => {
-        let v = e.target.value.replace(/\D/g, "");
-        e.target.value = v ? formatNumber(v) : "";
-        updatePercent();
-      });
+const heSo99={9:0.126179,12:0.098233,15:0.081497,18:0.070365,21:0.06244,24:0.05651,36:0.042809};
+const heSo089={9:0.12517,12:0.09723,15:0.08049,18:0.06936,21:0.06143,24:0.05548};
+const heSo166={18:0.07719,21:0.069355,24:0.063512,36:0.050251};
 
-      traPercentInput.addEventListener("input", () => {
-        const giaXe = parseNumber(giaXeInput.value);
-        const p = parseFloat(traPercentInput.value);
-        if (giaXe > 0) {
-          traTienInput.value = formatNumber(Math.round((giaXe * p) / 100));
-        }
-      });
+let currentPackage=0.99,lock=false;
 
-      function updatePercent() {
-        const giaXe = parseNumber(giaXeInput.value);
-        const tien = parseNumber(traTienInput.value);
-        if (giaXe > 0)
-          traPercentInput.value = ((tien / giaXe) * 100).toFixed(2);
-      }
+const format=n=>n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
+const parse=v=>parseFloat(v.replace(/\./g,""))||0;
+const ceil=n=>Math.ceil(n/1000)*1000;
+const formatInput=el=>el.value=format(el.value.replace(/\D/g,""));
 
-      const heSo99 = {
-        9: 0.1261792333,
-        12: 0.0982338,
-        15: 0.0814975,
-        18: 0.07036566666,
-        21: 0.06244,
-        24: 0.05651,
-        36: 0.042809,
-      };
+function setPercent(p){traPercent.value=p;onTraPercentChange()}
+function setPackage(p){
+  currentPackage=p;
+  btn099.className=p===0.99?"btn btn-primary w-100":"btn btn-secondary w-100";
+  btn089.className=p===0.89?"btn btn-primary w-100":"btn btn-secondary w-100";
+  btn166.className=p===1.66?"btn btn-primary w-100":"btn btn-secondary w-100";
+  autoTinh();
+}
 
-      const heSo089 = {
-        9: 0.12517,
-        12: 0.09723,
-        15: 0.08049,
-        18: 0.06936,
-        21: 0.06143,
-        24: 0.05548,
-      };
+function onGiaXeChange(){formatInput(giaXe);autoTinh()}
+function onTraTienChange(){
+  if(lock)return;lock=true;
+  formatInput(traTien);
+  if(parse(giaXe.value)>0)
+    traPercent.value=((parse(traTien.value)/parse(giaXe.value))*100).toFixed(2);
+  lock=false;autoTinh();
+}
+function onTraPercentChange(){
+  if(lock)return;lock=true;
+  traTien.value=format(ceil(parse(giaXe.value)*parseFloat(traPercent.value||0)/100));
+  lock=false;autoTinh();
+}
 
-      const heSo166 = {
-        18: 0.07719,
-        21: 0.069355,
-        24: 0.063512,
-        36: 0.050251,
-      };
-      function setPackage(p) {
-        currentPackage = p;
+function autoTinh(){
+  if(parse(giaXe.value)>0 && parse(traTien.value)<parse(giaXe.value)) tinhTraGop();
+  else result.style.display="none";
+}
 
-        document.getElementById("btn099").style.background =
-          p === 0.99 ? "#007bff" : "#aaa";
-        document.getElementById("btn089").style.background =
-          p === 0.89 ? "#007bff" : "#aaa";
-        document.getElementById("btn166").style.background =
-          p === 1.66 ? "#007bff" : "#aaa";
+function tinhTraGop(){
+  const vay=parse(giaXe.value)-parse(traTien.value);
+  const heSo=currentPackage===0.99?heSo99:currentPackage===0.89?heSo089:heSo166;
 
-        if (document.getElementById("result").style.display === "block") {
-          tinhTraGop();
-        }
-      }
-      function ceilToThousand(n) {
-        return Math.ceil(n / 1000) * 1000;
-      }
+  let min=Infinity,plans=[];
+  for(let t in heSo){
+    const thang=ceil(vay*heSo[t]+12000);
+    const lai=thang*t-vay;
+    if(lai<min)min=lai;
+    plans.push({t,thang,lai});
+  }
 
-      function tinhTraGop() {
-        const giaXe = parseNumber(giaXeInput.value);
-        const traTruoc = parseNumber(traTienInput.value);
+  let html=`<b>Giá xe:</b> ${format(giaXe.value)} đ<br>
+            <b>Trả trước:</b> ${format(traTien.value)} đ<br>
+            <b>Khoản vay:</b> ${format(vay)} đ<br><br>`;
+  plans.forEach(p=>{
+    html+=`
+    <div class="plan-box ${p.lai===min?'best-plan':''}" onclick="selectPlan(this)">
+      <div class="plan-row"><strong>${p.t} tháng</strong></div>
+      <div class="plan-row"><span>Trả/tháng</span><span class="value">${format(p.thang)} đ</span></div>
+      <div class="divider"></div>
+      <div class="plan-row total"><span>Tổng lãi</span><span class="value">${format(p.lai)} đ</span></div>
+    </div>`;
+  });
 
-        if (giaXe <= 0 || traTruoc > giaXe) {
-          alert("Dữ liệu không hợp lệ!");
-          return;
-        }
+  result.innerHTML=html;
+  result.style.display="block";
+}
 
-        const vay = giaXe - traTruoc;
-        let heSo;
+function selectPlan(el){
+  document.querySelectorAll('.plan-box').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
 
-        switch (currentPackage) {
-          case 0.99:
-            heSo = heSo99;
-            break;
-          case 0.89:
-            heSo = heSo089;
-            break;
-          case 1.66:
-            heSo = heSo166;
-            break;
-          default:
-            heSo = heSo99;
-        }
+function exportImage(){
+  if(result.style.display==="none")return alert("Chưa có dữ liệu");
+  html2canvas(result).then(c=>{
+    const a=document.createElement("a");
+    a.href=c.toDataURL();
+    a.download="bang-tra-gop-hdsaison.png";
+    a.click();
+  });
+}
+</script>
 
-        let html = `<b>Khoản vay:</b> ${formatNumber(vay)} VNĐ<br><br><ul>`;
-
-        for (let thang in heSo) {
-          let tienThang = vay * heSo[thang] + 12000;
-          let tongTra = ceilToThousand(tienThang) * thang;
-          let lai = tongTra - vay;
-
-          html += `
-          <li class="plan-item">
-  <div class="plan-box">
-    <div class="plan-row">
-      <span class="label">${thang} tháng</span>
-      <span class="value">${formatNumber(
-        ceilToThousand(tienThang)
-      )} đ / tháng</span>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="plan-row total">
-      <span class="label">Tổng lãi</span>
-      <span class="value">${formatNumber(ceilToThousand(lai))} đ</span>
-    </div>
-  </div>
-</li>
-          `;
-        }
-
-        html += "</ul>";
-
-        const result = document.getElementById("result");
-        result.style.display = "block";
-        result.innerHTML = html;
-      }
-    </script>
-  </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
