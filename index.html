@@ -165,8 +165,10 @@ input{text-align:right;font-size:16px;padding:12px}
 </div>
 
 <div class="d-flex gap-2 mb-3">
-  <button id="btn099" class="btn btn-primary w-100" onclick="setPackage(0.99)">0.99</button>
+  <!-- <button id="btn099" class="btn btn-primary w-100" onclick="setPackage(0.99)">0.99</button> -->
+  <button id="btn121" class="btn btn-primary w-100" onclick="setPackage(1.21)">1.21</button>
   <button id="btn089" class="btn btn-secondary w-100" onclick="setPackage(0.89)">0.89</button>
+  <!-- <button id="btn121" class="btn btn-secondary w-100" onclick="setPackage(1.21)">1.21</button> -->
   <button id="btn166" class="btn btn-secondary w-100" onclick="setPackage(1.66)">1.66</button>
 </div>
 
@@ -181,11 +183,14 @@ function login(){loginKey.value===ACCESS_KEY?(loginScreen.style.display="none",s
 function logout(){sessionStorage.clear();location.reload()}
 window.onload=()=>{if(sessionStorage.getItem("logged")==="1")loginScreen.style.display="none"}
 
-const heSo99={9:0.126179,12:0.098233,15:0.081497,18:0.070365,21:0.06244,24:0.05651,36:0.042809};
+// const heSo99={9:0.126179,12:0.098233,15:0.081497,18:0.070365,21:0.06244,24:0.05651,36:0.042809};
 const heSo089={9:0.12517,12:0.09723,15:0.08049,18:0.06936,21:0.06143,24:0.05548};
+const heSo121={9:0.12837,12:0.1004,15:0.08367,18:0.07256,21:0.06465,24:0.05874,36:0.04516};
 const heSo166={18:0.07719,21:0.069355,24:0.063512,36:0.050251};
 
-let currentPackage=0.99,lock=false;
+
+// let currentPackage=0.99,lock=false;
+let currentPackage=1.21,lock=false;
 
 const format=n=>n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
 const parse=v=>parseFloat(v.replace(/\./g,""))||0;
@@ -195,7 +200,7 @@ const formatInput=el=>el.value=format(el.value.replace(/\D/g,""));
 function setPercent(p){traPercent.value=p;onTraPercentChange()}
 function setPackage(p){
   currentPackage=p;
-  btn099.className=p===0.99?"btn btn-primary w-100":"btn btn-secondary w-100";
+  // btn099.className=p===0.99?"btn btn-primary w-100":"btn btn-secondary w-100";
   btn089.className=p===0.89?"btn btn-primary w-100":"btn btn-secondary w-100";
   btn166.className=p===1.66?"btn btn-primary w-100":"btn btn-secondary w-100";
   autoTinh();
@@ -222,7 +227,8 @@ function autoTinh(){
 
 function tinhTraGop(){
   const vay=parse(giaXe.value)-parse(traTien.value);
-  const heSo=currentPackage===0.99?heSo99:currentPackage===0.89?heSo089:heSo166;
+  // const heSo=currentPackage===0.99?heSo99:currentPackage===0.89?heSo089:heSo166;
+  const heSo=currentPackage===1.21?heSo121:currentPackage===0.89?heSo089:heSo166;
 
   let min=Infinity,plans=[];
   for(let t in heSo){
