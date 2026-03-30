@@ -16,90 +16,47 @@
     />
   <style>
     :root{
-      --bg:#f5f8fb;
+      --bg:#f4f7fb;
       --card:#ffffff;
       --accent:#2b8be6;
+      --accent-2:#1e88e5;
       --danger:#e53935;
       --muted:#6b7280;
-      --border:#d6dbe6;
-      --shadow: 0 6px 18px rgba(43,67,99,0.08);
-      --radius:8px;
+      --border:#e6eef9;
+      --shadow: 0 8px 30px rgba(43,67,99,0.08);
+      --radius:12px;
+      --max-width:1100px;
     }
     *{ box-sizing: border-box; font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial; }
-    h1{font-size:20px; margin-bottom:10px}
-    .chart-wrap{max-width:1000px; height:420px}
-    canvas{background:#fff; border:1px solid #eee; width:100% !important; height:100% !important; display:block}
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 56px;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        z-index: 1000;
-    }
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 56px;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        z-index: 1000;
-      }
-      .logo {
-        font-weight: 700;
-        color: #007bff;
-      }
-      .desktop-nav a {
-        margin-left: 15px;
-        font-size: 14px;
-        text-decoration: none;
-        color: #333;
-      }
-      @media (max-width: 768px) {
-        .desktop-nav {
-          display: none;
-        }
-      }
+    body{ background: var(--bg); color:#24313a; -webkit-font-smoothing:antialiased }
+    h1{font-size:20px; margin-bottom:12px; font-weight:700}
+    header{ position:fixed; top:0; left:0; right:0; height:64px; background:linear-gradient(90deg,#fff,#fbfdff); display:flex; align-items:center; justify-content:space-between; padding:0 18px; box-shadow:var(--shadow); z-index:1000 }
+    .logo{ font-weight:800; color:var(--accent); font-size:16px }
+    .desktop-nav a{ margin-left:14px; font-size:14px; color:#2b3b4a; text-decoration:none }
+    @media (max-width:768px){ .desktop-nav{ display:none } }
+    .page{ max-width:var(--max-width); margin:0 auto; padding-top:92px; padding-left:16px; padding-right:16px }
 
-      .container-custom {
-        max-width: 520px;
-        margin: auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      }
+    .chart-wrap{ max-width:1000px; height:460px; margin:0 auto; border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow); border:1px solid var(--border); padding:18px }
+    canvas{ width:100% !important; height:100% !important; display:block }
 
-      input {
-        text-align: right;
-        font-size: 16px;
-        padding: 12px;
-      }
-      @media (max-width: 768px) {
-        .chart-wrap{height:300px}
-        input{padding:8px; font-size:14px}
-      }
-        @media (max-width: 480px) {
-          #summaryBox > div { min-width:160px }
-          #summaryBox table { font-size:13px }
-        }
-      label {
-        font-weight: 500;
-      }
-    .hamburger{display:none}
-    .page{max-width:1100px; margin:0 auto; padding-top:76px}
+    /* Inputs */
+    .mb-3 .form-control{ border:1px solid #e6eef9; border-radius:10px; background:linear-gradient(180deg,#fff,#fbfdff); padding:10px 12px }
+    .mb-3 label{ font-weight:600; color:var(--muted); font-size:13px }
+    input[type='text']{ text-align:right }
+
+    /* Summary boxes */
+    #summaryBox{ margin-top:18px; display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start }
+    #summaryBox > div { flex:1; min-width:220px }
+    #summaryBox table{ width:100%; border-collapse:separate; border-spacing:0; border-radius:10px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.04) }
+    #summaryBox td{ padding:10px; border-bottom:1px solid rgba(46,66,90,0.06); background-clip:padding-box }
+    #summaryBox tr:last-child td{ border-bottom:0 }
+
+    /* Buttons */
+    .btn-primary{ background:var(--accent); border:none; box-shadow:none }
+    .btn-outline-secondary{ border-radius:10px }
+    /* Save button sizing to match inputs */
+    #saveTargetsBtn{ height:40px; display:inline-flex; align-items:center; padding:6px 14px; border-radius:10px }
+
     /* Modal / login input styling */
     .modal .modal-dialog{ max-width:420px }
     .modal .modal-content{ border-radius:12px; padding:0; overflow:hidden }
@@ -107,13 +64,14 @@
     .modal .modal-title{ margin:0; font-weight:700; font-size:18px }
     .modal .modal-body{ padding:18px 20px }
     .modal .form-label{ font-weight:600; font-size:14px }
-    /* single outer border for the input+button, avoid double borders */
-    .modal .input-group{ border:1px solid #d1d5db; border-radius:8px; overflow:hidden; display:flex; align-items:center }
+    .modal .input-group{ border:1px solid #e6eef9; border-radius:10px; overflow:hidden; display:flex; align-items:center }
     .modal .input-group .form-control{ border:0; box-shadow:none; border-radius:0; padding:10px 12px }
-    .modal .input-group .btn{ border:0; box-shadow:none; min-width:44px; padding:6px 8px; display:flex; align-items:center; justify-content:center; background:transparent; color:inherit }
-    .modal .input-group .btn:focus{ box-shadow:none }
+    .modal .input-group .btn{ border:0; box-shadow:none; min-width:44px; padding:6px 8px; background:transparent }
     #loginError{ font-size:14px }
     @media (max-width:420px){ .modal .modal-dialog{ max-width:92% } }
+
+    @media (max-width:768px){ .chart-wrap{ height:340px } .page{ padding-top:86px } }
+    @media (max-width:480px){ #summaryBox > div{ min-width:160px } #summaryBox table{ font-size:13px } }
   </style>
 </head>
 <body>
@@ -167,7 +125,7 @@
 
   <!-- Inputs for targets -->
   <div class="mb-3">
-    <div class="d-flex w-100 gap-2 flex-column flex-md-row flex-wrap align-items-start">
+    <div class="d-flex w-100 gap-2 flex-column flex-md-row flex-wrap align-items-center">
       <div class="d-flex align-items-center gap-2 me-3">
         <label class="mb-0 me-2 text-muted">Chỉ tiêu MC:</label>
         <input id="inputTargetMC" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
@@ -176,10 +134,10 @@
         <label class="mb-0 ms-0 me-2 text-muted">Chỉ tiêu DL:</label>
         <input id="inputTargetDL" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
       </div>
-    </div>
-    <div class="mt-2 d-flex justify-content-start align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2">
       <button id="saveTargetsBtn" class="btn btn-primary">Lưu</button>
       <span id="saveStatus" class="text-success"></span>
+      </div>
     </div>
   </div>
 
@@ -187,15 +145,15 @@
   <div class="mb-3">
     <div class="d-flex gap-2 flex-column flex-sm-row align-items-start">
       <div class="d-flex flex-column">
-        <label class="mb-1 text-muted">From</label>
+        <label class="mb-1 text-muted">Từ ngày</label>
         <input id="inputFromDate" type="date" class="form-control" />
       </div>
       <div class="d-flex flex-column">
-        <label class="mb-1 text-muted">To</label>
+        <label class="mb-1 text-muted">Đến ngày</label>
         <input id="inputToDate" type="date" class="form-control" />
       </div>
       <div class="d-flex align-items-end">
-        <button id="reloadDataBtn" class="btn btn-outline-secondary">Tải dữ liệu</button>
+          <!-- Tải dữ liệu removed: auto-load on date change -->
       </div>
     </div>
   </div>
@@ -402,7 +360,8 @@
       const id = authUser.id;
       const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
       const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
-      const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+      // include pagination params (page & size) - API rejects requests without them
+      const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
       return fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
         .then(async r=>{
           if(!r.ok){
@@ -416,8 +375,8 @@
           return r.json();
         })
         .then(data=>{
-          // expect API returns an array or an object with contracts array
-          const arr = data.contracts || data || [];
+          // expect API returns either a paged object (`content`), an object with `contracts`, or a raw array
+          const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
           mcAch = 0; dlAch = 0;
           arr.forEach(c=>{
             const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
@@ -444,7 +403,28 @@
     const togglePassBtn = document.getElementById('togglePassBtn');
     const inputFromDate = document.getElementById('inputFromDate');
     const inputToDate = document.getElementById('inputToDate');
-    const reloadDataBtn = document.getElementById('reloadDataBtn');
+      // const reloadDataBtn = document.getElementById('reloadDataBtn'); // Removed manual reload button
+      // Auto-load when date inputs change (debounced)
+      let _loadTimer = null;
+      function scheduleReload(){
+        clearTimeout(_loadTimer);
+        _loadTimer = setTimeout(()=>{
+          const f = inputFromDate.value || defaultFromDate();
+          const t = inputToDate.value || defaultToDate();
+          fetchAchievedFromData(f,t).then(()=>{
+            const stored = getStoredTargets();
+            renderChart(stored.mcTarget, stored.dlTarget);
+            renderSummary(stored.mcTarget, stored.dlTarget);
+          }).catch(err=>{
+            console.warn('Tải dữ liệu lỗi', err);
+            const msg = document.createElement('div'); msg.style.color='red'; msg.style.marginTop='8px';
+            msg.textContent = 'Tải dữ liệu lỗi: ' + (err && err.message ? err.message : 'Kiểm tra kết nối và đăng nhập');
+            document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
+          });
+        }, 350);
+      }
+      if(inputFromDate) inputFromDate.addEventListener('change', scheduleReload);
+      if(inputToDate) inputToDate.addEventListener('change', scheduleReload);
 
     // Toggle password visibility
     if(togglePassBtn){
@@ -541,20 +521,8 @@
     // Kickoff: set default date inputs and then auth check
     if(inputFromDate) inputFromDate.value = defaultFromDate();
     if(inputToDate) inputToDate.value = defaultToDate();
-    if(reloadDataBtn){ reloadDataBtn.addEventListener('click', ()=>{
-      const f = inputFromDate.value || defaultFromDate();
-      const t = inputToDate.value || defaultToDate();
-      fetchAchievedFromData(f,t).then(()=>{
-        const stored = getStoredTargets();
-        renderChart(stored.mcTarget, stored.dlTarget);
-        renderSummary(stored.mcTarget, stored.dlTarget);
-      }).catch(err=>{
-        console.warn('Tải dữ liệu lỗi', err);
-        const msg = document.createElement('div'); msg.style.color='red'; msg.style.marginTop='8px';
-        msg.textContent = 'Tải dữ liệu lỗi: ' + (err && err.message ? err.message : 'Kiểm tra kết nối và đăng nhập');
-        document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
-      });
-    }); }
+      // Removed manual reload button event listener
+      // if(reloadDataBtn){ reloadDataBtn.addEventListener('click', scheduleReload); }
 
     if(getAuthToken()) startApp(); else showLogin();
 
