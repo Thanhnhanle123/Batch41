@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biểu đồ tổng quan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  <style>
+    :root{
+      --bg:#f5f8fb;
+      --card:#ffffff;
+      --accent:#2b8be6;
+      --danger:#e53935;
+      --muted:#6b7280;
+      --border:#d6dbe6;
+      --shadow: 0 6px 18px rgba(43,67,99,0.08);
+      --radius:8px;
+    }
+    *{ box-sizing: border-box; font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial; }
+    h1{font-size:20px; margin-bottom:10px}
+    .chart-wrap{max-width:1000px; height:420px}
+    canvas{background:#fff; border:1px solid #eee; width:100% !important; height:100% !important; display:block}
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+    }
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+      }
+      .logo {
+        font-weight: 700;
+        color: #007bff;
+      }
+      .desktop-nav a {
+        margin-left: 15px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #333;
+      }
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none;
+        }
+      }
+
+      .container-custom {
+        max-width: 520px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      input {
+        text-align: right;
+        font-size: 16px;
+        padding: 12px;
+      }
+      @media (max-width: 768px) {
+        .chart-wrap{height:300px}
+        input{padding:8px; font-size:14px}
+      }
+        @media (max-width: 480px) {
+          #summaryBox > div { min-width:160px }
+          #summaryBox table { font-size:13px }
+        }
+      label {
+        font-weight: 500;
+      }
+    .hamburger{display:none}
+    .page{max-width:1100px; margin:0 auto; padding-top:76px}
+    /* Modal / login input styling */
+    .modal .modal-dialog{ max-width:420px }
+    .modal .modal-content{ border-radius:12px; padding:0; overflow:hidden }
+    .modal .modal-header{ border-bottom:0; padding:16px 20px }
+    .modal .modal-title{ margin:0; font-weight:700; font-size:18px }
+    .modal .modal-body{ padding:18px 20px }
+    .modal .form-label{ font-weight:600; font-size:14px }
+    /* single outer border for the input+button, avoid double borders */
+    .modal .input-group{ border:1px solid #d1d5db; border-radius:8px; overflow:hidden; display:flex; align-items:center }
+    .modal .input-group .form-control{ border:0; box-shadow:none; border-radius:0; padding:10px 12px }
+    .modal .input-group .btn{ border:0; box-shadow:none; min-width:44px; padding:6px 8px; display:flex; align-items:center; justify-content:center; background:transparent; color:inherit }
+    .modal .input-group .btn:focus{ box-shadow:none }
+    #loginError{ font-size:14px }
+    @media (max-width:420px){ .modal .modal-dialog{ max-width:92% } }
+  </style>
+</head>
+<body>
+  <header>
+      <div class="logo">🚗 Batch 41</div>
+      <nav class="desktop-nav">
+        <a href="./index.html">Tính trả góp</a>
+        <a href="./check_old.html">Tính tuổi</a>
+        <a href="./cancel_contract.html">Huỷ HĐ</a>
+        <a href="./target.html">Tổng quan chỉ tiêu</a>
+        <a href="#" onclick="logout()">Đăng xuất</a>
+      </nav>
+      <!-- HAMBURGER -->
+      <button
+        class="btn btn-outline-primary d-md-none"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileMenu"
+      >
+        ☰
+      </button>
+    </header>
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🚗 Batch 41</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <a class="btn btn-light w-100 mb-2" href="index.html"
+          >📊 Tính trả góp</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="check_old.html"
+          >🎂 Tính tuổi</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
+          >❌ Huỷ hợp đồng</a
+        >
+        <hr />
+        <button class="btn btn-danger w-100" onclick="logout()">
+          🔐 Đăng xuất
+        </button>
+      </div>
+    </div>
+
+  <div class="page">
+  <h1>Tổng quan chỉ tiêu</h1>
+
+  <!-- Inputs for targets -->
+  <div class="mb-3">
+    <div class="d-flex w-100 gap-2 flex-column flex-md-row flex-wrap align-items-start">
+      <div class="d-flex align-items-center gap-2 me-3">
+        <label class="mb-0 me-2 text-muted">Chỉ tiêu MC:</label>
+        <input id="inputTargetMC" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <label class="mb-0 ms-0 me-2 text-muted">Chỉ tiêu DL:</label>
+        <input id="inputTargetDL" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
+      </div>
+    </div>
+    <div class="mt-2 d-flex justify-content-start align-items-center gap-2">
+      <button id="saveTargetsBtn" class="btn btn-primary">Lưu</button>
+      <span id="saveStatus" class="text-success"></span>
+    </div>
+  </div>
+
+  <!-- Date range for data -->
+  <div class="mb-3">
+    <div class="d-flex gap-2 flex-column flex-sm-row align-items-start">
+      <div class="d-flex flex-column">
+        <label class="mb-1 text-muted">From</label>
+        <input id="inputFromDate" type="date" class="form-control" />
+      </div>
+      <div class="d-flex flex-column">
+        <label class="mb-1 text-muted">To</label>
+        <input id="inputToDate" type="date" class="form-control" />
+      </div>
+      <div class="d-flex align-items-end">
+        <button id="reloadDataBtn" class="btn btn-outline-secondary">Tải dữ liệu</button>
+      </div>
+    </div>
+  </div>
+
+    <div class="chart-wrap p-3 bg-white rounded shadow-sm">
+    <canvas id="overviewChart"></canvas>
+  </div>
+    <!-- Login modal: will appear if no auth token is stored -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Đăng nhập</h5>
+          </div>
+          <div class="modal-body">
+            <div id="loginError" class="text-danger mb-2" style="display:none;"></div>
+            <div class="mb-3">
+              <label class="form-label">Tài khoản</label>
+              <input id="loginUsername" class="form-control" autocomplete="username" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <div class="input-group">
+                <input id="loginPassword" type="password" class="form-control" autocomplete="current-password" />
+                <button class="btn btn-outline-secondary" type="button" id="togglePassBtn" aria-label="Hiển thị mật khẩu">👁️</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- Chart.js and datalabels plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    
+    // Utility to format currency (VND)
+    function fmt(v){
+      return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' ₫';
+    }
+
+    // Defaults for targets (can be overridden by user/localStorage)
+    const DEFAULT_MC = 164000000;
+    const DEFAULT_DL = 80000000;
+    // Achieved numbers will be computed from data.json (API) below
+    let mcAch = 0;
+    let dlAch = 0;
+
+    // Fetch data.json and compute achieved amounts grouped by type
+    function fetchAchievedFromData(){
+      return fetch('data.json')
+        .then(r=>{
+          if(!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(data=>{
+          mcAch = 0; dlAch = 0;
+          const arr = data.contracts || [];
+          arr.forEach(c=>{
+            const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+            if(!ty) return;
+            // prefer financedAmount, fallback to totalPurchase
+            const val = Number(c.financedAmount || c.totalPurchase || 0);
+            if(ty === 'MC') mcAch += val; else if(ty === 'DL') dlAch += val;
+          });
+          return { mcAch, dlAch };
+        });
+    }
+
+    function parseNumberInput(s){
+      if(s === null || s === undefined) return 0;
+      // remove dots/commas/spaces
+      const cleaned = String(s).replace(/[\.\,\s]/g,'');
+      const n = Number(cleaned);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function getStoredTargets(){
+      const m = parseNumberInput(localStorage.getItem('targetMC')) || DEFAULT_MC;
+      const d = parseNumberInput(localStorage.getItem('targetDL')) || DEFAULT_DL;
+      return { mcTarget: m, dlTarget: d };
+    }
+
+    // Set up initial input values
+    const inputMC = document.getElementById('inputTargetMC');
+    const inputDL = document.getElementById('inputTargetDL');
+    const saveBtn = document.getElementById('saveTargetsBtn');
+    const saveStatus = document.getElementById('saveStatus');
+
+    // Chart rendering logic
+    let chartInstance = null;
+    function renderChart(mcTarget, dlTarget){
+      const data = {
+        labels: ['Chỉ Tiêu','Số tiền đã đạt'],
+        datasets: [
+          { label: 'MC', backgroundColor: '#2b8be6', data: [mcTarget, mcAch], stack: 'stack1' },
+          { label: 'DL', backgroundColor: '#e64b4b', data: [dlTarget, dlAch], stack: 'stack1' }
+        ]
+      };
+
+      const cfg = {
+        type: 'bar',
+        data: data,
+        plugins: [ChartDataLabels],
+        options: {
+          plugins: {
+            legend: { position: 'top' },
+            datalabels: { color: '#fff', anchor: 'center', formatter: v=> v ? fmt(v) : '', font: { weight: '600' } },
+            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: v=> v.toLocaleString('vi-VN') + ' ₫' } } }
+        }
+      };
+
+      const ctx = document.getElementById('overviewChart').getContext('2d');
+      if(chartInstance) { chartInstance.destroy(); }
+      chartInstance = new Chart(ctx, cfg);
+    }
+
+    function renderSummary(mcTarget, dlTarget){
+      const mcTotal = mcTarget;
+      const mcAchieved = mcAch;
+      const mcRemain = mcTotal - mcAchieved;
+      const mcRate = mcTotal ? (mcAchieved / mcTotal * 100) : 0;
+
+      const dlTotal = dlTarget;
+      const dlAchieved = dlAch;
+      const dlRemain = dlTotal - dlAchieved;
+      const dlRate = dlTotal ? (dlAchieved / dlTotal * 100) : 0;
+
+      const totalTarget = mcTotal + dlTotal;
+      const totalAch = mcAchieved + dlAchieved;
+      const totalRemain = totalTarget - totalAch;
+      const totalRate = totalTarget ? (totalAch / totalTarget * 100) : 0;
+
+      const summaryHtml = `
+        <div id="summaryBox" style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">
+          <div style="flex:1; min-width:220px;">
+            <table style="width:100%; border-collapse:collapse; font-size:15px; background:#eef7ff; border:2px solid #2f3b52;">
+              <tr><td style="border:1px solid #2f3b52; padding:10px; font-weight:700;">MC - Chỉ tiêu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#1e88e5; font-weight:700;">${fmt(mcTotal)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Đã đạt</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${fmt(mcAchieved)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Còn thiếu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e53935">${fmt(mcRemain)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tỷ lệ</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${mcRate.toFixed(2)}%</td></tr>
+            </table>
+          </div>
+
+          <div style="flex:1; min-width:220px;">
+            <table style="width:100%; border-collapse:collapse; font-size:15px; background:#fff5f5; border:2px solid #2f3b52;">
+              <tr><td style="border:1px solid #2f3b52; padding:10px; font-weight:700;">DL - Chỉ tiêu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e64b4b; font-weight:700;">${fmt(dlTotal)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Đã đạt</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${fmt(dlAchieved)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Còn thiếu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e53935">${fmt(dlRemain)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tỷ lệ</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${dlRate.toFixed(2)}%</td></tr>
+            </table>
+          </div>
+
+          <div style="flex:1; min-width:220px;">
+            <table style="width:100%; border-collapse:collapse; font-size:15px; background:#e9edf3; border:2px solid #2f3b52;">
+              <tr><td style="border:1px solid #2f3b52; padding:10px; font-weight:700;">Tổng</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#2f3b52; font-weight:700;">${fmt(totalTarget)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tổng đã đạt</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${fmt(totalAch)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tổng thiếu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e53935">${fmt(totalRemain)}</td></tr>
+              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tỷ lệ</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${totalRate.toFixed(2)}%</td></tr>
+            </table>
+          </div>
+        </div>
+      `;
+      // replace or insert
+      const existing = document.getElementById('summaryBox');
+      if(existing) existing.outerHTML = summaryHtml; else document.querySelector('.chart-wrap').insertAdjacentHTML('afterend', summaryHtml);
+    }
+
+    // AUTH helpers
+    function getAuthToken(){ return localStorage.getItem('authToken'); }
+    function setAuthToken(t){ localStorage.setItem('authToken', t); }
+    function clearAuthToken(){ localStorage.removeItem('authToken'); }
+
+    // Fetch wrapper that sends Authorization header when token present
+    // Accepts optional from/to dates in input date format (YYYY-MM-DD). The API expects DD-MM-YYYY
+    function formatApiDateFromInput(d){ // 'YYYY-MM-DD' -> 'DD-MM-YYYY'
+      if(!d) return '';
+      const parts = d.split('-'); if(parts.length !== 3) return d;
+      return parts[2] + '-' + parts[1] + '-' + parts[0];
+    }
+
+    function getStoredAuthUser(){
+      try{ const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; }catch(e){ return null; }
+    }
+
+    function fetchAchievedFromData(fromInput, toInput){
+      const token = getAuthToken();
+      const authUser = getStoredAuthUser();
+      console.log('Token:', token, 'Auth User:', authUser);
+      // require token and user id — always call the contracts API
+      if(!(token && authUser && authUser.id)){
+        return Promise.reject(new Error('No auth token or user info available'));
+      }
+      const id = authUser.id;
+      const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
+      const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
+      const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+      return fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
+        .then(async r=>{
+          if(!r.ok){
+            // try to read response body (json or text) to show better error
+            let bodyText = '';
+            try{ bodyText = await r.text(); }catch(e){}
+            const trace = r.headers.get('tracelogid') || r.headers.get('TraceLogId') || '';
+            const msg = `HTTP ${r.status}` + (bodyText ? (': ' + bodyText) : '') + (trace ? (' (trace:' + trace + ')') : '');
+            throw new Error(msg);
+          }
+          return r.json();
+        })
+        .then(data=>{
+          // expect API returns an array or an object with contracts array
+          const arr = data.contracts || data || [];
+          mcAch = 0; dlAch = 0;
+          arr.forEach(c=>{
+            const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+            if(!ty) return;
+            const val = Number(c.financedAmount || c.totalPurchase || 0);
+            if(ty === 'MC') mcAch += val; else if(ty === 'DL') dlAch += val;
+          });
+          return { mcAch, dlAch };
+        });
+    }
+
+    // date helpers: default to current month
+    function pad(n){ return n<10 ? '0'+n : String(n); }
+    function defaultFromDate(){ const d = new Date(); d.setDate(1); return d.toISOString().slice(0,10); }
+    function defaultToDate(){ const d = new Date(); return d.toISOString().slice(0,10); }
+
+    // Login modal handling
+    const loginModalEl = document.getElementById('loginModal');
+    const loginModal = new bootstrap.Modal(loginModalEl, { backdrop: 'static', keyboard: false });
+    const loginBtnEl = document.getElementById('loginBtn');
+    const loginErrorEl = document.getElementById('loginError');
+    const loginUserEl = document.getElementById('loginUsername');
+    const loginPassEl = document.getElementById('loginPassword');
+    const togglePassBtn = document.getElementById('togglePassBtn');
+    const inputFromDate = document.getElementById('inputFromDate');
+    const inputToDate = document.getElementById('inputToDate');
+    const reloadDataBtn = document.getElementById('reloadDataBtn');
+
+    // Toggle password visibility
+    if(togglePassBtn){
+      togglePassBtn.addEventListener('click', ()=>{
+        if(loginPassEl.type === 'password'){
+          loginPassEl.type = 'text';
+          togglePassBtn.textContent = '🙈';
+          togglePassBtn.setAttribute('aria-label','Ẩn mật khẩu');
+        } else {
+          loginPassEl.type = 'password';
+          togglePassBtn.textContent = '👁️';
+          togglePassBtn.setAttribute('aria-label','Hiển thị mật khẩu');
+        }
+      });
+    }
+
+    function showLogin(){ loginErrorEl.style.display = 'none'; loginErrorEl.textContent = '';
+      loginUserEl.value = ''; loginPassEl.value = ''; loginModal.show();
+    }
+
+    function startApp(){
+      // read dates from inputs (if set) or use defaults
+      const from = inputFromDate.value || null;
+      const to = inputToDate.value || null;
+      fetchAchievedFromData(from, to).then(()=>{
+        const stored = getStoredTargets();
+        inputMC.value = stored.mcTarget.toLocaleString('vi-VN');
+        inputDL.value = stored.dlTarget.toLocaleString('vi-VN');
+        renderChart(stored.mcTarget, stored.dlTarget);
+        renderSummary(stored.mcTarget, stored.dlTarget);
+      }).catch(err=>{
+        console.warn('Không thể tải dữ liệu từ API:', err);
+        const msg = document.createElement('div');
+        msg.style.color = 'red'; msg.style.marginTop = '8px';
+        msg.textContent = 'Cảnh báo: không thể tải dữ liệu từ API. ' + (err && err.message ? err.message : 'Vui lòng đăng nhập hoặc kiểm tra kết nối.');
+        document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
+      });
+    }
+
+    // Real login: POST to auth API and store accessToken + user info
+    loginBtnEl.addEventListener('click', async ()=>{
+      const u = (loginUserEl.value || '').trim();
+      const p = (loginPassEl.value || '');
+      if(!u || !p){ loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Nhập tài khoản và mật khẩu'; return; }
+      loginBtnEl.disabled = true;
+      loginErrorEl.style.display = 'none';
+      try{
+        const res = await fetch('https://hpo.hdsaison.com.vn/hpo/api/v1/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const body = await res.json().catch(()=>null);
+        if(!res.ok){
+          const msg = body && (body.message || body.error) ? (body.message || body.error) : ('HTTP ' + res.status);
+          loginErrorEl.style.display = 'block'; loginErrorEl.textContent = msg;
+          loginBtnEl.disabled = false; return;
+        }
+        // Extract accessToken from common response shapes
+        const accessToken = body && (body.accessToken || body.token || (body.data && (body.data.accessToken || body.data.token)));
+        if(!accessToken){
+          loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Không nhận được accessToken từ server';
+          loginBtnEl.disabled = false; return;
+        }
+        setAuthToken(accessToken);
+        // Normalize and store user payload. API responses vary; try common locations and ensure `id` exists.
+        let userPayload = null;
+        if(body){
+          if(body.user) userPayload = body.user;
+          else if(body.data && body.data.user) userPayload = body.data.user;
+          else if(body.data && (body.data.id || body.data.userId)) userPayload = body.data;
+          else if(body.id || body.userId) userPayload = body;
+        }
+        // Fallback: if we couldn't find a user object, store an empty object (prevents missing id errors)
+        if(!userPayload) userPayload = {};
+        // Ensure `id` exists on the stored payload by searching common locations
+        try{
+          const maybeId = userPayload.id || userPayload.userId || (body && body.data && (body.data.id || body.data.userId)) || (body && (body.id || body.userId));
+          if(maybeId) userPayload.id = maybeId;
+        }catch(e){}
+        try{ localStorage.setItem('authUser', JSON.stringify(userPayload)); }catch(e){}
+        loginModal.hide();
+        loginBtnEl.disabled = false;
+        startApp();
+      }catch(err){
+        loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Lỗi kết nối: ' + (err.message || err);
+        loginBtnEl.disabled = false;
+      }
+    });
+
+    // submit on Enter
+    loginPassEl.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') loginBtnEl.click(); });
+
+    // Kickoff: set default date inputs and then auth check
+    if(inputFromDate) inputFromDate.value = defaultFromDate();
+    if(inputToDate) inputToDate.value = defaultToDate();
+    if(reloadDataBtn){ reloadDataBtn.addEventListener('click', ()=>{
+      const f = inputFromDate.value || defaultFromDate();
+      const t = inputToDate.value || defaultToDate();
+      fetchAchievedFromData(f,t).then(()=>{
+        const stored = getStoredTargets();
+        renderChart(stored.mcTarget, stored.dlTarget);
+        renderSummary(stored.mcTarget, stored.dlTarget);
+      }).catch(err=>{
+        console.warn('Tải dữ liệu lỗi', err);
+        const msg = document.createElement('div'); msg.style.color='red'; msg.style.marginTop='8px';
+        msg.textContent = 'Tải dữ liệu lỗi: ' + (err && err.message ? err.message : 'Kiểm tra kết nối và đăng nhập');
+        document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
+      });
+    }); }
+
+    if(getAuthToken()) startApp(); else showLogin();
+
+    // Save handler
+    saveBtn.addEventListener('click', ()=>{
+      const mc = parseNumberInput(inputMC.value) || DEFAULT_MC;
+      const dl = parseNumberInput(inputDL.value) || DEFAULT_DL;
+      localStorage.setItem('targetMC', String(mc));
+      localStorage.setItem('targetDL', String(dl));
+      renderChart(mc, dl);
+      renderSummary(mc, dl);
+      saveStatus.textContent = 'Đã lưu';
+      setTimeout(()=> saveStatus.textContent = '', 2500);
+    });
+
+    // Logout (clear auth token and session)
+    function logout(){ sessionStorage.clear(); localStorage.removeItem('authToken'); location.reload(); }
+  </script>
+</body>
+</html>
