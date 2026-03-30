@@ -154,6 +154,12 @@
         transform: scale(0.8);
         margin-top: 0.25rem;
       }
+      .age-result-error {
+        background: #fff1f1;
+        color: #d93025;
+        padding: 8px;
+        border-radius: 8px;
+      }
     </style>
   </head>
 
@@ -178,7 +184,6 @@
       <div class="logo">🚗 Batch 41</div>
       <nav class="desktop-nav">
         <a href="./index.html">Tính trả góp</a>
-        <a href="./check_old.html">Tính tuổi</a>
         <a href="./cancel_contract.html">Huỷ HĐ</a>
         <a href="./target.html">Tổng quan chỉ tiêu</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
@@ -206,13 +211,12 @@
         <a class="btn btn-light w-100 mb-2" href="index.html"
           >📊 Tính trả góp</a
         >
-        <a class="btn btn-light w-100 mb-2" href="check_old.html"
-          >🎂 Tính tuổi</a
-        >
         <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
           >❌ Huỷ hợp đồng</a
         >
-        <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
+        <a class="btn btn-light w-100 mb-2" href="./target.html"
+          >📈 Tổng quan chỉ tiêu</a
+        >
         <hr />
         <button class="btn btn-danger w-100" onclick="logout()">
           🔐 Đăng xuất
@@ -265,6 +269,26 @@
 
       <!-- Dynamic package buttons -->
       <div id="packageButtons" class="d-flex gap-2 mb-3"></div>
+
+      <label>Ngày sinh</label>
+      <input
+        id="dob"
+        class="form-control mb-2"
+        placeholder="DD/MM/YYYY"
+        maxlength="10"
+        inputmode="numeric"
+        oninput="formatDate(this)"
+      />
+      <div
+        id="ageResult"
+        class="mb-3"
+        style="font-weight: 600; color: #1e4fd6"
+      ></div>
+      <div
+        id="ageAlert"
+        class="mb-3"
+        style="color: #d93025; font-weight: 600"
+      ></div>
 
       <div id="result" class="result" style="display: none"></div>
       <button class="btn btn-warning w-100 mt-2" onclick="openExportModal()">
@@ -352,6 +376,7 @@
         </div>
       </div>
     </div>
+    <script src="./he_so.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
       const ACCESS_KEY = "B41";
@@ -378,43 +403,8 @@
         location.reload();
       }
 
-      const HE_SO = {
-        0.89: {
-          9: 0.12517,
-          12: 0.09723,
-          15: 0.08049,
-          18: 0.06936,
-          21: 0.06143,
-          24: 0.05548,
-        },
-        1.21: {
-          9: 0.12837,
-          12: 0.1004,
-          15: 0.08367,
-          18: 0.07256,
-          21: 0.06465,
-          24: 0.05874,
-          36: 0.04516,
-        },
-        1.51: {
-          9: 0.131461,
-          12: 0.103484,
-          15: 0.086765,
-          18: 0.075684,
-          21: 0.067811,
-          24: 0.061945,
-          36: 0.048559,
-        },
-        1.78: {
-          9: 0.134079,
-          12: 0.106095,
-          15: 0.089412,
-          18: 0.078378,
-          21: 0.070555,
-          24: 0.064745,
-          36: 0.051548,
-        },
-      };
+      // HE_SO coefficients are loaded from external file he_so.js
+      // Make sure he_so.js is present at the project root.
 
       let currentPackage = 1.21,
         lock = false;
@@ -424,6 +414,8 @@
       const ceil = (n) => Math.ceil(n / 1000) * 1000;
       const formatInput = (el) =>
         (el.value = format(el.value.replace(/\D/g, "")));
+      // selected tenor from UI
+      let selectedTenor = null;
 
       function renderPackageButtons() {
         const container = $("packageButtons");
@@ -542,7 +534,25 @@
         let min = Infinity,
           plans = [];
 
+        const allowed = getAllowedTenors();
+
+        if (allowed && allowed.length === 0) {
+          $("ageAlert").innerText = "Khách không đủ điều kiện vay theo tuổi.";
+          $("result").style.display = "none";
+          return;
+        } else if (Array.isArray(allowed)) {
+          if (allowed.length === 1)
+            $("ageAlert").innerText = `Chỉ được vay ${allowed[0]} tháng.`;
+          else
+            $("ageAlert").innerText =
+              `Chỉ được vay ${allowed[0]} - ${allowed[allowed.length - 1]} tháng.`;
+        } else {
+          $("ageAlert").innerText = "";
+        }
+
         Object.entries(heSo).forEach(([t, hs]) => {
+          const tenor = parseInt(t);
+          if (allowed && !allowed.includes(tenor)) return; // skip disallowed tenor
           let thang = ceil(vay * hs + 12000);
           let lai = thang * t - vay;
           if (lai < min) min = lai;
@@ -557,7 +567,7 @@
 
         plans.forEach((p) => {
           html += `
-<div class="plan-box ${p.lai === min ? "best-plan" : ""}" onclick="selectPlan(this)">
+<div class="plan-box ${p.lai === min ? "best-plan" : ""}" data-tenor="${p.t}" onclick="selectPlan(this)">
 <div class="plan-row"><strong>${p.t} tháng</strong></div>
 <div class="plan-row"><span>Trả/tháng</span><span class="value">${format(p.thang)} đ</span></div>
 <div class="divider"></div>
@@ -567,6 +577,8 @@
 
         $("result").innerHTML = html;
         $("result").style.display = "block";
+        // reset selection when plans change
+        selectedTenor = null;
       }
 
       function selectPlan(el) {
@@ -574,6 +586,7 @@
           .querySelectorAll(".plan-box")
           .forEach((p) => p.classList.remove("active"));
         el.classList.add("active");
+        selectedTenor = parseInt(el.getAttribute("data-tenor") || 0);
       }
 
       function openExportModal() {
@@ -592,6 +605,12 @@
       }
 
       async function confirmExport() {
+        const allowedBeforeExport = getAllowedTenors();
+        if (allowedBeforeExport && allowedBeforeExport.length === 0) {
+          $("ageAlert").innerText =
+            "Không thể xuất báo giá: khách không đủ điều kiện vay theo tuổi.";
+          return;
+        }
         const tuVanVien = $("modalTuVanVien").value.trim();
 
         // Lưu vào localStorage
@@ -611,7 +630,9 @@
         const heSo = HE_SO[currentPackage];
 
         let plans = {};
+        const allowed = getAllowedTenors();
         Object.entries(heSo).forEach(([t, hs]) => {
+          if (allowed && !allowed.includes(parseInt(t))) return;
           let thang = ceil(vay * hs + 12000);
           let tongLai = thang * t - vay;
 
@@ -629,6 +650,18 @@
         exportDiv.style.fontFamily = "Times New Roman";
         exportDiv.style.fontSize = "26px";
         exportDiv.style.lineHeight = "1.6";
+
+        // build dynamic plan rows so we only show available tenors
+        const planKeys = Object.keys(plans)
+          .map((k) => parseInt(k, 10))
+          .filter((n) => !isNaN(n))
+          .sort((a, b) => a - b);
+        let plansRows = "";
+        planKeys.forEach((k) => {
+          const p = plans[k];
+          if (!p) return;
+          plansRows += `${k} THÁNG: ${p.thang + (p.lai || "")}<br>`;
+        });
 
         exportDiv.innerHTML = `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -652,12 +685,7 @@
   ${giayTo ? `<b>GIẤY TỜ:</b> ${giayTo} đ<br>` : ""}
   <hr style="margin:10px 0;">
 
-  12 THÁNG: ${plans[12] ? plans[12].thang + plans[12].lai : ""}<br>
-  15 THÁNG: ${plans[15] ? plans[15].thang + plans[15].lai : ""}<br>
-  18 THÁNG: ${plans[18] ? plans[18].thang + plans[18].lai : ""}<br>
-  21 THÁNG: ${plans[21] ? plans[21].thang + plans[21].lai : ""}<br>
-  24 THÁNG: ${plans[24] ? plans[24].thang + plans[24].lai : ""}<br>
-  36 THÁNG: ${plans[36] ? plans[36].thang + plans[36].lai : ""}<br>
+  ${plansRows}
 
   <br>
   <b>THỦ TỤC:</b> CCCD CHIP + ĐTDĐ
@@ -688,6 +716,111 @@
         bootstrap.Modal.getInstance(
           document.getElementById("exportModal"),
         ).hide();
+      }
+
+      // ===== TUỔI (từ check_old.html) =====
+      function formatDate(input) {
+        let v = input.value.replace(/\D/g, "");
+        if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+        if (v.length > 5) v = v.slice(0, 5) + "/" + v.slice(5, 9);
+        input.value = v;
+
+        if (v.length === 10) tinhTuoi(v);
+        else {
+          $("ageResult").innerText = "";
+          $("ageResult").classList.remove("age-result-error");
+          // Re-render packages and plans when DOB cleared/invalid
+          $("ageAlert").innerText = "";
+          renderPackageButtons();
+          autoTinh();
+        }
+      }
+
+      function tinhTuoi(dateStr) {
+        const [d, m, y] = dateStr.split("/").map(Number);
+        const dob = new Date(y, m - 1, d);
+        const today = new Date();
+
+        if (
+          dob.getFullYear() !== y ||
+          dob.getMonth() !== m - 1 ||
+          dob.getDate() !== d ||
+          dob > today
+        ) {
+          $("ageResult").innerText = "Ngày sinh không hợp lệ";
+          $("ageResult").classList.add("age-result-error");
+          return;
+        }
+
+        let years = today.getFullYear() - y;
+        let months = today.getMonth() - (m - 1);
+
+        if (today.getDate() < d) months--;
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+
+        $("ageResult").innerText = `${years} tuổi • ${months} tháng`;
+        $("ageResult").classList.remove("age-result-error");
+        // Update UI: show/hide age alert, re-render packages and recompute plans
+        const allowedNow = getAllowedTenors();
+        if (allowedNow && allowedNow.length === 0) {
+          $("ageAlert").innerText = "Khách không đủ điều kiện vay theo tuổi.";
+        } else if (Array.isArray(allowedNow)) {
+          if (allowedNow.length === 1)
+            $("ageAlert").innerText = `Chỉ được vay ${allowedNow[0]} tháng.`;
+          else
+            $("ageAlert").innerText =
+              `Chỉ được vay ${allowedNow[0]} - ${allowedNow[allowedNow.length - 1]} tháng.`;
+        } else {
+          $("ageAlert").innerText = "";
+        }
+        renderPackageButtons();
+        autoTinh();
+      }
+
+      // Return allowed tenor list based on DOB rules (uses months precision).
+      // - null = no DOB provided (no restriction)
+      // - [] = explicit no-loan
+      // - otherwise: array of allowed tenors (subset of AVAILABLE_TENORS)
+      const AVAILABLE_TENORS = [9, 12, 15, 18, 21, 24, 36];
+      function getAllowedTenors() {
+        const v = $("dob").value || "";
+        if (!v) return null;
+        const parts = v.split("/").map(Number);
+        if (parts.length !== 3) return null;
+        const [d, m, y] = parts;
+        const dob = new Date(y, m - 1, d);
+        const today = new Date();
+        if (
+          dob.getFullYear() !== y ||
+          dob.getMonth() !== m - 1 ||
+          dob.getDate() !== d ||
+          dob > today
+        )
+          return null;
+
+        // compute exact age in years and months
+        let years = today.getFullYear() - y;
+        let months = today.getMonth() - (m - 1);
+        if (today.getDate() < d) months--;
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+        const totalMonths = years * 12 + months;
+
+        // For each available tenor, compute age at loan end (in months).
+        // Disallow tenor if (totalMonths + tenorMonths) > 70 years (70*12 months).
+        const MAX_MONTHS = 70 * 12; // 840
+
+        const allowed = AVAILABLE_TENORS.filter((tenor) => {
+          return totalMonths + tenor <= MAX_MONTHS && totalMonths >= 18 * 12; // allowed when <= 70 years and >= 18 months
+        });
+
+        // If no tenor is allowed, return empty array to indicate not eligible
+        return allowed.length ? allowed : [];
       }
 
       window.onload = () => {

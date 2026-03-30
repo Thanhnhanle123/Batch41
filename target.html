@@ -72,6 +72,16 @@
 
     @media (max-width:768px){ .chart-wrap{ height:340px } .page{ padding-top:86px } }
     @media (max-width:480px){ #summaryBox > div{ min-width:160px } #summaryBox table{ font-size:13px } }
+    /* Customers table mobile friendly: stack rows and show labels */
+    #customersTable td, #customersTable th{ white-space:nowrap; }
+    @media (max-width:576px){
+      #customersTable thead{ display:none; }
+      #customersTable{ border:0; }
+      #customersTable tbody tr{ display:block; margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:8px; background:#fff }
+      #customersTable tbody td{ display:flex; justify-content:space-between; padding:6px 8px; border:0; }
+      #customersTable tbody td:before{ content: attr(data-label); font-weight:600; color:var(--muted); margin-right:8px; }
+      #customersTable tbody td[data-label='#']{ display:none; }
+    }
   </style>
 </head>
 <body>
@@ -79,7 +89,6 @@
       <div class="logo">🚗 Batch 41</div>
       <nav class="desktop-nav">
         <a href="./index.html">Tính trả góp</a>
-        <a href="./check_old.html">Tính tuổi</a>
         <a href="./cancel_contract.html">Huỷ HĐ</a>
         <a href="./target.html">Tổng quan chỉ tiêu</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
@@ -106,9 +115,6 @@
       <div class="offcanvas-body">
         <a class="btn btn-light w-100 mb-2" href="index.html"
           >📊 Tính trả góp</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="check_old.html"
-          >🎂 Tính tuổi</a
         >
         <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
         >❌ Huỷ hợp đồng</a
@@ -162,6 +168,22 @@
     <div class="chart-wrap p-3 bg-white rounded shadow-sm">
     <canvas id="overviewChart"></canvas>
   </div>
+  
+    <!-- Customers table -->
+    <div class="card mt-4 p-3" id="customersCard">
+      <h5 class="mb-3">Danh sách khách hàng</h5>
+      <div id="customersSummary" class="mb-2 text-muted small">&nbsp;</div>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover" id="customersTable">
+          <thead>
+            <tr><th>#</th><th>Tên khách</th><th>SĐT</th><th>CMND</th><th>Hợp đồng</th><th>Loại</th><th>Số tiền</th></tr>
+          </thead>
+          <tbody id="customersTbody"></tbody>
+        </table>
+      </div>
+      <div class="text-muted small">Nhấp vào một dòng để xem thông tin sản phẩm.</div>
+    </div>
+
     <!-- Login modal: will appear if no auth token is stored -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -374,7 +396,6 @@
     function fetchAchievedFromData(fromInput, toInput){
       const token = getAuthToken();
       const authUser = getStoredAuthUser();
-      console.log('Token:', token, 'Auth User:', authUser);
       // ensure token is present and not expired
       if(!token || !isTokenValid(token)){
         clearAuthToken(); try{ localStorage.removeItem('authUser'); }catch(e){}
@@ -444,6 +465,8 @@
             const stored = getStoredTargets();
             renderChart(stored.mcTarget, stored.dlTarget);
             renderSummary(stored.mcTarget, stored.dlTarget);
+            // reload customers list for the new date range
+            if(typeof loadCustomersTable === 'function') loadCustomersTable();
           }).catch(err=>{
             console.warn('Tải dữ liệu lỗi', err);
             const msg = document.createElement('div'); msg.style.color='red'; msg.style.marginTop='8px';
@@ -484,6 +507,8 @@
         inputDL.value = stored.dlTarget.toLocaleString('vi-VN');
         renderChart(stored.mcTarget, stored.dlTarget);
         renderSummary(stored.mcTarget, stored.dlTarget);
+        // load customers after initial data load
+        if(typeof loadCustomersTable === 'function') loadCustomersTable();
       }).catch(err=>{
         console.warn('Không thể tải dữ liệu từ API:', err);
         const msg = document.createElement('div');
@@ -571,6 +596,122 @@
 
     // Logout (clear auth token and session)
     function logout(){ sessionStorage.clear(); localStorage.removeItem('authToken'); location.reload(); }
+  </script>
+  <!-- Product modal -->
+  <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Chi tiết sản phẩm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="productList"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Try loading contracts from API (when logged in) else fall back to data.json
+    async function fetchContractsFromApi(fromInput, toInput){
+      const token = getAuthToken();
+      const authUser = getStoredAuthUser();
+      if(!token || !isTokenValid(token) || !(authUser && authUser.id)){
+        return null; // signal to caller to fallback
+      }
+      const id = authUser.id;
+      const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
+      const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
+      const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+      try{
+        const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const data = await r.json();
+        // contract list might be in content or contracts or array
+        const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
+        return arr;
+      }catch(err){ console.warn('API load contracts failed:', err); return null; }
+    }
+
+    async function loadCustomersTable(){
+      try{
+        // try API first (using date filters currently set)
+        const from = inputFromDate.value || defaultFromDate();
+        const to = inputToDate.value || defaultToDate();
+        let arr = await fetchContractsFromApi(from, to);
+        if(!arr){
+          // fallback to local data.json
+          const res = await fetch('data.json');
+          if(!res.ok) throw new Error('Cannot load data.json');
+          const j = await res.json();
+          arr = j.contracts || [];
+        }
+        const tbody = document.getElementById('customersTbody');
+        tbody.innerHTML = '';
+        // compute average tenor (tenorInMonths) for MC contracts only
+        let sumTenor = 0, countTenor = 0;
+        arr.forEach(c=>{
+          const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+          if(ty !== 'MC') return; // only MC
+          const t = Number(c.tenorInMonths || c.tenor || 0);
+          if(!Number.isNaN(t) && t > 0){ sumTenor += t; countTenor++; }
+        });
+        const avgTenor = countTenor ? Math.round((sumTenor / countTenor) * 100) / 100 : 0;
+        const summaryEl = document.getElementById('customersSummary');
+        summaryEl.textContent = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
+        arr.forEach((c, idx)=>{
+          const cust = c.customer || {};
+          const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
+          const phone = cust.phoneNumber || '';
+          const nid = cust.nationalId || '';
+          const contractNo = c.number || c.code || '';
+          const type = c.type || '';
+          const amount = c.financedAmount || c.totalPurchase || 0;
+          const tr = document.createElement('tr');
+          tr.style.cursor = 'pointer';
+          const colLabels = ['#','Tên khách','SĐT','CMND','Hợp đồng','Loại','Số tiền'];
+          const colValues = [String(idx+1), name, phone, nid, contractNo, type, amount.toLocaleString('vi-VN') + ' ₫'];
+          colValues.forEach((val,i)=>{
+            const td = document.createElement('td');
+            td.setAttribute('data-label', colLabels[i]);
+            if(i === 6) td.style.textAlign = 'right';
+            td.textContent = val;
+            tr.appendChild(td);
+          });
+          tr.addEventListener('click', ()=> showProductsForContract(c));
+          tbody.appendChild(tr);
+        });
+      }catch(err){ console.warn('Không thể load customers:', err); }
+    }
+
+    function showProductsForContract(contract){
+      const modalEl = document.getElementById('productModal');
+      const modal = new bootstrap.Modal(modalEl);
+      const container = document.getElementById('productList');
+      container.innerHTML = '';
+      const prods = (contract.submittedProducts && contract.submittedProducts.length) ? contract.submittedProducts : (contract.contractProducts || []);
+      if(!prods || prods.length === 0){ container.innerHTML = '<div class="text-muted">Không có sản phẩm.</div>'; modal.show(); return; }
+      const table = document.createElement('table'); table.className = 'table table-sm';
+      const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>#</th><th>Mã/Model</th><th>Giá</th></tr>'; table.appendChild(thead);
+      const tb = document.createElement('tbody');
+      prods.forEach((p,i)=>{
+        const tr = document.createElement('tr');
+        const name = p.modelDesc || p.name || p.productName || '';
+        const price = p.productPrice || p.productPrice || p.price || 0;
+        tr.innerHTML = `<td>${i+1}</td><td>${name}</td><td style="text-align:right">${Number(price).toLocaleString('vi-VN')} ₫</td>`;
+        tb.appendChild(tr);
+      });
+      table.appendChild(tb);
+      container.appendChild(table);
+      modal.show();
+    }
+
+    // load on script end
+    loadCustomersTable();
   </script>
 </body>
 </html>
