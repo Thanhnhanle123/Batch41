@@ -72,6 +72,28 @@
 
     @media (max-width:768px){ .chart-wrap{ height:340px } .page{ padding-top:86px } }
     @media (max-width:480px){ #summaryBox > div{ min-width:160px } #summaryBox table{ font-size:13px } }
+
+    /* Mobile-specific tweaks to make charts and cards fit smaller screens */
+    @media (max-width:768px){
+      .chart-wrap{ padding:12px; }
+      .chart-wrap canvas#overviewChart{ height:360px !important; }
+      #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:220px !important; height:220px !important }
+      #kpiRow{ flex-direction:row; gap:8px; }
+      #kpiRow .kpi-card{ min-width:140px; padding:10px; font-size:14px }
+      .modal .modal-dialog{ max-width:92% }
+    }
+
+    @media (max-width:576px){
+      .chart-wrap{ padding:10px; }
+      .chart-wrap canvas#overviewChart{ height:260px !important; }
+      #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:180px !important; height:180px !important }
+      #kpiRow{ flex-direction:column; }
+      #kpiRow .kpi-card{ width:100%; min-width:0; padding:10px; }
+      /* Make product modal full width-ish on phones */
+      #productModal .modal-dialog{ max-width:95%; margin:0 8px; }
+      /* Reduce table padding for small screens */
+      #customersTable tbody td{ padding:6px 6px; }
+    }
     /* Customers table mobile friendly: stack rows and show labels */
     #customersTable td, #customersTable th{ white-space:nowrap; }
     @media (max-width:576px){
