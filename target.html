@@ -735,7 +735,9 @@
         });
         const avgTenor = countTenor ? Math.round((sumTenor / countTenor) * 100) / 100 : 0;
         const summaryEl = document.getElementById('customersSummary');
-        summaryEl.textContent = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC LIVE)`;
+        let summaryHtml = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC LIVE)`;
+        if(countTenor && avgTenor < 15){ summaryHtml += ' <div class="text-danger mt-1">Cảnh báo: kỳ hạn trung bình < 15 tháng — RỦI RO KỲ HẠN.</div>'; }
+        summaryEl.innerHTML = summaryHtml;
         arr.forEach((c, idx)=>{
           const cust = c.customer || {};
           const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
@@ -1039,7 +1041,10 @@
         }
       });
       const avgTenor = countTenor ? Math.round((sumTenor/countTenor)*100)/100 : 0;
-      const summaryEl = document.getElementById('customersSummary'); summaryEl.textContent = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
+      const summaryEl = document.getElementById('customersSummary');
+      let summaryHtml = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
+      if(countTenor && avgTenor < 15){ summaryHtml += ' <div class="text-danger mt-1">Cảnh báo: kỳ hạn trung bình < 15 tháng — RỦI RO KỲ HẠN cao.</div>'; }
+      summaryEl.innerHTML = summaryHtml;
       window._displayedContracts = arr.slice();
     }
 
