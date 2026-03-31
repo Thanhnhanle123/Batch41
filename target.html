@@ -82,6 +82,27 @@
       #customersTable tbody td:before{ content: attr(data-label); font-weight:600; color:var(--muted); margin-right:8px; }
       #customersTable tbody td[data-label='#']{ display:none; }
     }
+    /* Contract details modal styling (card-like rows) */
+    #productModal .contract-details{ background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(15,23,42,0.06); margin-bottom:14px; }
+    #productModal .contract-details .row{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:10px 6px; border-bottom:1px solid #f1f5f9 }
+    #productModal .contract-details .row:last-child{ border-bottom:0 }
+    #productModal .contract-details .label{ color:#374151; font-weight:700 }
+    #productModal .contract-details .value{ color:#0f172a; font-weight:700 }
+    #productModal .contract-details .amount{ color:var(--accent-2); font-size:1.05rem }
+    #productModal .contract-details .muted{ color:#6b7280; font-weight:400; margin-left:8px }
+    /* Highlighted date-range row: start and end close together */
+    #productModal .contract-details .date-range{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px; background:linear-gradient(90deg,#eef7ff,#f6fbff); border-radius:8px; margin:6px 0 12px 0 }
+    #productModal .contract-details .date-range .pill{ background:var(--accent-2); color:#fff; padding:6px 10px; border-radius:6px; font-weight:700; display:inline-block }
+    #productModal .contract-details .date-range .arrow{ margin:0 8px; color:#334155; font-weight:700 }
+    /* KPI cards */
+    #kpiRow .kpi-card{ flex:1; background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(15,23,42,0.06); display:flex; flex-direction:column }
+    #kpiRow .kpi-card .label{ color:var(--muted); font-weight:600; font-size:13px }
+    #kpiRow .kpi-card .value{ font-weight:800; font-size:1.15rem; color:var(--accent-2) }
+    /* Canvas sizing: keep overview large and analytics canvases readable */
+    canvas{ width:100% !important; height:100% !important; display:block }
+    .chart-wrap canvas#overviewChart{ height:480px !important; max-height:640px }
+    /* Analytics cards: make each chart taller so MC/DL bars are visible and readable */
+    #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:320px !important; height:320px !important }
   </style>
 </head>
 <body>
@@ -168,15 +189,27 @@
     <div class="chart-wrap p-3 bg-white rounded shadow-sm">
     <canvas id="overviewChart"></canvas>
   </div>
+  <!-- Analytics: KPI cards and charts -->
+  <div id="analytics" class="mt-4">
+    <div id="kpiRow" class="d-flex gap-3 mb-3"></div>
+    <div class="row g-3">
+      <div class="col-md-6"><div class="card p-2"><canvas id="statusChart"></canvas></div></div>
+      <div class="col-md-6"><div class="card p-2"><canvas id="revenueChart"></canvas></div></div>
+      <div class="col-md-6"><div class="card p-2"><canvas id="tenorChart"></canvas></div></div>
+      <div class="col-md-6"><div class="card p-2"><canvas id="topChart"></canvas></div></div>
+    </div>
+  </div>
   
     <!-- Customers table -->
     <div class="card mt-4 p-3" id="customersCard">
       <h5 class="mb-3">Danh sách khách hàng</h5>
-      <div id="customersSummary" class="mb-2 text-muted small">&nbsp;</div>
+      <div class="d-flex gap-2 mb-2 align-items-center">
+        <div id="customersSummary" class="text-muted small flex-grow-1">&nbsp;</div>
+      </div>
       <div class="table-responsive">
         <table class="table table-sm table-hover" id="customersTable">
           <thead>
-            <tr><th>#</th><th>Tên khách</th><th>SĐT</th><th>CMND</th><th>Hợp đồng</th><th>Loại</th><th>Số tiền</th></tr>
+            <tr><th>#</th><th>Tên khách</th><th>SĐT</th><th>CMND</th><th>Hợp đồng</th><th>Loại</th><th>Số tiền</th><th>Trạng thái</th></tr>
           </thead>
           <tbody id="customersTbody"></tbody>
         </table>
@@ -225,32 +258,15 @@
     }
 
     // Defaults for targets (can be overridden by user/localStorage)
-    const DEFAULT_MC = 164000000;
-    const DEFAULT_DL = 80000000;
+    const DEFAULT_MC = 0;
+    const DEFAULT_DL = 0;
+    // Color palette for charts
+    const PALETTE = ['#2b8be6','#e64b4b','#10b981','#f59e0b','#9ca3af','#60a5fa'];
     // Achieved numbers will be computed from data.json (API) below
     let mcAch = 0;
     let dlAch = 0;
 
-    // Fetch data.json and compute achieved amounts grouped by type
-    function fetchAchievedFromData(){
-      return fetch('data.json')
-        .then(r=>{
-          if(!r.ok) throw new Error('HTTP ' + r.status);
-          return r.json();
-        })
-        .then(data=>{
-          mcAch = 0; dlAch = 0;
-          const arr = data.contracts || [];
-          arr.forEach(c=>{
-            const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
-            if(!ty) return;
-            // prefer financedAmount, fallback to totalPurchase
-            const val = Number(c.financedAmount || c.totalPurchase || 0);
-            if(ty === 'MC') mcAch += val; else if(ty === 'DL') dlAch += val;
-          });
-          return { mcAch, dlAch };
-        });
-    }
+    // (removed simple data-only fetchAchievedFromData) - consolidated version below handles API + fallback
 
     function parseNumberInput(s){
       if(s === null || s === undefined) return 0;
@@ -371,7 +387,6 @@
     function getStoredAuthUser(){
       try{ const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; }catch(e){ return null; }
     }
-
     // JWT helpers: basic payload parse and expiry check
     function parseJwtPayload(token){
       try{
@@ -644,11 +659,14 @@
         const to = inputToDate.value || defaultToDate();
         let arr = await fetchContractsFromApi(from, to);
         if(!arr){
-          // fallback to local data.json
-          const res = await fetch('data.json');
-          if(!res.ok) throw new Error('Cannot load data.json');
-          const j = await res.json();
-          arr = j.contracts || [];
+          // API failed or user not authenticated — do not fallback to local files
+          console.warn('API load contracts failed or not authenticated');
+          const tbody = document.getElementById('customersTbody');
+          if(tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Không thể tải dữ liệu từ API. Vui lòng đăng nhập hoặc kiểm tra kết nối.</td></tr>';
+          // ensure analytics see empty dataset
+          window._allContracts = [];
+          if(typeof renderAnalytics === 'function') renderAnalytics([]);
+          return; // stop further processing
         }
         const tbody = document.getElementById('customersTbody');
         tbody.innerHTML = '';
@@ -673,36 +691,315 @@
           const amount = c.financedAmount || c.totalPurchase || 0;
           const tr = document.createElement('tr');
           tr.style.cursor = 'pointer';
-          const colLabels = ['#','Tên khách','SĐT','CMND','Hợp đồng','Loại','Số tiền'];
-          const colValues = [String(idx+1), name, phone, nid, contractNo, type, amount.toLocaleString('vi-VN') + ' ₫'];
-          colValues.forEach((val,i)=>{
-            const td = document.createElement('td');
-            td.setAttribute('data-label', colLabels[i]);
-            if(i === 6) td.style.textAlign = 'right';
-            td.textContent = val;
-            tr.appendChild(td);
-          });
+        const colLabels = ['#','Tên khách','SĐT','CMND','Hợp đồng','Loại','Số tiền', 'Trạng thái'];
+        // Render amount and a styled status badge (special style when indusStatus === 'LIVE')
+        const statusRaw = (c.indusStatus || c.status || c.statusName || '').toString();
+        const statusLower = statusRaw.toLowerCase();
+        let badgeClass = 'badge bg-secondary';
+        let statusDisplay = statusRaw || '—';
+        if(statusLower === 'live' || statusLower === 'l'){
+          badgeClass = 'badge bg-success';
+          statusDisplay = 'LIVE';
+        } else if(statusLower.includes('active') || statusLower.includes('hoạt') || statusLower.includes('approved')){
+          badgeClass = 'badge bg-success';
+        } else if(statusLower.includes('wait') || statusLower.includes('pending') || statusLower.includes('chờ')){
+          badgeClass = 'badge bg-warning text-dark';
+        } else if(statusLower.includes('reject') || statusLower.includes('cancel') || statusLower.includes('hủy')){
+          badgeClass = 'badge bg-danger';
+        }
+
+        const amountText = amount.toLocaleString('vi-VN') + ' ₫';
+        const statusHtml = `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`;
+        const colValues = [String(idx+1), name, phone, nid, contractNo, type, amountText, statusHtml];
+        colValues.forEach((val,i)=>{
+          const td = document.createElement('td');
+          td.setAttribute('data-label', colLabels[i]);
+          if(i === 6) td.style.textAlign = 'right';
+          if(i === 7) td.innerHTML = val; else td.textContent = val;
+          tr.appendChild(td);
+        });
           tr.addEventListener('click', ()=> showProductsForContract(c));
           tbody.appendChild(tr);
         });
+        // render analytics based on the same array
+        if(typeof renderAnalytics === 'function') renderAnalytics(arr);
       }catch(err){ console.warn('Không thể load customers:', err); }
     }
+
+    // --- Analytics rendering (status pie, revenue time-series, tenor distribution, top contracts) ---
+    let statusChart = null, revenueChart = null, tenorChart = null, topChart = null;
+
+    function monthKey(d){ const dt = new Date(d); return dt.getFullYear() + '-' + pad(dt.getMonth()+1); }
+
+    function fmtShort(v){ return v.toLocaleString('vi-VN') + ' ₫'; }
+
+    function buildStatusCounts(arr){ const m = {}; arr.forEach(c=>{ const s = (c.indusStatus || c.status || c.statusName || 'UNKNOWN') .toString(); m[s] = (m[s]||0) + 1; }); return m; }
+
+    function buildMonthlyRevenue(arr){ const m = {}; arr.forEach(c=>{ const d = c.disbursementDate || c.createdDate || c.approvedDate; if(!d) return; const k = monthKey(d); m[k] = (m[k]||0) + Number(c.financedAmount || c.totalPurchase || 0); }); return m; }
+
+    function buildTenorDist(arr){ const m = {}; arr.forEach(c=>{ const t = Number(c.tenorInMonths || c.tenor || 0); if(!t) return; m[t] = (m[t]||0) + 1; }); return m; }
+
+    function buildTopContracts(arr, n=5){ const copy = arr.slice().filter(c=>Number(c.financedAmount||0)>0); copy.sort((a,b)=>Number(b.financedAmount||0)-Number(a.financedAmount||0)); return copy.slice(0,n); }
+
+    function renderAnalytics(arr){
+      try{
+        // KPIs
+        const totalContracts = arr.length;
+        const liveContracts = arr.filter(c=> (c.indusStatus||'').toString().toLowerCase() === 'live').length;
+        const totalFinanced = arr.reduce((s,c)=> s + Number(c.financedAmount||c.totalPurchase||0), 0);
+        const totalDisbursed = arr.reduce((s,c)=> s + (c.disbursementDate ? Number(c.financedAmount||0) : 0), 0);
+        const kpiRow = document.getElementById('kpiRow');
+        kpiRow.innerHTML = `
+          <div class="kpi-card"><div class="label">Tổng HĐ</div><div class="value">${totalContracts}</div></div>
+          <div class="kpi-card"><div class="label">HĐ LIVE</div><div class="value">${liveContracts}</div></div>
+          <div class="kpi-card"><div class="label">Tổng giải ngân</div><div class="value">${fmtShort(totalDisbursed)}</div></div>
+          <div class="kpi-card"><div class="label">Tổng vay</div><div class="value">${fmtShort(totalFinanced)}</div></div>
+        `;
+
+        // Status pie
+        const statusCounts = buildStatusCounts(arr);
+        const statusLabels = Object.keys(statusCounts);
+        const statusData = statusLabels.map(l=>statusCounts[l]);
+        if(statusChart) statusChart.destroy();
+        const ctxS = document.getElementById('statusChart').getContext('2d');
+        statusChart = new Chart(ctxS, {
+          type: 'pie',
+          data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusLabels.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          plugins: [ChartDataLabels],
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' },
+              datalabels: {
+                color: '#fff',
+                font: { weight: '700' },
+                formatter: (value) => {
+                  const sum = statusData.reduce((a,b)=>a+b,0);
+                  const pct = sum ? (value / sum * 100).toFixed(1) + '%' : '';
+                  return value + (pct ? (' (' + pct + ')') : '');
+                }
+              }
+            },
+            layout: { padding: 6 }
+          }
+        });
+
+        // Revenue time series (monthly)
+        const rev = buildMonthlyRevenue(arr);
+        const revKeys = Object.keys(rev).sort();
+        const revValues = revKeys.map(k=>rev[k]);
+        if(revenueChart) revenueChart.destroy();
+        const ctxR = document.getElementById('revenueChart').getContext('2d');
+        revenueChart = new Chart(ctxR, {
+          type: 'bar',
+          data: { labels: revKeys, datasets: [{ label: 'Doanh số (financed)', data: revValues, backgroundColor: PALETTE[0], borderRadius: 8, barThickness: 'flex' }] },
+          plugins: [ChartDataLabels],
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: 8 },
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.y) } },
+              datalabels: { anchor: 'end', align: 'end', formatter: v=> fmtShort(v), color: '#0f172a', font: { weight: '600' } }
+            },
+            scales: { y: { ticks: { callback: v=> v.toLocaleString('vi-VN') } } }
+          }
+        });
+
+        // Tenor distribution
+        const tenor = buildTenorDist(arr);
+        const tenorKeys = Object.keys(tenor).map(Number).sort((a,b)=>a-b).map(String);
+        const tenorVals = tenorKeys.map(k=>tenor[k]);
+        if(tenorChart) tenorChart.destroy();
+        const ctxT = document.getElementById('tenorChart').getContext('2d');
+        tenorChart = new Chart(ctxT, {
+          type: 'bar',
+          data: { labels: tenorKeys, datasets: [{ label: 'Số HĐ', data: tenorVals, backgroundColor: PALETTE[3], borderRadius: 6 }] },
+          plugins: [ChartDataLabels],
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'end', formatter: v => v, color:'#0f172a' } },
+            scales: { y: { beginAtZero: true } },
+            layout: { padding: 6 }
+          }
+        });
+
+        // Top contracts by financedAmount
+        const top = buildTopContracts(arr,5);
+        const topLabels = top.map(c=> (c.number || c.code || ('HĐ#'+c.id)) );
+        const topVals = top.map(c=> Number(c.financedAmount||c.totalPurchase||0));
+        if(topChart) topChart.destroy();
+        const ctxP = document.getElementById('topChart').getContext('2d');
+        topChart = new Chart(ctxP, {
+          type: 'bar',
+          data: { labels: topLabels, datasets: [{ label: 'Số tiền', data: topVals, backgroundColor: PALETTE[2], borderRadius: 6 }] },
+          plugins: [ChartDataLabels],
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.x) } }, datalabels: { anchor: 'end', align: 'end', formatter: v => fmtShort(v), color:'#fff' } },
+            indexAxis: 'y',
+            scales: { x: { ticks: { callback: v => v.toLocaleString('vi-VN') } } },
+            layout: { padding: 6 }
+          }
+        });
+
+      }catch(e){ console.warn('Analytics render error', e); }
+    }
+
+    // -------- Filtering & CSV export support --------
+    window._allContracts = [];
+    window._displayedContracts = [];
+
+    function getStatusText(c){
+      const statusRaw = (c.indusStatus || c.status || c.statusName || '').toString();
+      const s = statusRaw.toLowerCase();
+      if(s === 'live' || s === 'l') return 'LIVE';
+      if(s.includes('active') || s.includes('hoạt') || s.includes('approved')) return 'APPROVED';
+      if(s.includes('wait') || s.includes('pending') || s.includes('chờ')) return 'PENDING';
+      if(s.includes('reject') || s.includes('cancel') || s.includes('hủy')) return 'CANCELLED';
+      return statusRaw || '';
+    }
+
+    function applyFilters(arr){
+      const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
+      const statusFilter = (document.getElementById('filterStatus').value || '').toLowerCase();
+      const typeFilter = (document.getElementById('filterType').value || '').toLowerCase();
+      return arr.filter(c=>{
+        if(typeFilter && ((c.type||'').toString().toLowerCase() !== typeFilter)) return false;
+        const st = getStatusText(c).toLowerCase();
+        if(statusFilter && !st.includes(statusFilter)) return false;
+        if(!q) return true;
+        const cust = c.customer || {};
+        const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ').toLowerCase();
+        const phone = (cust.phoneNumber||'').toLowerCase();
+        const nid = (cust.nationalId||'').toLowerCase();
+        const contractNo = ((c.number||c.code||'')+'').toLowerCase();
+        return name.includes(q) || phone.includes(q) || nid.includes(q) || contractNo.includes(q);
+      });
+    }
+
+    function renderCustomers(arr){
+      const tbody = document.getElementById('customersTbody'); tbody.innerHTML = '';
+      let sumTenor=0, countTenor=0;
+      arr.forEach((c, idx)=>{
+        const cust = c.customer || {};
+        const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
+        const phone = cust.phoneNumber || '';
+        const nid = cust.nationalId || '';
+        const contractNo = c.number || c.code || '';
+        const type = c.type || '';
+        const amount = c.financedAmount || c.totalPurchase || 0;
+        const tr = document.createElement('tr'); tr.style.cursor='pointer';
+        const statusDisplay = getStatusText(c);
+        const badgeClass = statusDisplay.toLowerCase() === 'live' ? 'badge bg-success' : (statusDisplay.toLowerCase().includes('pend') ? 'badge bg-warning text-dark' : (statusDisplay.toLowerCase().includes('cancel') ? 'badge bg-danger' : 'badge bg-secondary'));
+        const amountText = Number(amount).toLocaleString('vi-VN') + ' ₫';
+        const cols = [String(idx+1), name, phone, nid, contractNo, type, amountText, `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`];
+        const colLabels = ['#','Tên khách','SĐT','CMND','Hợp đồng','Loại','Số tiền','Trạng thái'];
+        cols.forEach((val,i)=>{ const td=document.createElement('td'); td.setAttribute('data-label', colLabels[i]); if(i===6) td.style.textAlign='right'; if(i===7) td.innerHTML=val; else td.textContent=val; tr.appendChild(td); });
+        tr.addEventListener('click', ()=> showProductsForContract(c));
+        tbody.appendChild(tr);
+        // tenor stats
+        const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+        if(ty === 'MC'){ const t = Number(c.tenorInMonths || c.tenor || 0); if(t>0){ sumTenor += t; countTenor++; } }
+      });
+      const avgTenor = countTenor ? Math.round((sumTenor/countTenor)*100)/100 : 0;
+      const summaryEl = document.getElementById('customersSummary'); summaryEl.textContent = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
+      window._displayedContracts = arr.slice();
+    }
+
+    function debounce(fn, ms=250){ let t=null; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
+
+    function initFilters(){
+      const inputs = ['filterSearch','filterStatus','filterType'].map(id=>document.getElementById(id));
+      const reload = debounce(()=>{ if(!window._allContracts) return; const filtered = applyFilters(window._allContracts); renderCustomers(filtered); });
+      inputs.forEach(el=>{ if(el) el.addEventListener('input', reload); el && el.addEventListener('change', reload); });
+      const exportBtn = document.getElementById('exportCsvBtn'); if(exportBtn) exportBtn.addEventListener('click', exportCsv);
+    }
+
+    function exportCsv(){
+      const rows = window._displayedContracts || [];
+      if(!rows.length) return alert('Không có dữ liệu để xuất');
+      const cols = ['Mã HĐ','Tên khách','SĐT','CMND','Loại','Số tiền','Trạng thái'];
+      const lines = [cols.join(',')];
+      rows.forEach(c=>{
+        const cust=c.customer||{}; const name=[cust.lastName,cust.middleName,cust.firstName].filter(Boolean).join(' ');
+        const vals=[ (c.number||c.code||''), name, (cust.phoneNumber||''), (cust.nationalId||''), (c.type||''), Number(c.financedAmount||c.totalPurchase||0), getStatusText(c) ];
+        lines.push(vals.map(v=> '"'+String(v).replace(/"/g,'""')+'"').join(','));
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'contracts.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    // initialize after DOM elements exist
+    document.addEventListener('DOMContentLoaded', ()=>{ initFilters(); });
 
     function showProductsForContract(contract){
       const modalEl = document.getElementById('productModal');
       const modal = new bootstrap.Modal(modalEl);
       const container = document.getElementById('productList');
       container.innerHTML = '';
+
+      // Financial/detail fields to show
+      const totalPurchase = Number(contract.totalPurchase || 0);
+      const downPaymentAmount = Number(contract.downPaymentAmount || 0);
+      const downPaymentRate = contract.downPaymentRate || 0;
+      const financedAmount = Number(contract.financedAmount || 0);
+      const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
+      const monthlyInstallment = Number(contract.monthlyInstallment || 0);
+      const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
+      const disbursementDate = contract.disbursementDate || contract.disbursedDate || '';
+
+      function fmtDate(d){ try{ if(!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('vi-VN'); }catch(e){ return d; } }
+
+      // compute end date by adding tenor months to startingInstallmentDate and subtracting one day
+      function computeEndDate(start, months){
+        try{
+          if(!start || !months) return null;
+          const dt = new Date(start);
+          const end = new Date(dt);
+          end.setMonth(end.getMonth() + Number(months));
+          // subtract one day to make the end date the day before the next-month equivalent
+          end.setDate(end.getDate());
+          return end;
+        }catch(e){ return null; }
+      }
+
+      // Build details HTML
+      const detailsHtml = `
+        <div class="mb-3 contract-details">
+          <div class="row"><div class="label">Tổng mua</div><div class="value amount">${fmt(totalPurchase)}</div></div>
+          <div class="row"><div class="label">Tiền trả trước</div><div class="value">${fmt(downPaymentAmount)}<span class="muted"> (${Number(downPaymentRate).toFixed(2)}%)</span></div></div>
+          <div class="row"><div class="label">Số tiền vay</div><div class="value amount">${fmt(financedAmount)}</div></div>
+          <div class="row"><div class="label">Kỳ hạn (tháng)</div><div class="value">${tenorInMonths}</div></div>
+          <div class="row"><div class="label">Tiền trả mỗi tháng</div><div class="value amount">${fmt(monthlyInstallment)}</div></div>
+          <div class="row"><div class="label">Ngày giải ngân</div><div class="value">${fmtDate(disbursementDate)}</div></div>
+          <div class="row"><div class="label">Thời gian góp</div><div class="value"><span class="pill">${fmtDate(startingInstallmentDate)}</span><span class="arrow"> -> </span><span class="pill">${(function(){ const e = computeEndDate(startingInstallmentDate, tenorInMonths); return e ? fmtDate(e) : '—'; })()}</span></div></div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', detailsHtml);
+
+      // Products list (may be empty)
       const prods = (contract.submittedProducts && contract.submittedProducts.length) ? contract.submittedProducts : (contract.contractProducts || []);
-      if(!prods || prods.length === 0){ container.innerHTML = '<div class="text-muted">Không có sản phẩm.</div>'; modal.show(); return; }
+      if(!prods || prods.length === 0){
+        const msg = document.createElement('div');
+        msg.className = 'text-muted';
+        msg.textContent = 'Không có sản phẩm.';
+        container.appendChild(msg);
+        modal.show();
+        return;
+      }
+
       const table = document.createElement('table'); table.className = 'table table-sm';
-      const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>#</th><th>Mã/Model</th><th>Giá</th></tr>'; table.appendChild(thead);
+      const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>Mã/Model</th></tr>'; table.appendChild(thead);
       const tb = document.createElement('tbody');
-      prods.forEach((p,i)=>{
+      prods.forEach((p)=>{
         const tr = document.createElement('tr');
         const name = p.modelDesc || p.name || p.productName || '';
-        const price = p.productPrice || p.productPrice || p.price || 0;
-        tr.innerHTML = `<td>${i+1}</td><td>${name}</td><td style="text-align:right">${Number(price).toLocaleString('vi-VN')} ₫</td>`;
+        tr.innerHTML = `<td>${name}</td>`;
         tb.appendChild(tr);
       });
       table.appendChild(tb);
