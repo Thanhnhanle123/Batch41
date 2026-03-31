@@ -1324,6 +1324,57 @@
         if(titleEl) titleEl.textContent = `Chi tiết sản phẩm — ${name}` + (phone ? (' ('+phone+')') : '');
       }catch(e){ }
       container.innerHTML = '';
+      // try to fetch and show customer image (if available)
+      (function(){
+        const imgWrap = document.createElement('div'); imgWrap.style.marginBottom='12px';
+        const img = document.createElement('img');
+        img.style.maxWidth = '160px'; img.style.borderRadius='8px'; img.style.display='none'; img.style.cursor='pointer';
+        imgWrap.appendChild(img);
+        container.appendChild(imgWrap);
+
+        async function tryLoadImage(){
+          try{
+            const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
+            const token = getAuthToken();
+            // prefer explicit download paths returned by API fields
+            const candidates = [];
+            const pick = v=>{ if(!v) return; if(Array.isArray(v)) v.forEach(x=> pick(x)); else if(typeof v === 'string') candidates.push(v); };
+            pick(contract.billImageUrls || contract.billImageUrl);
+            pick(contract.contractImageUrls || contract.contractImageUrl);
+            pick(contract.mortgageContractImageUrls || contract.mortgageContractImageUrl);
+            pick(contract.billImagePath || contract.personalImagePath);
+            // normalize candidates to full URLs
+            let url = null;
+            for(const p of candidates){
+              const s = String(p||'').trim();
+              if(!s) continue;
+              // if it's already a full URL
+              if(s.startsWith('http')){ url = s; break; }
+              // if path starts with /downloadfile -> prefix baseApi
+              if(s.indexOf('/downloadfile/') !== -1){ url = baseApi + s.replace(/^\/+/, '/'); break; }
+              // if path starts with 'downloadfile/'
+              if(s.indexOf('downloadfile/') === 0){ url = baseApi + '/' + s; break; }
+            }
+            // if no explicit path, try constructing personal image path from contract code/number
+            if(!url){
+              const code = contract.code || contract.number || contract.id || '';
+              if(code) url = `${baseApi}/downloadfile/${code}/0/personal/0.jpeg`;
+            }
+            if(!url) return;
+            const resp = await fetch(url, { headers: token ? { 'Authorization': 'Bearer ' + token } : {} });
+            if(!resp.ok) return;
+            const blob = await resp.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            // show image
+            img.src = blobUrl; img.style.display = 'block';
+            // open large in new tab on click
+            img.addEventListener('click', ()=> window.open(blobUrl, '_blank'));
+            // remember to revoke when modal hidden
+            modalEl._customerImageUrl = blobUrl;
+          }catch(e){ console.warn('load customer image failed', e); }
+        }
+        tryLoadImage();
+      })();
 
       // Financial/detail fields to show
       const totalPurchase = Number(contract.totalPurchase || 0);
@@ -1372,6 +1423,8 @@
         msg.textContent = 'Không có sản phẩm.';
         container.appendChild(msg);
         modal.show();
+        // revoke object URL when modal closes
+        modalEl.addEventListener('hidden.bs.modal', function(){ try{ if(modalEl._customerImageUrl){ URL.revokeObjectURL(modalEl._customerImageUrl); modalEl._customerImageUrl = null; } }catch(e){} });
         return;
       }
 
