@@ -118,6 +118,8 @@
     /* Canvas sizing: keep overview large and analytics canvases readable */
     canvas{ width:100% !important; height:100% !important; display:block }
     .chart-wrap canvas#overviewChart{ height:420px !important; max-height:520px }
+    /* Make analytics charts equal height */
+    #analytics .card canvas { min-height:220px !important; height:220px !important; }
     /* Customers summary banner (moved outside card) */
     #customersSummary{ background: linear-gradient(180deg,#fff,#fcfeff); border:1px solid var(--border); padding:10px 14px; border-radius:10px; box-shadow:0 6px 18px rgba(15,23,42,0.04); color:var(--muted); display:flex; align-items:center; gap:12px; font-size:0.95rem; margin-bottom:12px }
     #customersSummary .muted{ color:var(--muted) }
@@ -125,6 +127,10 @@
     @media (max-width:576px){ #customersSummary{ font-size:0.88rem; padding:8px 10px } }
     /* Analytics cards: make each chart taller so MC/DL bars are visible and readable */
     #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:320px !important; height:320px !important }
+    /* Revenue chart container should flex to fill its card and stay readable */
+    .card.d-flex .flex-grow-1 canvas{ width:100% !important; height:100% !important; min-height:260px; }
+    /* Centered revenue chart variant */
+    canvas.centered-chart{ display:block; margin:auto; }
   </style>
 </head>
 <body>
@@ -215,19 +221,55 @@
   <!-- Analytics: KPI cards and charts -->
   <div id="analytics" class="mt-4">
     <div id="kpiRow" class="d-flex gap-3 mb-3"></div>
-    <div class="row g-3">
-      <div class="col-md-6"><div class="card p-2"><canvas id="statusChart"></canvas>
-        <div class="text-muted small mt-2">Phân bố trạng thái hợp đồng: hiển thị số lượng hợp đồng theo từng trạng thái.</div>
-      </div></div>
-      <div class="col-md-6"><div class="card p-2"><canvas id="revenueChart"></canvas>
-        <div class="text-muted small mt-2">Doanh số theo tháng.</div>
-      </div></div>
-      <div class="col-md-6"><div class="card p-2"><canvas id="tenorChart"></canvas>
-        <div class="text-muted small mt-2">Phân bố kỳ hạn</div>
-      </div></div>
-      <div class="col-md-6"><div class="card p-2"><canvas id="topChart"></canvas>
-        <div class="text-muted small mt-2">Top hợp đồng</div>
-      </div></div>
+    <div class="row g-3 align-items-stretch">
+      <div class="col-md-6">
+        <div class="card p-2 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Phân bố trạng thái</strong></div>
+            <div>
+              <span class="small text-muted">Hiển thị tổng &amp; tách theo MC / DL</span>
+              <button id="manageStatusBtn" class="btn btn-sm btn-outline-secondary ms-2">Quản lý trạng thái</button>
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-4"><canvas id="statusChartAll"></canvas><div class="text-center small mt-1">Tất cả</div></div>
+            <div class="col-4"><canvas id="statusChartMC"></canvas><div class="text-center small mt-1">MC</div></div>
+            <div class="col-4"><canvas id="statusChartDL"></canvas><div class="text-center small mt-1">DL</div></div>
+          </div>
+          <div id="statusLegend" class="d-flex flex-wrap gap-2 mt-2"></div>
+          <div class="text-muted small mt-1">Phân bố trạng thái hợp đồng: hiển thị số lượng hợp đồng theo từng trạng thái (All / MC / DL).</div>
+          <div class="text-muted small mt-1">Ghi chú: biểu đồ "MC" và "DL" chỉ tính theo loại hợp đồng tương ứng; dùng để so sánh phân bổ trạng thái giữa hai dòng sản phẩm.</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-2 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Doanh số theo tháng</strong></div>
+            <div class="small text-muted">Doanh số theo tháng (MC/DL)</div>
+          </div>
+          <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+            <canvas id="revenueChart" class="centered-chart" style="flex:0 0 auto; max-width:95%; max-height:100%;"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-2 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Phân bố kỳ hạn</strong></div>
+            <div class="small text-muted">Số hợp đồng theo kỳ hạn (tháng)</div>
+          </div>
+          <canvas id="tenorChart"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-2 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Top hợp đồng</strong></div>
+            <div class="small text-muted">Hợp đồng giá trị lớn nhất</div>
+          </div>
+          <canvas id="topChart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
   
@@ -649,6 +691,22 @@
     
 
     // On startup check token validity and require login if missing/expired
+    // Ensure default status mappings exist (so user sees initial rows in manager)
+    function ensureDefaultStatusMappings(){
+      try{
+        const cur = localStorage.getItem('statusMappings');
+        if(cur && cur.trim()) return;
+        const defaults = [
+          { code: 'REJECT', label: 'Từ chối', color: '#e64b4b' },
+          { code: 'LIVE', label: 'Hoạt động', color: '#10b981' },
+          { code: 'FINISH_ADDITIONAL_INFO', label: 'Hoạt tất thêm thô', color: '#111111' },
+          { code: 'ADDITIONAL_INFO', label: 'Thêm thông tin', color: '#9ca3af' },
+          { code: 'REJECT_STATUS', label: 'Từ chối b1', color: '#f59e0b' }
+        ];
+        localStorage.setItem('statusMappings', JSON.stringify(defaults));
+      }catch(e){ console.warn('ensureDefaultStatusMappings failed', e); }
+    }
+    ensureDefaultStatusMappings();
     const initialToken = getAuthToken();
     if(initialToken && isTokenValid(initialToken)) startApp(); else { clearAuthToken(); try{ localStorage.removeItem('authUser'); }catch(e){}; showLogin(); }
 
@@ -692,6 +750,34 @@
         <div class="modal-header"><h5 class="modal-title">Gợi ý tăng kỳ hạn</h5></div>
         <div class="modal-body" id="tenorSuggestionBody"></div>
         <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status mapping manager modal -->
+  <div class="modal fade" id="statusManagerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Quản lý mapping trạng thái</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted">Định nghĩa các mã trạng thái (ví dụ: <code>FINISH_ADDITIONAL_INFO</code>) kèm nhãn hiển thị và màu để biểu đồ dùng.</p>
+          <table class="table table-sm" id="statusMappingsTable">
+            <thead><tr><th>Mã</th><th>Nhãn</th><th>Màu</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="d-flex gap-2">
+            <input id="newStatusCode" class="form-control form-control-sm" placeholder="Mã trạng thái (ví dụ FINISH_ADDITIONAL_INFO)" />
+            <input id="newStatusLabel" class="form-control form-control-sm" placeholder="Nhãn hiển thị" />
+            <input id="newStatusColor" type="color" class="form-control form-control-sm" value="#2b8be6" style="width:56px;padding:2px;" />
+            <button id="addStatusBtn" class="btn btn-sm btn-primary">Thêm</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="saveStatusMappingsBtn" class="btn btn-primary">Lưu</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
       </div>
     </div>
   </div>
@@ -745,7 +831,7 @@
     }
 
     // --- Analytics rendering (status pie, revenue time-series, tenor distribution, top contracts) ---
-    let statusChart = null, revenueChart = null, tenorChart = null, topChart = null;
+    let statusChartAll = null, statusChartMC = null, statusChartDL = null, revenueChart = null, tenorChart = null, topChart = null;
 
     function monthKey(d){ const dt = new Date(d); return dt.getFullYear() + '-' + pad(dt.getMonth()+1); }
 
@@ -762,6 +848,42 @@
     }
 
     function buildStatusCounts(arr){ const m = {}; arr.forEach(c=>{ const s = (c.indusStatus || c.status || c.statusName || 'UNKNOWN') .toString(); m[s] = (m[s]||0) + 1; }); return m; }
+    // Map status for a contract using user-defined mappings (stored in localStorage)
+    function getStatusMappings(){
+      try{
+        const raw = localStorage.getItem('statusMappings');
+        if(!raw) return [];
+        const j = JSON.parse(raw);
+        if(!Array.isArray(j)) return [];
+        return j.map(o=>({ code: String(o.code||'').trim(), label: String(o.label||'').trim(), color: String(o.color||'').trim() }));
+      }catch(e){ return []; }
+    }
+
+    function saveStatusMappings(mappings){ try{ localStorage.setItem('statusMappings', JSON.stringify(mappings || [])); }catch(e){ console.warn('saveStatusMappings failed', e); } }
+
+    function mapStatusForContract(c){
+      const mappings = getStatusMappings();
+      // check statusCodes field first
+      const scRaw = (c.statusCodes || c.statusCode || '');
+      let codes = [];
+      if(Array.isArray(scRaw)) codes = scRaw.map(x=>String(x||'').trim()).filter(Boolean);
+      else if(typeof scRaw === 'string' && scRaw.trim()) codes = scRaw.split(/[,;|\s]+/).map(x=>x.trim()).filter(Boolean);
+      else if(scRaw) codes = [String(scRaw).trim()];
+      for(const code of codes){
+        const found = mappings.find(m=> m.code && String(m.code).toLowerCase() === String(code).toLowerCase());
+        if(found) return { label: found.label || code, color: found.color || null };
+      }
+      // fallback: try indusStatus/status/statusName normalized
+      const raw = (c.indusStatus || c.status || c.statusName || '').toString();
+      const mapped = mappings.find(m=> m.code && String(m.code).toLowerCase() === String(raw).toLowerCase());
+      if(mapped) return { label: mapped.label || raw, color: mapped.color || null };
+      // no mapping found -> use existing display
+      const display = getStatusText(c) || raw || 'UNKNOWN';
+      return { label: display, color: null };
+    }
+
+    // Rebuild status counts using mapped labels
+    function buildStatusCounts(arr){ const m = {}; (arr||[]).forEach(c=>{ const mapped = mapStatusForContract(c); const s = (mapped && mapped.label) ? mapped.label : ( (c.indusStatus || c.status || c.statusName || 'UNKNOWN').toString()); m[s] = (m[s]||0) + 1; }); return m; }
 
     function buildMonthlyRevenue(arr){ const m = {}; arr.forEach(c=>{ const d = c.disbursementDate || c.createdDate || c.approvedDate; if(!d) return; const k = monthKey(d); m[k] = (m[k]||0) + Number(c.financedAmount || c.totalPurchase || 0); }); return m; }
 
@@ -785,24 +907,61 @@
         `;
 
         const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
-        // Status pie
-        const statusCounts = buildStatusCounts(arr);
-        const statusLabels = Object.keys(statusCounts);
-        const statusData = statusLabels.map(l=>statusCounts[l]);
-        if(statusChart) statusChart.destroy();
-        const ctxS = document.getElementById('statusChart').getContext('2d');
-        statusChart = new Chart(ctxS, {
+        // Status pies: All, MC, DL
+        const statusCountsAll = buildStatusCounts(arr);
+        const labelsAll = Object.keys(statusCountsAll);
+        const dataAll = labelsAll.map(l=>statusCountsAll[l]);
+        // build a consistent label list (use labelsAll order) and render legend
+        const uniqueLabels = labelsAll.slice();
+        const legendEl = document.getElementById('statusLegend');
+        if(legendEl){
+          legendEl.innerHTML = '';
+          const mappings = getStatusMappings();
+          uniqueLabels.forEach((lab, idx)=>{
+            const chip = document.createElement('div');
+            chip.style.display = 'inline-flex'; chip.style.alignItems = 'center'; chip.style.gap = '8px';
+            chip.className = 'small';
+            const sw = document.createElement('span');
+            sw.style.width = '12px'; sw.style.height = '12px'; sw.style.display='inline-block'; sw.style.borderRadius='3px';
+            // prefer mapping color if available
+            const mapByLabel = mappings.find(m=> String(m.label||'').toLowerCase() === String(lab||'').toLowerCase());
+            sw.style.background = (mapByLabel && mapByLabel.color) ? mapByLabel.color : PALETTE[idx % PALETTE.length];
+            chip.innerHTML = '';
+            chip.appendChild(sw);
+            const labelText = document.createElement('span'); labelText.textContent = ' ' + lab;
+            chip.appendChild(labelText);
+            legendEl.appendChild(chip);
+          });
+        }
+        const mcArr = (arr||[]).filter(c=> ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'MC');
+        const dlArr = (arr||[]).filter(c=> ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'DL');
+        const statusCountsMC = buildStatusCounts(mcArr);
+        const statusCountsDL = buildStatusCounts(dlArr);
+        const labelsMC = uniqueLabels; // use same order
+        const labelsDL = uniqueLabels; // use same order
+        // All
+        if(statusChartAll) statusChartAll.destroy();
+        const ctxAll = document.getElementById('statusChartAll').getContext('2d');
+        statusChartAll = new Chart(ctxAll, {
           type: 'pie',
-          data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusLabels.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
-          plugins: [],
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'bottom' },
-            },
-            layout: { padding: 6 }
-          }
+          data: { labels: labelsAll, datasets: [{ data: dataAll, backgroundColor: labelsAll.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
+        });
+        // MC
+        if(statusChartMC) statusChartMC.destroy();
+        const ctxMC = document.getElementById('statusChartMC').getContext('2d');
+        statusChartMC = new Chart(ctxMC, {
+          type: 'pie',
+          data: { labels: labelsMC, datasets: [{ data: labelsMC.map(l=> statusCountsMC[l] || 0), backgroundColor: labelsMC.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
+        });
+        // DL
+        if(statusChartDL) statusChartDL.destroy();
+        const ctxDL = document.getElementById('statusChartDL').getContext('2d');
+        statusChartDL = new Chart(ctxDL, {
+          type: 'pie',
+          data: { labels: labelsDL, datasets: [{ data: labelsDL.map(l=> statusCountsDL[l] || 0), backgroundColor: labelsDL.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
         });
 
         // Prepare filtered set: only contracts that are LIVE or have APPROVED_HARD_COPY_STATUS
@@ -1069,7 +1228,60 @@
       const reload = debounce(()=>{ if(!window._allContracts) return; const filtered = applyFilters(window._allContracts); renderCustomers(filtered); });
       if(sel) sel.addEventListener('change', reload);
       const exportBtn = document.getElementById('exportCsvBtn'); if(exportBtn) exportBtn.addEventListener('click', exportCsv);
+      // wire up status manager button
+      const manageBtn = document.getElementById('manageStatusBtn');
+      if(manageBtn){
+        manageBtn.addEventListener('click', ()=>{
+          const modalEl = document.getElementById('statusManagerModal');
+          const modal = new bootstrap.Modal(modalEl);
+          renderStatusMappingsTable();
+          modal.show();
+        });
+      }
+      const addBtn = document.getElementById('addStatusBtn');
+      if(addBtn) addBtn.addEventListener('click', ()=>{
+        const code = (document.getElementById('newStatusCode').value || '').trim();
+        const label = (document.getElementById('newStatusLabel').value || '').trim();
+        const color = (document.getElementById('newStatusColor').value || '').trim() || '#2b8be6';
+        if(!code) return alert('Nhập mã trạng thái');
+        const list = getStatusMappings();
+        list.push({ code, label: label || code, color });
+        saveStatusMappings(list);
+        renderStatusMappingsTable();
+        document.getElementById('newStatusCode').value = ''; document.getElementById('newStatusLabel').value = '';
+      });
+      const saveBtnMap = document.getElementById('saveStatusMappingsBtn');
+      if(saveBtnMap) saveBtnMap.addEventListener('click', ()=>{ const mappings = collectStatusMappingsFromTable(); saveStatusMappings(mappings); if(typeof renderAnalytics === 'function') renderAnalytics(window._allContracts || []); const modalEl = document.getElementById('statusManagerModal'); const m = bootstrap.Modal.getInstance(modalEl); if(m) m.hide(); });
     }
+
+    // Render mappings table inside modal
+    function renderStatusMappingsTable(){
+      const tbody = document.querySelector('#statusMappingsTable tbody'); if(!tbody) return;
+      const mappings = getStatusMappings(); tbody.innerHTML = '';
+      mappings.forEach((m, idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><input class="form-control form-control-sm status-code" value="${escapeHtml(m.code)}" /></td>
+                        <td><input class="form-control form-control-sm status-label" value="${escapeHtml(m.label)}" /></td>
+                        <td><input type="color" class="form-control form-control-sm status-color" value="${escapeHtml(m.color||'#2b8be6')}" style="width:56px;" /></td>
+                        <td><button class="btn btn-sm btn-danger remove-mapping">Xóa</button></td>`;
+        tbody.appendChild(tr);
+      });
+      // attach remove handlers
+      tbody.querySelectorAll('.remove-mapping').forEach(btn=> btn.addEventListener('click', (e)=>{ const row = e.target.closest('tr'); if(row) row.remove(); }));
+    }
+
+    function collectStatusMappingsFromTable(){
+      const rows = Array.from(document.querySelectorAll('#statusMappingsTable tbody tr'));
+      const out = rows.map(r=>{
+        const code = (r.querySelector('.status-code').value || '').trim();
+        const label = (r.querySelector('.status-label').value || '').trim() || code;
+        const color = (r.querySelector('.status-color').value || '').trim() || '#2b8be6';
+        return { code, label, color };
+      }).filter(x=> x.code );
+      return out;
+    }
+
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
     function exportCsv(){
       const rows = window._displayedContracts || [];
