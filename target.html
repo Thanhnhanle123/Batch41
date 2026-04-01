@@ -298,8 +298,9 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Đăng nhập</h5>
-          </div>
+                  <h5 class="modal-title">Đăng nhập</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
           <div class="modal-body">
             <div id="loginError" class="text-danger mb-2" style="display:none;"></div>
             <div class="mb-3">
@@ -334,8 +335,8 @@
     }
 
     // Defaults for targets (can be overridden by user/localStorage)
-    const DEFAULT_MC = 0;
-    const DEFAULT_DL = 0;
+    const DEFAULT_MC = 100000000; // 100 million VND
+    const DEFAULT_DL = 1000000000; // 1 billion VND
     // Color palette for charts
     const PALETTE = ['#2b8be6','#e64b4b','#10b981','#f59e0b','#9ca3af','#60a5fa'];
     // Achieved numbers will be computed from data.json (API) below
@@ -558,6 +559,67 @@
     function defaultFromDate(){ const d = new Date(); d.setDate(1); return d.toISOString().slice(0,10); }
     function defaultToDate(){ const d = new Date(); return d.toISOString().slice(0,10); }
 
+    // Date range helpers: limit range to at most maxMonths (3)
+    function monthDiffInMonths(fromStr, toStr){
+      try{
+        if(!fromStr || !toStr) return 0;
+        const f = new Date(fromStr);
+        const t = new Date(toStr);
+        if(isNaN(f) || isNaN(t)) return 0;
+        let months = (t.getFullYear() - f.getFullYear()) * 12 + (t.getMonth() - f.getMonth());
+        if(t.getDate() < f.getDate()) months -= 1;
+        return months;
+      }catch(e){ return 0; }
+    }
+
+    // Show a modal dialog notification (auto-dismiss optional)
+    function showAlert(msg, type='danger', timeout=5000, title='Thông báo'){
+      try{
+        // create modal markup
+        const id = 'globalAlertModal';
+        // remove existing if present
+        const existing = document.getElementById(id);
+        if(existing) existing.remove();
+        const wrapper = document.createElement('div');
+        wrapper.id = id;
+        wrapper.className = 'modal fade';
+        wrapper.tabIndex = -1;
+        wrapper.innerHTML = `
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">${escapeHtml(title)}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-${type}">${escapeHtml(msg)}</div>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(wrapper);
+        const modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+        modal.show();
+        if(timeout && timeout > 0){ setTimeout(()=>{ try{ modal.hide(); }catch(e){} }, timeout); }
+        wrapper.addEventListener('hidden.bs.modal', ()=>{ try{ wrapper.remove(); }catch(e){} });
+      }catch(e){ console.warn('showAlert failed', e); }
+    }
+
+    function enforceMaxDateRange(maxMonths = 1){
+      try{
+        const f = inputFromDate.value; const t = inputToDate.value;
+        if(!f || !t){ errEl.textContent = ''; return true; }
+        const months = monthDiffInMonths(f,t);
+        if(months === maxMonths){
+          // do NOT auto-adjust — reject range and show error + alert
+          const msg = `Phạm vi tối đa là ${maxMonths} tháng — Vui lòng chọn lại.`;
+          showAlert(msg, 'danger', 6000);
+          return false;
+        }
+        errEl.textContent = '';
+        return true;
+      }catch(e){ return true; }
+    }
+
     // Login modal handling
     const loginModalEl = document.getElementById('loginModal');
     const loginModal = new bootstrap.Modal(loginModalEl, { backdrop: 'static', keyboard: false });
@@ -588,8 +650,8 @@
           });
         }, 350);
       }
-      if(inputFromDate) inputFromDate.addEventListener('change', scheduleReload);
-      if(inputToDate) inputToDate.addEventListener('change', scheduleReload);
+      if(inputFromDate) inputFromDate.addEventListener('change', ()=>{ if(enforceMaxDateRange(1)) scheduleReload(); });
+      if(inputToDate) inputToDate.addEventListener('change', ()=>{ if(enforceMaxDateRange(1)) scheduleReload(); });
 
     // Toggle password visibility
     if(togglePassBtn){
@@ -699,7 +761,7 @@
         const defaults = [
           { code: 'REJECT', label: 'Từ chối', color: '#e64b4b' },
           { code: 'LIVE', label: 'Hoạt động', color: '#10b981' },
-          { code: 'FINISH_ADDITIONAL_INFO', label: 'Hoàn Tất thêm thông tin', color: '#111111' },
+          { code: 'FINISH_ADDITIONAL_INFO', label: 'Hoàn tất thêm thông tin', color: '#111111' },
           { code: 'ADDITIONAL_INFO', label: 'Thêm thông tin', color: '#9ca3af' },
           { code: 'REJECT_STATUS', label: 'Từ chối b1', color: '#f59e0b' }
         ];
@@ -942,25 +1004,33 @@
         // All
         if(statusChartAll) statusChartAll.destroy();
         const ctxAll = document.getElementById('statusChartAll').getContext('2d');
+        // determine colors for each label using mappings when available
+        const mappings = getStatusMappings();
+        const colorsAll = labelsAll.map((lab, i)=>{
+          const m = mappings.find(mm=> String(mm.label||'').toLowerCase() === String(lab||'').toLowerCase());
+          return (m && m.color) ? m.color : PALETTE[i % PALETTE.length];
+        });
         statusChartAll = new Chart(ctxAll, {
           type: 'pie',
-          data: { labels: labelsAll, datasets: [{ data: dataAll, backgroundColor: labelsAll.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          data: { labels: labelsAll, datasets: [{ data: dataAll, backgroundColor: colorsAll }] },
           options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
         });
         // MC
         if(statusChartMC) statusChartMC.destroy();
         const ctxMC = document.getElementById('statusChartMC').getContext('2d');
+        const colorsMC = labelsMC.map((lab, i)=>{ const m = mappings.find(mm=> String(mm.label||'').toLowerCase() === String(lab||'').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
         statusChartMC = new Chart(ctxMC, {
           type: 'pie',
-          data: { labels: labelsMC, datasets: [{ data: labelsMC.map(l=> statusCountsMC[l] || 0), backgroundColor: labelsMC.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          data: { labels: labelsMC, datasets: [{ data: labelsMC.map(l=> statusCountsMC[l] || 0), backgroundColor: colorsMC }] },
           options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
         });
         // DL
         if(statusChartDL) statusChartDL.destroy();
         const ctxDL = document.getElementById('statusChartDL').getContext('2d');
+        const colorsDL = labelsDL.map((lab, i)=>{ const m = mappings.find(mm=> String(mm.label||'').toLowerCase() === String(lab||'').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
         statusChartDL = new Chart(ctxDL, {
           type: 'pie',
-          data: { labels: labelsDL, datasets: [{ data: labelsDL.map(l=> statusCountsDL[l] || 0), backgroundColor: labelsDL.map((_,i)=> PALETTE[i % PALETTE.length]) }] },
+          data: { labels: labelsDL, datasets: [{ data: labelsDL.map(l=> statusCountsDL[l] || 0), backgroundColor: colorsDL }] },
           options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
         });
 

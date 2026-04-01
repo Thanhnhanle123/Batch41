@@ -417,6 +417,37 @@
       // selected tenor from UI
       let selectedTenor = null;
 
+      // Helper: normalize HE_SO entry formats (support new array-of-objects and legacy object mapping)
+      function getHeSoEntries(pkg) {
+        const raw = HE_SO[pkg];
+        if (!raw) return [];
+        if (Array.isArray(raw)) {
+          return raw.map((e) => ({
+            tenor: parseInt(e.tenor, 10),
+            coef: parseFloat(e.coef),
+            minPercent: typeof e.minPercent === "number" ? e.minPercent : null,
+            maxPercent: typeof e.maxPercent === "number" ? e.maxPercent : null,
+          }));
+        }
+        // legacy format: object mapping tenor->coef
+        return Object.entries(raw).map(([t, hs]) => ({
+          tenor: parseInt(t, 10),
+          coef: parseFloat(hs),
+          minPercent: null,
+          maxPercent: null,
+        }));
+      }
+
+      // Percent tolerance (in percent points). e.g. 0.5 allows 10.12% to match 10% bucket
+      const PERCENT_TOLERANCE = 0.5;
+
+      function percentAllowed(entry, percentVal) {
+        const tol = PERCENT_TOLERANCE;
+        if (entry.minPercent !== null && percentVal + tol < entry.minPercent) return false;
+        if (entry.maxPercent !== null && percentVal - tol > entry.maxPercent) return false;
+        return true;
+      }
+
       function renderPackageButtons() {
         const container = $("packageButtons");
         container.innerHTML = "";
@@ -530,7 +561,6 @@
         let gia = parse($("giaXe").value);
         let tra = parse($("traTien").value);
         let vay = gia - tra;
-        let heSo = HE_SO[currentPackage];
         let min = Infinity,
           plans = [];
 
@@ -550,13 +580,20 @@
           $("ageAlert").innerText = "";
         }
 
-        Object.entries(heSo).forEach(([t, hs]) => {
-          const tenor = parseInt(t);
-          if (allowed && !allowed.includes(tenor)) return; // skip disallowed tenor
-          let thang = ceil(vay * hs + 12000);
-          let lai = thang * t - vay;
+        const percentVal = parseFloat($("traPercent").value || 0);
+        const heSoEntries = getHeSoEntries(currentPackage);
+
+        heSoEntries.forEach((entry) => {
+          const tenor = entry.tenor;
+          // filter by age-allowed tenor
+          if (allowed && !allowed.includes(tenor)) return;
+          // filter by percent constraints if present
+          if (!percentAllowed(entry, percentVal)) return;
+
+          let thang = ceil(vay * entry.coef + 12000);
+          let lai = thang * tenor - vay;
           if (lai < min) min = lai;
-          plans.push({ t, thang, lai });
+          plans.push({ t: tenor, thang, lai });
         });
 
         let html = `
@@ -631,9 +668,13 @@
 
         let plans = {};
         const allowed = getAllowedTenors();
-        Object.entries(heSo).forEach(([t, hs]) => {
-          if (allowed && !allowed.includes(parseInt(t))) return;
-          let thang = ceil(vay * hs + 12000);
+        const percentVal = parseFloat($("traPercent").value || 0);
+        const heSoEntries = getHeSoEntries(currentPackage);
+        heSoEntries.forEach((entry) => {
+          const t = entry.tenor;
+          if (allowed && !allowed.includes(t)) return;
+          if (!percentAllowed(entry, percentVal)) return;
+          let thang = ceil(vay * entry.coef + 12000);
           let tongLai = thang * t - vay;
 
           plans[t] = {
