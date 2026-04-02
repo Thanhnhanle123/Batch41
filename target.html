@@ -345,14 +345,17 @@
 
     // (removed simple data-only fetchAchievedFromData) - consolidated version below handles API + fallback
 
+    // Chuyển giá trị input (chuỗi có thể chứa '.' hoặc ',' hoặc khoảng trắng) sang Number.
+    // Trả về 0 khi giá trị không hợp lệ hoặc rỗng.
     function parseNumberInput(s){
       if(s === null || s === undefined) return 0;
-      // remove dots/commas/spaces
+      // loại bỏ dấu phân nhóm và khoảng trắng
       const cleaned = String(s).replace(/[\.\,\s]/g,'');
       const n = Number(cleaned);
       return isNaN(n) ? 0 : n;
     }
 
+    // Lấy chỉ tiêu MC và DL từ localStorage. Nếu chưa có, trả về giá trị mặc định.
     function getStoredTargets(){
       const m = parseNumberInput(localStorage.getItem('targetMC')) || DEFAULT_MC;
       const d = parseNumberInput(localStorage.getItem('targetDL')) || DEFAULT_DL;
@@ -366,6 +369,7 @@
     const saveStatus = document.getElementById('saveStatus');
 
     // Format helpers for target inputs (thousand separator '.' for vi-VN)
+    // Định dạng chuỗi số: thêm dấu chấm nhóm hàng nghìn (dùng cho hiển thị trong input).
     function formatNumberStringWithDots(s){
       const digits = String(s || '').replace(/[^0-9]/g, '');
       if(!digits) return '';
@@ -386,7 +390,9 @@
       });
     });
 
-    // Chart rendering logic
+    // Vẽ biểu đồ tổng quan (bar chart) so sánh: Chỉ tiêu vs Đã đạt cho MC và DL.
+    // - `mcTarget`, `dlTarget`: chỉ tiêu tiền tệ (VND)
+    // Sử dụng biến toàn cục `mcAch` và `dlAch` làm giá trị đã đạt.
     let chartInstance = null;
     function renderChart(mcTarget, dlTarget){
       const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
@@ -421,6 +427,7 @@
       // (resize re-render handled globally to avoid duplicate listeners)
     }
 
+    // Tạo phần tóm tắt (summary) hiển thị: chỉ tiêu, đã đạt, còn thiếu và tỷ lệ (%) cho MC, DL và tổng.
     function renderSummary(mcTarget, dlTarget){
       const mcTotal = mcTarget;
       const mcAchieved = mcAch;
@@ -472,23 +479,24 @@
       if(existing) existing.outerHTML = summaryHtml; else document.querySelector('.chart-wrap').insertAdjacentHTML('afterend', summaryHtml);
     }
 
-    // AUTH helpers
+    // AUTH helpers: lưu/đọc token trong localStorage
     function getAuthToken(){ return localStorage.getItem('authToken'); }
     function setAuthToken(t){ localStorage.setItem('authToken', t); }
     function clearAuthToken(){ localStorage.removeItem('authToken'); }
 
-    // Fetch wrapper that sends Authorization header when token present
-    // Accepts optional from/to dates in input date format (YYYY-MM-DD). The API expects DD-MM-YYYY
+    // Chuyển định dạng ngày từ input HTML 'YYYY-MM-DD' sang định dạng API 'DD-MM-YYYY'.
     function formatApiDateFromInput(d){ // 'YYYY-MM-DD' -> 'DD-MM-YYYY'
       if(!d) return '';
       const parts = d.split('-'); if(parts.length !== 3) return d;
       return parts[2] + '-' + parts[1] + '-' + parts[0];
     }
 
+    // Lấy thông tin user đã lưu (payload) từ localStorage (dạng JSON). Trả về null nếu không parse được.
     function getStoredAuthUser(){
       try{ const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; }catch(e){ return null; }
     }
-    // JWT helpers: basic payload parse and expiry check
+    // JWT helpers: giải mã payload của token (không verify signature) và kiểm tra expiry.
+    // `parseJwtPayload` trả về object payload nếu parse thành công, ngược lại null.
     function parseJwtPayload(token){
       try{
         const parts = token.split('.'); if(parts.length < 2) return null;
@@ -498,17 +506,21 @@
       }catch(e){ return null; }
     }
 
+    // Trả về true nếu token có claim `exp` và chưa hết hạn.
     function isTokenValid(token){
       if(!token) return false;
       const p = parseJwtPayload(token); if(!p) return false;
       if(p.exp && typeof p.exp === 'number'){
         const now = Math.floor(Date.now()/1000);
-        // consider token invalid if exp <= now
         return p.exp > now;
       }
-      return true; // no exp claim — assume valid
+      return true; // nếu không có exp, giả sử còn hợp lệ
     }
 
+    // Tải danh sách hợp đồng từ API theo user hiện tại và khoảng ngày.
+    // - Kiểm tra token trong localStorage (nếu hết hạn => yêu cầu đăng nhập).
+    // - Gọi API, xử lý nhiều dạng response (paged.content, contracts, or raw array).
+    // - Tính `mcAch` và `dlAch` (tổng giá trị hợp đồng theo loại) và trả về object {mcAch, dlAch}.
     function fetchAchievedFromData(fromInput, toInput){
       const token = getAuthToken();
       const authUser = getStoredAuthUser();
@@ -555,11 +567,15 @@
     }
 
     // date helpers: default to current month
+    // `pad` thêm số 0 phía trước nếu cần (ví dụ 7 -> '07')
     function pad(n){ return n<10 ? '0'+n : String(n); }
+    // `defaultFromDate` trả về ngày đầu tháng hiện tại (YYYY-MM-DD)
     function defaultFromDate(){ const d = new Date(); d.setDate(1); return d.toISOString().slice(0,10); }
+    // `defaultToDate` trả về ngày hiện tại (YYYY-MM-DD)
     function defaultToDate(){ const d = new Date(); return d.toISOString().slice(0,10); }
 
     // Date range helpers: limit range to at most maxMonths (3)
+    // Tính hiệu số tháng giữa hai ngày (kết quả có thể âm nếu to < from).
     function monthDiffInMonths(fromStr, toStr){
       try{
         if(!fromStr || !toStr) return 0;
@@ -572,7 +588,9 @@
       }catch(e){ return 0; }
     }
 
-    // Show a modal dialog notification (auto-dismiss optional)
+    // Hiển thị popup modal cảnh báo/thông báo.
+    // - `msg`: nội dung, `type`: bootstrap alert type (danger, success, info...),
+    // - `timeout`: thời gian tự đóng (ms), `title`: tiêu đề modal.
     function showAlert(msg, type='danger', timeout=5000, title='Thông báo'){
       try{
         // create modal markup
@@ -604,6 +622,7 @@
       }catch(e){ console.warn('showAlert failed', e); }
     }
 
+    // Kiểm tra và ép giới hạn khoảng thời gian tối đa (theo tháng). Nếu vượt, hiển thị lỗi và trả về false.
     function enforceMaxDateRange(maxMonths = 1){
       try{
         const f = inputFromDate.value; const t = inputToDate.value;
@@ -630,6 +649,7 @@
     const togglePassBtn = document.getElementById('togglePassBtn');
     const inputFromDate = document.getElementById('inputFromDate');
     const inputToDate = document.getElementById('inputToDate');
+      // Tự động debounce và tải lại dữ liệu khi người dùng thay đổi ngày hoặc các filter.
       let _loadTimer = null;
       function scheduleReload(){
         clearTimeout(_loadTimer);
@@ -668,10 +688,12 @@
       });
     }
 
+    // Hiện modal đăng nhập và làm sạch lỗi/field trước khi hiển thị.
     function showLogin(){ loginErrorEl.style.display = 'none'; loginErrorEl.textContent = '';
       loginUserEl.value = ''; loginPassEl.value = ''; loginModal.show();
     }
 
+    // Khởi động app: tải dữ liệu đã đạt từ API và render chart + summary.
     function startApp(){
       // read dates from inputs (if set) or use defaults
       const from = inputFromDate.value || null;
@@ -693,7 +715,8 @@
       });
     }
 
-    // Real login: POST to auth API and store accessToken + user info
+    // Xử lý sự kiện đăng nhập: gửi POST tới API auth, lưu `accessToken` và payload user vào localStorage,
+    // sau đó đóng modal và khởi động lại ứng dụng (startApp).
     loginBtnEl.addEventListener('click', async ()=>{
       const u = (loginUserEl.value || '').trim();
       const p = (loginPassEl.value || '');
@@ -958,7 +981,7 @@
         // KPIs
         const totalContracts = arr.length;
         const liveContracts = arr.filter(c=> (c.indusStatus||'').toString().toLowerCase() === 'live').length;
-        const totalFinanced = arr.reduce((s,c)=> s + (c.status === "APPROVED_HARD_COPY_STATUS" ? Number(c.financedAmount||c.totalPurchase||0) : 0), 0);
+        const totalFinanced = arr.reduce((s,c)=> s + (c.result === "APPROVE_STATUS" ? Number(c.financedAmount||c.totalPurchase||0) : 0), 0);
         const totalDisbursed = arr.reduce((s,c)=> s + (c.disbursementDate && c.indusStatus == "LIVE" ? Number(c.financedAmount||0) : 0), 0);
         const kpiRow = document.getElementById('kpiRow');
         kpiRow.innerHTML = `
