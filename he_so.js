@@ -5,9 +5,9 @@
 // Backward compatibility: if HE_SO[package] is an object mapping tenor->coef, code will still handle it.
 const HE_SO = {
   0.99: [
-    { tenor: 9, coef: 0.126179, minPercent: 0, maxPercent: 10 },
-    { tenor: 12, coef: 0.098233, minPercent: 0, maxPercent: 10 },
-    { tenor: 15, coef: 0.081497, minPercent: 0, maxPercent: 10 },
+    { tenor: 9, coef: 0.126179, minPercent: 0, maxPercent: 19 },
+    { tenor: 12, coef: 0.098233, minPercent: 0, maxPercent: 19 },
+    { tenor: 15, coef: 0.081497, minPercent: 0, maxPercent: 19 }, 
     { tenor: 9, coef: 0.126179, minPercent: 20  },
     { tenor: 12, coef: 0.098233, minPercent: 20  },
     { tenor: 15, coef: 0.081497, minPercent: 20 },
