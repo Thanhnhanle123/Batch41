@@ -23,9 +23,27 @@
     *{ box-sizing: border-box; font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial; }
     body{ background: var(--bg); color:#24313a; -webkit-font-smoothing:antialiased }
     h1{font-size:20px; margin-bottom:12px; font-weight:700}
-    header{ position:fixed; top:0; left:0; right:0; height:64px; background:linear-gradient(90deg,#fff,#fbfdff); display:flex; align-items:center; justify-content:space-between; padding:0 18px; box-shadow:var(--shadow); z-index:1000 }
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+    }
     .logo{ font-weight:800; color:var(--accent); font-size:16px }
-    .desktop-nav a{ margin-left:14px; font-size:14px; color:#2b3b4a; text-decoration:none }
+    .desktop-nav a {
+        margin-left: 15px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #333;
+    }
     @media (max-width:768px){ .desktop-nav{ display:none } }
     .page{ max-width:var(--max-width); margin:0 auto; padding-top:92px; padding-left:16px; padding-right:16px }
 
@@ -140,6 +158,7 @@
         <a href="./index.html">Tính trả góp</a>
         <a href="./cancel_contract.html">Huỷ HĐ</a>
         <a href="./target.html">Tổng quan chỉ tiêu</a>
+        <a href="./customers.html">Danh sách khách hàng</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
       </nav>
       <!-- HAMBURGER -->
@@ -169,6 +188,7 @@
         >❌ Huỷ hợp đồng</a
         >
         <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
+        <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
         <hr />
         <button class="btn btn-danger w-100" onclick="logout()">
           🔐 Đăng xuất
@@ -1243,7 +1263,7 @@
     // helper: returns true if contract is LIVE (indusStatus) or has APPROVED_HARD_COPY_STATUS in statusCodes
     function isLiveOrApproved(c){
       const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
-      if(ind.includes('live') || ind === 'l') return true;
+      if(ind.includes('live') || ind.includes('request for disbursement') || ind === 'l') return true;
       const scRaw = (c.statusCodes || c.statusCode || '');
       let codes = [];
       if(Array.isArray(scRaw)) codes = scRaw.map(x=>String(x||'').trim()).filter(Boolean);
