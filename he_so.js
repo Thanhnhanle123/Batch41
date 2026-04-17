@@ -73,13 +73,13 @@ const HE_SO = {
   // coef: 0,13484	0,10682	0,09020	0,07915	0,07136	0,06554	0,05759	0,05243
   // minPercent: 20 for all 1.85 entries
   1.85: [
-    { tenor: 9, coef: 0.13218, minPercent: 20 },
-    { tenor: 12, coef: 0.10422, minPercent: 20 },
-    { tenor: 15, coef: 0.08751, minPercent: 20 },
-    { tenor: 18, coef: 0.07644, minPercent: 20 },
-    { tenor: 21, coef: 0.06858, minPercent: 20 },
-    { tenor: 24, coef: 0.06273, minPercent: 20 },
-    { tenor: 30, coef: 0.05467, minPercent: 20 },
-    { tenor: 36, coef: 0.04941, minPercent: 20 },
+    { tenor: 9, coef: 0.13484, minPercent: 20 },
+    { tenor: 12, coef: 0.10682, minPercent: 20 },
+    { tenor: 15, coef: 0.09020, minPercent: 20 },
+    { tenor: 18, coef: 0.07915, minPercent: 20 },
+    { tenor: 21, coef: 0.07136, minPercent: 20 },
+    { tenor: 24, coef: 0.06554, minPercent: 20 },
+    { tenor: 30, coef: 0.05759, minPercent: 20 },
+    { tenor: 36, coef: 0.05243, minPercent: 20 },
   ]
 };
