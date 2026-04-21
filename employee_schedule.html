@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tìm lịch theo nhân viên</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      * { box-sizing: border-box; font-family: Roboto; }
+      body { background: #f0f4f8; padding-top: 56px; }
+      header { position: fixed; top:0; left:0; right:0; height:56px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 15px; box-shadow:0 4px 12px rgba(0,0,0,0.08); z-index:1000 }
+      .logo{font-weight:700; color:#007bff; font-size:16px}
+      .desktop-nav a { margin-left: 15px; font-size: 14px; text-decoration: none; color: #333; }
+      @media (max-width: 768px) { .desktop-nav { display: none; } }
+      .container-custom{ max-width:900px; margin:90px auto 40px; background:#fff; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08)}
+    table { width:100%; }
+
+    /* Highlight today's rows */
+    tr.table-warning td { font-weight: 600; border-left: 4px solid #ffc107; }
+    tr.table-warning { background-color: #fff3cd !important; }
+    .today-badge { background: #ffc107; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 6px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">🚗 Batch 41</div>
+      <nav class="desktop-nav">
+        <a href="./index.html">Tính trả góp</a>
+        <a href="./cancel_contract.html">Huỷ HĐ</a>
+        <a href="./target.html">Tổng quan chỉ tiêu</a>
+        <a href="./customers.html">Danh sách khách hàng</a>
+        <a href="./customer_search.html">Tìm khách hàng</a>
+        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
+        <a href="#" onclick="logout()">Đăng xuất</a>
+      </nav>
+      <!-- HAMBURGER -->
+      <button
+        class="btn btn-outline-primary d-md-none"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileMenu"
+      >
+        ☰
+      </button>
+    </header>
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🚗 Batch 41</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
+        <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
+        <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
+        <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
+        <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Tìm lịch làm việc</a>
+        <hr />
+        <button class="btn btn-danger w-100" onclick="logout()">🔐 Đăng xuất</button>
+      </div>
+    </div>
+
+    <div class="container-custom">
+      <h5 class="text-center mb-3">Tìm lịch làm việc theo nhân viên</h5>
+
+      <div class="row g-2 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Chọn nhân viên</label>
+          <div>
+            <select id="employeeSelect" class="form-select">
+              <option value="">-- Chọn --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      
+
+      <div id="resultArea">
+        <table class="table table-sm table-striped" id="resultTable">
+          <thead>
+            <tr><th>Ngày</th><th>POS</th><th>POS Name</th><th>Nhân viên</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+     <script>
+      if (sessionStorage.getItem("logged") !== "1") {
+        window.location.href = "index.html";
+      }
+      function logout() {
+        sessionStorage.removeItem("logged");
+        location.href = "index.html";
+      }
+    </script>
+
+    <script>
+      // danh sách mặc định (cùng với tên bạn đã cung cấp)
+      const NAMES = ['Mai','Bảo','Tú','Nguyên','Kiều','Thuận','Thanh','Hiền','Tiên','Quỳnh','Chi','Phố','Yến','Hoa','Loan','Trinh','An','Mẫn','Ngọc','Nhân'];
+
+      const select = document.getElementById('employeeSelect');
+      const tbody = document.querySelector('#resultTable tbody');
+
+      NAMES.forEach(n=>{
+        const opt = document.createElement('option'); opt.value = n; opt.text = n; select.appendChild(opt);
+      });
+
+      select.onchange = ()=>{ loadByName() }
+
+      function normalizeName(name){
+        if(!name) return '';
+        // try to produce filename variants: keep original and ascii-normalized
+        const orig = name.trim();
+        const ascii = orig.normalize('NFD').replace(/\p{Diacritic}/gu,'');
+        return [orig, ascii, ascii.replace(/\s+/g,'_')];
+      }
+
+      async function loadByName(){
+        const name = (select.value||'').trim();
+        if(!name) { alert('Chọn nhân viên'); return }
+        // load master day_llv.json and filter client-side by name (diacritics-insensitive)
+        function stripDiacritics(s){
+          return String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu,'');
+        }
+        const needle = stripDiacritics(name).toLowerCase();
+        try{
+          const res = await fetch('day_llv.json');
+          if(!res.ok){ alert('Không tìm thấy day_llv.json'); return }
+          const data = await res.json();
+          const filtered = data.filter(item => {
+            const source = item.employee || item.name || item.Nhân || '';
+            const n = stripDiacritics(source).toLowerCase().trim();
+            // exact match (diacritics-insensitive, case-insensitive)
+            return n === needle && item.day !== null;
+          });
+          if(!filtered.length){ alert('Không tìm thấy lịch cho: '+name); return }
+          renderTable(filtered);
+        }catch(e){
+          alert('Lỗi khi đọc day_llv.json');
+          console.error(e);
+        }
+      }
+
+      function renderTable(items){
+        tbody.innerHTML = '';
+        const today = new Date();
+        items.forEach(it=>{
+          const tr = document.createElement('tr');
+          const day = it.day || it.date || '';
+          const pos = it.pos || it.pos_code || it.posName || it.pos_name || '';
+          const posName = it.posName || it.pos_name || '';
+          const name = it.name || it.employee || '';
+
+          let isToday = false;
+          if(day){
+            const s = String(day).trim();
+            // 1) Try native Date parse (ISO and JS-recognized formats)
+            const parsed = new Date(s);
+            if(!isNaN(parsed)){
+              isToday = parsed.getFullYear() === today.getFullYear() && parsed.getMonth() === today.getMonth() && parsed.getDate() === today.getDate();
+            } else {
+              // 2) Try YYYY-MM-DD or YYYY/MM/DD with optional time
+              let m = s.match(/^(\d{4})[\-\/]?(\d{1,2})[\-\/]?(\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+              if(m){
+                const y = +m[1], mo = +m[2]-1, d = +m[3];
+                isToday = y === today.getFullYear() && mo === today.getMonth() && d === today.getDate();
+              } else {
+                // 3) Try DD/MM/YYYY or DD-MM-YYYY (common local format)
+                m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+                if(m){
+                  const d = +m[1], mo = +m[2]-1, y = +m[3];
+                  isToday = y === today.getFullYear() && mo === today.getMonth() && d === today.getDate();
+                }
+              }
+            }
+          }
+
+          if(isToday) tr.classList.add('table-warning');
+          tr.innerHTML = `<td>${day}</td><td>${pos}</td><td>${posName}</td><td>${name}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function showAll(){
+        // load day_llv.json if present for overview
+        fetch('day_llv.json').then(r=>r.ok? r.json(): null).then(d=>{ if(d) renderTable(d); else alert('Không có day_llv.json') })
+      }
+
+      function exportCSV(){
+        const rows = Array.from(tbody.querySelectorAll('tr')).map(tr=>
+          Array.from(tr.children).map(td=>`"${td.innerText.replace(/"/g,'""')}"`).join(',')
+        );
+        if(!rows.length){ alert('Chưa có dữ liệu để xuất'); return }
+        const csv = ['Ngày,POS,Tên', ...rows].join('\n');
+        const a = document.createElement('a');
+        a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+        a.download = 'schedule_export.csv'; a.click();
+      }
+    </script>
+  </body>
+</html>

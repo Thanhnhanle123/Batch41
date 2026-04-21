@@ -1,16 +1,43 @@
 <!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tìm thông tin khách hàng</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    :root{ --bg:#f0f4f8; --card:#fff; --accent:#007bff; --muted:#556b77; --border:rgba(227,234,243,1); --radius:12px }
-    *{ box-sizing:border-box; font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial }
-    body{ background:var(--bg); margin:0; color:#24313a; padding-top:56px }
-   header {
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tìm thông tin khách hàng</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f0f4f8;
+        --card: #fff;
+        --accent: #007bff;
+        --muted: #556b77;
+        --border: rgba(227, 234, 243, 1);
+        --radius: 12px;
+      }
+      * {
+        box-sizing: border-box;
+        font-family:
+          Roboto,
+          Inter,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Arial;
+      }
+      body {
+        background: var(--bg);
+        margin: 0;
+        color: #24313a;
+        padding-top: 56px;
+      }
+      header {
         position: fixed;
         top: 0;
         left: 0;
@@ -34,40 +61,158 @@
         font-size: 14px;
         text-decoration: none;
         color: #333;
-    }
-    .page{ max-width:520px; margin:0 auto; padding-top:24px; padding-left:18px; padding-right:18px }
-    .card-search{ background:var(--card); border:1px solid var(--border); padding:20px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.10) }
-    .form-row{ display:flex; gap:10px; flex-wrap:wrap }
-    .form-row input{ min-width:180px }
-    .small-muted{ color:var(--muted) }
-    /* Modal / login input styling (consistent with other pages) */
-    .modal .modal-dialog{ max-width:420px }
-    .modal .modal-content{ border-radius:12px; padding:0; overflow:hidden }
-    .modal .modal-header{ border-bottom:0; padding:16px 20px }
-    .modal .modal-title{ margin:0; font-weight:700; font-size:18px }
-    .modal .modal-body{ padding:18px 20px }
-    .modal .input-group{ border:1px solid #e6eef9; border-radius:10px; overflow:hidden; display:flex; align-items:center }
-    .modal .input-group .form-control{ border:0; box-shadow:none; border-radius:0; padding:10px 12px }
-    .modal .input-group .btn{ border:0; box-shadow:none; min-width:44px; padding:6px 8px; background:transparent }
-    /* Result cards */
-    .result-list{ display:flex; flex-direction:column; gap:14px; margin-top:14px }
-    .result-card{ background:#ffffff; border:1px solid rgba(43,139,230,0.08); border-radius:12px; padding:14px; box-shadow:0 8px 24px rgba(43,139,230,0.06); display:flex; gap:14px; align-items:flex-start }
-    .result-card .left{ flex:0 0 170px }
-    .result-card .right{ flex:1 }
-    .result-card h6{ margin:0 0 8px 0; font-size:16px; color:var(--accent) }
-    .meta-row{ color:var(--muted); font-size:13px; margin-bottom:6px }
-    .result-actions{ margin-top:10px }
-    .btn-primary, .btn-outline-secondary{ border-radius:8px }
-    .btn-primary{ background:var(--accent); border-color:var(--accent) }
-    @media (max-width:768px){ .desktop-nav{ display:none } }
-    .badge-live{ background:#10b981; color:#fff; padding:6px 8px; border-radius:8px; font-weight:700; font-size:12px }
-    .badge-other{ background:#6b7280; color:#fff; padding:6px 8px; border-radius:8px; font-weight:700; font-size:12px }
-    .small-key{ color:var(--muted); font-size:13px; margin-right:6px }
-    .raw-json{ margin-top:8px; background:#0f172a10; padding:8px; border-radius:8px; font-size:12px; display:none; white-space:pre-wrap }
-    .result-actions{ margin-top:8px }
-  </style>
-</head>
-<body>
+      }
+      .page {
+        max-width: 520px;
+        margin: 0 auto;
+        padding-top: 24px;
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .card-search {
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      .form-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .form-row input {
+        min-width: 180px;
+      }
+      .small-muted {
+        color: var(--muted);
+      }
+      /* Modal / login input styling (consistent with other pages) */
+      .modal .modal-dialog {
+        max-width: 420px;
+      }
+      .modal .modal-content {
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+      }
+      .modal .modal-header {
+        border-bottom: 0;
+        padding: 16px 20px;
+      }
+      .modal .modal-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      .modal .modal-body {
+        padding: 18px 20px;
+      }
+      .modal .input-group {
+        border: 1px solid #e6eef9;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+      }
+      .modal .input-group .form-control {
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 10px 12px;
+      }
+      .modal .input-group .btn {
+        border: 0;
+        box-shadow: none;
+        min-width: 44px;
+        padding: 6px 8px;
+        background: transparent;
+      }
+      /* Result cards */
+      .result-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 14px;
+      }
+      .result-card {
+        background: #ffffff;
+        border: 1px solid rgba(43, 139, 230, 0.08);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 8px 24px rgba(43, 139, 230, 0.06);
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+      }
+      .result-card .left {
+        flex: 0 0 170px;
+      }
+      .result-card .right {
+        flex: 1;
+      }
+      .result-card h6 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: var(--accent);
+      }
+      .meta-row {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .result-actions {
+        margin-top: 10px;
+      }
+      .btn-primary,
+      .btn-outline-secondary {
+        border-radius: 8px;
+      }
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none;
+        }
+      }
+      .badge-live {
+        background: #10b981;
+        color: #fff;
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .badge-other {
+        background: #6b7280;
+        color: #fff;
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .small-key {
+        color: var(--muted);
+        font-size: 13px;
+        margin-right: 6px;
+      }
+      .raw-json {
+        margin-top: 8px;
+        background: #0f172a10;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 12px;
+        display: none;
+        white-space: pre-wrap;
+      }
+      .result-actions {
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
     <header>
       <div class="logo">🚗 Batch 41</div>
       <nav class="desktop-nav">
@@ -76,6 +221,7 @@
         <a href="./target.html">Tổng quan chỉ tiêu</a>
         <a href="./customers.html">Danh sách khách hàng</a>
         <a href="./customer_search.html">Tìm khách hàng</a>
+        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
       </nav>
       <!-- HAMBURGER -->
@@ -98,231 +244,529 @@
         ></button>
       </div>
       <div class="offcanvas-body">
-        <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
-        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
-        <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
-        <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
-        <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
+        <a class="btn btn-light w-100 mb-2" href="index.html"
+          >📊 Tính trả góp</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
+          >❌ Huỷ hợp đồng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./target.html"
+          >📈 Tổng quan chỉ tiêu</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./customers.html"
+          >👥 Dan sách khách hàng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./customer_search.html"
+          >🔎 Tìm khách hàng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html"
+          >📅 Tìm lịch làm việc</a
+        >
         <hr />
-        <button class="btn btn-danger w-100" onclick="logout()">🔐 Đăng xuất</button>
+        <button class="btn btn-danger w-100" onclick="logout()">
+          🔐 Đăng xuất
+        </button>
       </div>
     </div>
 
     <div class="page">
-        <div class="card-search">
+      <div class="card-search">
         <h5 class="text-center mb-3">TÌM THÔNG TIN KHÁCH HÀNG</h5>
-      <div class="form-row mb-3">
-        <input id="qPhone" class="form-control" placeholder="Số điện thoại" required />
-        <input id="qName" class="form-control" placeholder="Họ và tên" required />
-        <input id="qNid" class="form-control" placeholder="CMND/CCCD" required />
-        <select id="idTypeSelect" class="form-control" style="max-width:160px">
-          <option value="auto">Tự động (CCCD/CMND)</option>
-          <option value="cccd">CCCD</option>
-          <option value="cmnd">CMND</option>
-        </select>
-        <button id="searchBtn" class="btn btn-primary">Tìm</button>
-        <button id="clearBtn" class="btn btn-outline-secondary">Xóa</button>
-      </div>
-      <div class="mb-2">
-        <textarea id="pasteBlock" class="form-control" placeholder="Dán đoạn thông tin khách hàng ở đây (tự động lấy Họ tên + CCCD/CMND khi dán)" rows="4"></textarea>
-      </div>
-      <div id="status" class="mb-2 small-muted"></div>
-      <div id="result"></div>
-    </div>
-  </div>
-
-  <!-- Login modal (same flow as other pages) -->
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Đăng nhập</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="form-row mb-3">
+          <input
+            id="qPhone"
+            class="form-control"
+            placeholder="Số điện thoại"
+            required
+          />
+          <input
+            id="qName"
+            class="form-control"
+            placeholder="Họ và tên"
+            required
+          />
+          <input
+            id="qNid"
+            class="form-control"
+            placeholder="CMND/CCCD"
+            required
+          />
+          <select
+            id="idTypeSelect"
+            class="form-control"
+            style="max-width: 160px"
+          >
+            <option value="auto">Tự động (CCCD/CMND)</option>
+            <option value="cccd">CCCD</option>
+            <option value="cmnd">CMND</option>
+          </select>
+          <button id="searchBtn" class="btn btn-primary">Tìm</button>
+          <button id="clearBtn" class="btn btn-outline-secondary">Xóa</button>
         </div>
-        <div class="modal-body">
-          <div id="loginError" class="text-danger mb-2" style="display:none;"></div>
-          <div class="mb-3">
-            <label class="form-label">Tài khoản</label>
-            <input id="loginUsername" class="form-control" autocomplete="username" />
+        <div class="mb-2">
+          <textarea
+            id="pasteBlock"
+            class="form-control"
+            placeholder="Dán đoạn thông tin khách hàng ở đây (tự động lấy Họ tên + CCCD/CMND khi dán)"
+            rows="4"
+          ></textarea>
+        </div>
+        <div id="status" class="mb-2 small-muted"></div>
+        <div id="result"></div>
+      </div>
+    </div>
+
+    <!-- Login modal (same flow as other pages) -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Đăng nhập</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
-            <div class="input-group">
-              <input id="loginPassword" type="password" class="form-control" autocomplete="current-password" />
-              <button class="btn btn-outline-secondary" type="button" id="togglePassBtn">👁️</button>
+          <div class="modal-body">
+            <div
+              id="loginError"
+              class="text-danger mb-2"
+              style="display: none"
+            ></div>
+            <div class="mb-3">
+              <label class="form-label">Tài khoản</label>
+              <input
+                id="loginUsername"
+                class="form-control"
+                autocomplete="username"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <div class="input-group">
+                <input
+                  id="loginPassword"
+                  type="password"
+                  class="form-control"
+                  autocomplete="current-password"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="togglePassBtn"
+                >
+                  👁️
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          <div class="modal-footer">
+            <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+    <script>
+      if (sessionStorage.getItem("logged") !== "1") {
+        window.location.href = "index.html";
+      }
+      function logout() {
+        sessionStorage.removeItem("logged");
+        location.href = "index.html";
+      }
+    </script>
 
-  <script>
-    // Auth helpers
-    function getAuthToken(){ return localStorage.getItem('authToken'); }
-    function setAuthToken(t){ try{ localStorage.setItem('authToken', t); }catch(e){} }
-    function clearAuthToken(){ try{ localStorage.removeItem('authToken'); }catch(e){} }
-    function getStoredAuthUser(){ try{ return JSON.parse(localStorage.getItem('authUser')||'null'); }catch(e){ return null } }
-    function setStoredAuthUser(u){ try{ localStorage.setItem('authUser', JSON.stringify(u||{})); }catch(e){} }
-    function parseJwtPayload(token){ try{ const p = token.split('.')[1]; const payload = atob(p.replace(/-/g,'+').replace(/_/g,'/')); return JSON.parse(decodeURIComponent(payload.split('').map(c=> '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''))); }catch(e){ return null } }
-    function isTokenValid(token){ if(!token) return false; const p = parseJwtPayload(token); if(!p) return false; if(p.exp && typeof p.exp === 'number'){ return p.exp > Math.floor(Date.now()/1000); } return true; }
+    <script>
+      // Auth helpers
+      function getAuthToken() {
+        return localStorage.getItem("authToken");
+      }
+      function setAuthToken(t) {
+        try {
+          localStorage.setItem("authToken", t);
+        } catch (e) {}
+      }
+      function clearAuthToken() {
+        try {
+          localStorage.removeItem("authToken");
+        } catch (e) {}
+      }
+      function getStoredAuthUser() {
+        try {
+          return JSON.parse(localStorage.getItem("authUser") || "null");
+        } catch (e) {
+          return null;
+        }
+      }
+      function setStoredAuthUser(u) {
+        try {
+          localStorage.setItem("authUser", JSON.stringify(u || {}));
+        } catch (e) {}
+      }
+      function parseJwtPayload(token) {
+        try {
+          const p = token.split(".")[1];
+          const payload = atob(p.replace(/-/g, "+").replace(/_/g, "/"));
+          return JSON.parse(
+            decodeURIComponent(
+              payload
+                .split("")
+                .map(
+                  (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2),
+                )
+                .join(""),
+            ),
+          );
+        } catch (e) {
+          return null;
+        }
+      }
+      function isTokenValid(token) {
+        if (!token) return false;
+        const p = parseJwtPayload(token);
+        if (!p) return false;
+        if (p.exp && typeof p.exp === "number") {
+          return p.exp > Math.floor(Date.now() / 1000);
+        }
+        return true;
+      }
 
-    function showLogin(){ document.getElementById('loginError').style.display='none'; document.getElementById('loginError').textContent=''; document.getElementById('loginUsername').value=''; document.getElementById('loginPassword').value=''; const m = new bootstrap.Modal(document.getElementById('loginModal'), { backdrop: 'static' }); m.show(); }
+      function showLogin() {
+        document.getElementById("loginError").style.display = "none";
+        document.getElementById("loginError").textContent = "";
+        document.getElementById("loginUsername").value = "";
+        document.getElementById("loginPassword").value = "";
+        const m = new bootstrap.Modal(document.getElementById("loginModal"), {
+          backdrop: "static",
+        });
+        m.show();
+      }
 
-    // Validate input fields before searching
-    function validateInputs(){
-      const phone = (document.getElementById('qPhone').value||'').trim();
-      const name = (document.getElementById('qName').value||'').trim();
-      const nid = (document.getElementById('qNid').value||'').trim();
-      // require all three fields
-      if(!phone || !name || !nid) return { ok:false, msg: 'Vui lòng nhập Số điện thoại, Họ và tên và CMND/CCCD.' };
-      if(phone){ const p = phone.replace(/\s|\+|-/g,''); if(!/^\d{9,11}$/.test(p)) return { ok:false, msg: 'Số điện thoại không hợp lệ (9-11 chữ số).' }; }
-      if(nid){ const n = nid.replace(/\s|\-/g,''); if(!/^(\d{9}|\d{12})$/.test(n)) return { ok:false, msg: 'CMND/CCCD phải là 9 hoặc 12 chữ số.' }; }
-      if(name){ if(name.length < 3) return { ok:false, msg: 'Tên quá ngắn.' }; }
-      return { ok:true };
-    }
+      // Validate input fields before searching
+      function validateInputs() {
+        const phone = (document.getElementById("qPhone").value || "").trim();
+        const name = (document.getElementById("qName").value || "").trim();
+        const nid = (document.getElementById("qNid").value || "").trim();
+        // require all three fields
+        if (!phone || !name || !nid)
+          return {
+            ok: false,
+            msg: "Vui lòng nhập Số điện thoại, Họ và tên và CMND/CCCD.",
+          };
+        if (phone) {
+          const p = phone.replace(/\s|\+|-/g, "");
+          if (!/^\d{9,11}$/.test(p))
+            return {
+              ok: false,
+              msg: "Số điện thoại không hợp lệ (9-11 chữ số).",
+            };
+        }
+        if (nid) {
+          const n = nid.replace(/\s|\-/g, "");
+          if (!/^(\d{9}|\d{12})$/.test(n))
+            return { ok: false, msg: "CMND/CCCD phải là 9 hoặc 12 chữ số." };
+        }
+        if (name) {
+          if (name.length < 3) return { ok: false, msg: "Tên quá ngắn." };
+        }
+        return { ok: true };
+      }
 
-    // Parse a pasted text block to extract name and IDs (CCCD or CMND)
-    function parseIdentityBlock(text){
-      if(!text) return {};
-      const out = { name: '', cccd: '', cmnd: '' };
-      // labeled patterns
-      const nameMatch = text.match(/Họ\s*và\s*tên\s*[:\-]?\s*(.+)/i) || text.match(/Tên\s*[:\-]?\s*(.+)/i);
-      if(nameMatch) out.name = nameMatch[1].trim();
-      const cccdMatch = text.match(/(?:Số\s*)?CCCD\s*[:\-]?\s*(\d{12})/i) || text.match(/\b(\d{12})\b/);
-      if(cccdMatch) out.cccd = cccdMatch[1];
-      const cmndMatch = text.match(/(?:Số\s*)?CMND\s*[:\-]?\s*(\d{9})/i) || text.match(/\b(\d{9})\b/);
-      if(cmndMatch) out.cmnd = cmndMatch[1];
-      if(!out.name){ const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean); for(const l of lines){ if(/[A-Za-zÀ-ỹ\s\'\-]+$/.test(l) && !/\d/.test(l) && l.length>3){ out.name = l; break; } } }
-      return out;
-    }
+      // Parse a pasted text block to extract name and IDs (CCCD or CMND)
+      function parseIdentityBlock(text) {
+        if (!text) return {};
+        const out = { name: "", cccd: "", cmnd: "" };
+        // labeled patterns
+        const nameMatch =
+          text.match(/Họ\s*và\s*tên\s*[:\-]?\s*(.+)/i) ||
+          text.match(/Tên\s*[:\-]?\s*(.+)/i);
+        if (nameMatch) out.name = nameMatch[1].trim();
+        const cccdMatch =
+          text.match(/(?:Số\s*)?CCCD\s*[:\-]?\s*(\d{12})/i) ||
+          text.match(/\b(\d{12})\b/);
+        if (cccdMatch) out.cccd = cccdMatch[1];
+        const cmndMatch =
+          text.match(/(?:Số\s*)?CMND\s*[:\-]?\s*(\d{9})/i) ||
+          text.match(/\b(\d{9})\b/);
+        if (cmndMatch) out.cmnd = cmndMatch[1];
+        if (!out.name) {
+          const lines = text
+            .split(/\r?\n/)
+            .map((l) => l.trim())
+            .filter(Boolean);
+          for (const l of lines) {
+            if (
+              /[A-Za-zÀ-ỹ\s\'\-]+$/.test(l) &&
+              !/\d/.test(l) &&
+              l.length > 3
+            ) {
+              out.name = l;
+              break;
+            }
+          }
+        }
+        return out;
+      }
 
-    // login flow
-    document.getElementById('togglePassBtn').addEventListener('click', ()=>{ const p = document.getElementById('loginPassword'); if(p.type === 'password'){ p.type='text'; } else p.type='password'; });
-    document.getElementById('loginBtn').addEventListener('click', async ()=>{
-      const u = (document.getElementById('loginUsername').value||'').trim();
-      const p = (document.getElementById('loginPassword').value||'');
-      const errEl = document.getElementById('loginError');
-      if(!u || !p){ errEl.style.display='block'; errEl.textContent='Nhập tài khoản và mật khẩu'; return; }
-      try{
-        const res = await fetch('https://hpo.hdsaison.com.vn/hpo/api/v1/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ username:u, password:p }) });
-        const body = await res.json().catch(()=>null);
-        if(!res.ok){ errEl.style.display='block'; errEl.textContent = (body && (body.message||body.error)) || ('HTTP '+res.status); return; }
-        const token = body && (body.accessToken || body.token || (body.data && (body.data.accessToken||body.data.token)));
-        if(!token){ errEl.style.display='block'; errEl.textContent='Không nhận được accessToken'; return; }
-        setAuthToken(token);
-        // store user payload if present
-        let user = null;
-        if(body){ user = body.user || body.data || body; }
-        if(!user) user = {};
-        if(!user.id){ const maybe = body && (body.id || (body.data && (body.data.id || body.data.userId)) ); if(maybe) user.id = maybe; }
-        setStoredAuthUser(user);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal')); if(modal) modal.hide();
-      }catch(err){ errEl.style.display='block'; errEl.textContent = 'Lỗi kết nối: '+(err.message||err); }
-    });
+      // login flow
+      document.getElementById("togglePassBtn").addEventListener("click", () => {
+        const p = document.getElementById("loginPassword");
+        if (p.type === "password") {
+          p.type = "text";
+        } else p.type = "password";
+      });
+      document
+        .getElementById("loginBtn")
+        .addEventListener("click", async () => {
+          const u = (
+            document.getElementById("loginUsername").value || ""
+          ).trim();
+          const p = document.getElementById("loginPassword").value || "";
+          const errEl = document.getElementById("loginError");
+          if (!u || !p) {
+            errEl.style.display = "block";
+            errEl.textContent = "Nhập tài khoản và mật khẩu";
+            return;
+          }
+          try {
+            const res = await fetch(
+              "https://hpo.hdsaison.com.vn/hpo/api/v1/login",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: u, password: p }),
+              },
+            );
+            const body = await res.json().catch(() => null);
+            if (!res.ok) {
+              errEl.style.display = "block";
+              errEl.textContent =
+                (body && (body.message || body.error)) || "HTTP " + res.status;
+              return;
+            }
+            const token =
+              body &&
+              (body.accessToken ||
+                body.token ||
+                (body.data && (body.data.accessToken || body.data.token)));
+            if (!token) {
+              errEl.style.display = "block";
+              errEl.textContent = "Không nhận được accessToken";
+              return;
+            }
+            setAuthToken(token);
+            // store user payload if present
+            let user = null;
+            if (body) {
+              user = body.user || body.data || body;
+            }
+            if (!user) user = {};
+            if (!user.id) {
+              const maybe =
+                body &&
+                (body.id || (body.data && (body.data.id || body.data.userId)));
+              if (maybe) user.id = maybe;
+            }
+            setStoredAuthUser(user);
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("loginModal"),
+            );
+            if (modal) modal.hide();
+          } catch (err) {
+            errEl.style.display = "block";
+            errEl.textContent = "Lỗi kết nối: " + (err.message || err);
+          }
+        });
 
-    // build query and call API v2
-    async function performSearch(){
-      const phone = (document.getElementById('qPhone').value||'').trim();
-      const name = (document.getElementById('qName').value||'').trim();
-      const nid = (document.getElementById('qNid').value||'').trim();
-      const statusEl = document.getElementById('status');
-      const v = validateInputs();
-      if(!v.ok){ statusEl.style.color = 'red'; statusEl.textContent = v.msg; return; }
-      statusEl.style.color = '';
-      const params = new URLSearchParams(); if(phone) params.set('phoneNumber', phone); if(name) params.set('customerName', name); if(nid) params.set('nationalId', nid);
-      const url = 'https://hpo.hdsaison.com.vn/hpo/api/v2/sale-needs/contract?' + params.toString();
-      const token = getAuthToken();
-      if(!token || !isTokenValid(token)){ showLogin(); return; }
-      document.getElementById('status').textContent = 'Đang tìm...';
-      try{
-        const res = await fetch(url, { headers: { 'Accept':'application/json', 'Authorization': 'Bearer '+token } });
-        if(res.status === 401 || res.status === 409){ clearAuthToken(); showLogin(); document.getElementById('status').textContent = 'Yêu cầu đăng nhập lại.'; return; }
-        if(!res.ok){ document.getElementById('status').textContent = 'Lỗi API: '+res.status; const t = await res.text().catch(()=>null); document.getElementById('result').textContent = t || ''; return; }
-        const data = await res.json().catch(()=>null);
-        renderResult(data);
-        document.getElementById('status').textContent = 'Hoàn tất.';
-      }catch(err){ document.getElementById('status').textContent = 'Lỗi: '+(err.message||err); }
-    }
+      // build query and call API v2
+      async function performSearch() {
+        const phone = (document.getElementById("qPhone").value || "").trim();
+        const name = (document.getElementById("qName").value || "").trim();
+        const nid = (document.getElementById("qNid").value || "").trim();
+        const statusEl = document.getElementById("status");
+        const v = validateInputs();
+        if (!v.ok) {
+          statusEl.style.color = "red";
+          statusEl.textContent = v.msg;
+          return;
+        }
+        statusEl.style.color = "";
+        const params = new URLSearchParams();
+        if (phone) params.set("phoneNumber", phone);
+        if (name) params.set("customerName", name);
+        if (nid) params.set("nationalId", nid);
+        const url =
+          "https://hpo.hdsaison.com.vn/hpo/api/v2/sale-needs/contract?" +
+          params.toString();
+        const token = getAuthToken();
+        if (!token || !isTokenValid(token)) {
+          showLogin();
+          return;
+        }
+        document.getElementById("status").textContent = "Đang tìm...";
+        try {
+          const res = await fetch(url, {
+            headers: {
+              Accept: "application/json",
+              Authorization: "Bearer " + token,
+            },
+          });
+          if (res.status === 401 || res.status === 409) {
+            clearAuthToken();
+            showLogin();
+            document.getElementById("status").textContent =
+              "Yêu cầu đăng nhập lại.";
+            return;
+          }
+          if (!res.ok) {
+            document.getElementById("status").textContent =
+              "Lỗi API: " + res.status;
+            const t = await res.text().catch(() => null);
+            document.getElementById("result").textContent = t || "";
+            return;
+          }
+          const data = await res.json().catch(() => null);
+          renderResult(data);
+          document.getElementById("status").textContent = "Hoàn tất.";
+        } catch (err) {
+          document.getElementById("status").textContent =
+            "Lỗi: " + (err.message || err);
+        }
+      }
 
-    // (Removed copy-to-clipboard helper; Copy buttons were removed per request)
+      // (Removed copy-to-clipboard helper; Copy buttons were removed per request)
 
-    function renderResult(data){
-      const out = document.getElementById('result'); out.innerHTML = '';
-      if(!data){ out.innerHTML = '<div class="small-muted">Không có dữ liệu.</div>'; return; }
-      // handle v2 wrapper where data.data exists but is an empty array
-      if(data && Array.isArray(data.data) && data.data.length === 0){ out.innerHTML = '<div class="small-muted">Không có dữ liệu.</div>'; return; }
+      function renderResult(data) {
+        const out = document.getElementById("result");
+        out.innerHTML = "";
+        if (!data) {
+          out.innerHTML = '<div class="small-muted">Không có dữ liệu.</div>';
+          return;
+        }
+        // handle v2 wrapper where data.data exists but is an empty array
+        if (data && Array.isArray(data.data) && data.data.length === 0) {
+          out.innerHTML = '<div class="small-muted">Không có dữ liệu.</div>';
+          return;
+        }
 
-      // prefer v2 wrapper: data.data is the array
-      const arr = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : null);
-      if(arr && arr.length){
-        const list = document.createElement('div'); list.className = 'result-list';
-        arr.forEach(item => {
-          const card = document.createElement('div'); card.className = 'result-card';
-          const left = document.createElement('div'); left.className = 'left';
-          left.innerHTML = `<h6>${escapeHtml(item.contractNumber || item.contract_number || '')}</h6><div class="meta-row">${escapeHtml(item.prospectDate || item.prospect_date || '')}</div>`;
-          const right = document.createElement('div'); right.className = 'right';
-          const statusRaw = (item.indusStatus || item.indus_status || '').toString();
-          const badgeHtml = statusRaw && statusRaw.toLowerCase().includes('live') ? `<span class="badge-live">${escapeHtml(statusRaw)}</span>` : `<span class="badge-other">${escapeHtml(statusRaw||'—')}</span>`;
-          const name = escapeHtml(item.customerName || item.customer_name || '—');
-          const dob = escapeHtml(item.dob || '—');
-          const note = escapeHtml(item.statusTranslate || item.status_translate || '');
-          const fa = escapeHtml(item.fa || '');
-          const emi = escapeHtml(item.emi || '');
-          right.innerHTML = `
+        // prefer v2 wrapper: data.data is the array
+        const arr = Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data)
+            ? data
+            : null;
+        if (arr && arr.length) {
+          const list = document.createElement("div");
+          list.className = "result-list";
+          arr.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "result-card";
+            const left = document.createElement("div");
+            left.className = "left";
+            left.innerHTML = `<h6>${escapeHtml(item.contractNumber || item.contract_number || "")}</h6><div class="meta-row">${escapeHtml(item.prospectDate || item.prospect_date || "")}</div>`;
+            const right = document.createElement("div");
+            right.className = "right";
+            const statusRaw = (
+              item.indusStatus ||
+              item.indus_status ||
+              ""
+            ).toString();
+            const badgeHtml =
+              statusRaw && statusRaw.toLowerCase().includes("live")
+                ? `<span class="badge-live">${escapeHtml(statusRaw)}</span>`
+                : `<span class="badge-other">${escapeHtml(statusRaw || "—")}</span>`;
+            const name = escapeHtml(
+              item.customerName || item.customer_name || "—",
+            );
+            const dob = escapeHtml(item.dob || "—");
+            const note = escapeHtml(
+              item.statusTranslate || item.status_translate || "",
+            );
+            const fa = escapeHtml(item.fa || "");
+            const emi = escapeHtml(item.emi || "");
+            right.innerHTML = `
             <div class="meta-row">${badgeHtml} <span class="small-key">Tên:</span> ${name}</div>
             <div class="meta-row"><span class="small-key">SN:</span> ${dob} <span class="small-key" style="margin-left:12px">Ghi chú:</span> ${note}</div>
             <div class="meta-row"><span class="small-key">FA:</span> <strong>${fa}</strong> <span class="small-key" style="margin-left:12px">EMI:</span> <strong>${emi}</strong></div>
           `;
-          // no copy action (kept layout simple)
-          card.appendChild(left); card.appendChild(right); list.appendChild(card);
-        });
-        out.appendChild(list);
-        return;
+            // no copy action (kept layout simple)
+            card.appendChild(left);
+            card.appendChild(right);
+            list.appendChild(card);
+          });
+          out.appendChild(list);
+          return;
+        }
+
+        // fallback: single object
+        const card = document.createElement("div");
+        card.className = "result-card";
+        const left = document.createElement("div");
+        left.className = "left";
+        left.innerHTML = `<h6>${escapeHtml(data.contractNumber || data.contract_number || "")}</h6><div class="meta-row">${escapeHtml(data.prospectDate || data.prospect_date || "")}</div>`;
+        const right = document.createElement("div");
+        right.className = "right";
+        right.innerHTML = `<div class="meta-row"><span class="small-key">Tên:</span> ${escapeHtml(data.customerName || data.customer_name || "")}</div><div class="meta-row"><span class="small-key">SN:</span> ${escapeHtml(data.dob || "")}</div><div class="meta-row"><span class="small-key">FA:</span> <strong>${escapeHtml(data.fa || "")}</strong> <span class="small-key" style="margin-left:12px">EMI:</span> <strong>${escapeHtml(data.emi || "")}</strong></div>`;
+        // no copy action for fallback — kept simple per request
+        card.appendChild(left);
+        card.appendChild(right);
+        out.appendChild(card);
       }
 
-      // fallback: single object
-      const card = document.createElement('div'); card.className = 'result-card';
-      const left = document.createElement('div'); left.className = 'left'; left.innerHTML = `<h6>${escapeHtml(data.contractNumber||data.contract_number||'')}</h6><div class="meta-row">${escapeHtml(data.prospectDate||data.prospect_date||'')}</div>`;
-      const right = document.createElement('div'); right.className = 'right';
-      right.innerHTML = `<div class="meta-row"><span class="small-key">Tên:</span> ${escapeHtml(data.customerName||data.customer_name||'')}</div><div class="meta-row"><span class="small-key">SN:</span> ${escapeHtml(data.dob||'')}</div><div class="meta-row"><span class="small-key">FA:</span> <strong>${escapeHtml(data.fa||'')}</strong> <span class="small-key" style="margin-left:12px">EMI:</span> <strong>${escapeHtml(data.emi||'')}</strong></div>`;
-      // no copy action for fallback — kept simple per request
-      card.appendChild(left); card.appendChild(right); out.appendChild(card);
-    }
+      function escapeHtml(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
 
-    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      document
+        .getElementById("searchBtn")
+        .addEventListener("click", performSearch);
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        document.getElementById("qPhone").value = "";
+        document.getElementById("qName").value = "";
+        document.getElementById("qNid").value = "";
+        document.getElementById("result").innerHTML = "";
+        document.getElementById("status").textContent = "";
+      });
+      ["qPhone", "qName", "qNid"].forEach((id) => {
+        const el = document.getElementById(id);
+        el.addEventListener("keyup", (e) => {
+          if (e.key === "Enter") performSearch();
+        });
+      });
 
-    document.getElementById('searchBtn').addEventListener('click', performSearch);
-    document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('qPhone').value=''; document.getElementById('qName').value=''; document.getElementById('qNid').value=''; document.getElementById('result').innerHTML=''; document.getElementById('status').textContent=''; });
-    ['qPhone','qName','qNid'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('keyup', (e)=>{ if(e.key==='Enter') performSearch(); }); });
+      // auto-parse pasted block into fields (runs on paste and blur)
+      (function wireAutoParse() {
+        const pasteEl = document.getElementById("pasteBlock");
+        if (!pasteEl) return;
+        const doParse = () => {
+          const raw = pasteEl.value || "";
+          if (!raw) return;
+          const parsed = parseIdentityBlock(raw);
+          if (parsed.name) document.getElementById("qName").value = parsed.name;
+          const idTypeEl = document.getElementById("idTypeSelect");
+          const idType = idTypeEl ? idTypeEl.value || "auto" : "auto";
+          let chosen = "";
+          if (idType === "cccd") chosen = parsed.cccd || parsed.cmnd || "";
+          else if (idType === "cmnd") chosen = parsed.cmnd || parsed.cccd || "";
+          else chosen = parsed.cccd || parsed.cmnd || "";
+          if (chosen) document.getElementById("qNid").value = chosen;
+          const statusEl = document.getElementById("status");
+          if (statusEl)
+            statusEl.textContent =
+              parsed.name || chosen
+                ? "Đã lấy thông tin từ đoạn dán."
+                : "Không tìm thấy tên/CCCD/CMND trong đoạn dán.";
+        };
+        pasteEl.addEventListener("paste", () => setTimeout(doParse, 50));
+        pasteEl.addEventListener("blur", doParse);
+      })();
+    </script>
 
-    // auto-parse pasted block into fields (runs on paste and blur)
-    (function wireAutoParse(){
-      const pasteEl = document.getElementById('pasteBlock');
-      if(!pasteEl) return;
-      const doParse = ()=>{
-        const raw = pasteEl.value || '';
-        if(!raw) return;
-        const parsed = parseIdentityBlock(raw);
-        if(parsed.name) document.getElementById('qName').value = parsed.name;
-        const idTypeEl = document.getElementById('idTypeSelect');
-        const idType = idTypeEl ? (idTypeEl.value || 'auto') : 'auto';
-        let chosen = '';
-        if(idType === 'cccd') chosen = parsed.cccd || parsed.cmnd || '';
-        else if(idType === 'cmnd') chosen = parsed.cmnd || parsed.cccd || '';
-        else chosen = parsed.cccd || parsed.cmnd || '';
-        if(chosen) document.getElementById('qNid').value = chosen;
-        const statusEl = document.getElementById('status');
-        if(statusEl) statusEl.textContent = (parsed.name || chosen) ? 'Đã lấy thông tin từ đoạn dán.' : 'Không tìm thấy tên/CCCD/CMND trong đoạn dán.';
-      };
-      pasteEl.addEventListener('paste', ()=> setTimeout(doParse, 50));
-      pasteEl.addEventListener('blur', doParse);
-    })();
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

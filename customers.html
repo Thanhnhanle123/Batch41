@@ -1,28 +1,52 @@
 <!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Danh sách khách hàng</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#f6f9fc;
-      --card:#ffffff;
-      --accent:#2b8be6;
-      --muted:#556b77;
-      --border:rgba(230,238,249,1);
-      --shadow: 0 8px 20px rgba(15,23,42,0.06);
-      --radius:10px;
-      --max-width:1100px;
-    }
-    *{ box-sizing:border-box; font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial; }
-    body{ background:var(--bg); color:#24313a; -webkit-font-smoothing:antialiased; margin:0 }
-    h1{ font-size:20px; margin:0 0 12px 0; font-weight:700 }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Danh sách khách hàng</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f6f9fc;
+        --card: #ffffff;
+        --accent: #2b8be6;
+        --muted: #556b77;
+        --border: rgba(230, 238, 249, 1);
+        --shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        --radius: 10px;
+        --max-width: 1100px;
+      }
+      * {
+        box-sizing: border-box;
+        font-family:
+          Roboto,
+          Inter,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Arial;
+      }
+      body {
+        background: var(--bg);
+        color: #24313a;
+        -webkit-font-smoothing: antialiased;
+        margin: 0;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 12px 0;
+        font-weight: 700;
+      }
 
-    /* Keep header styles so header remains unchanged */
-    header {
+      /* Keep header styles so header remains unchanged */
+      header {
         position: fixed;
         top: 0;
         left: 0;
@@ -35,74 +59,265 @@
         padding: 0 15px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         z-index: 1000;
-    }
-    .logo{ font-weight:700; color:var(--accent); font-size:16px }
-    .desktop-nav a {
+      }
+      .logo {
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 16px;
+      }
+      .desktop-nav a {
         margin-left: 15px;
         font-size: 14px;
         text-decoration: none;
         color: #333;
-    }
-    @media (max-width:768px){ .desktop-nav{ display:none } }
+      }
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none;
+        }
+      }
 
-    /* Page layout */
-    .page{ max-width:var(--max-width); margin:0 auto; padding-top:92px; padding-left:18px; padding-right:18px }
+      /* Page layout */
+      .page {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding-top: 92px;
+        padding-left: 18px;
+        padding-right: 18px;
+      }
 
-    /* Controls */
-    .controls{ display:flex; gap:12px; align-items:center; margin:12px 0; justify-content:space-between }
-    .filter-group{ display:flex; gap:8px; align-items:center }
-    .filter-row{ display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap }
-    .filter-group label{ font-weight:600; color:var(--muted); margin-right:6px }
-    select.filter-select{ padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); background:#fff }
-    input.filter-input{ padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); background:#fff; min-width:160px }
-    button.clear-btn{ padding:6px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); background:transparent; color:var(--muted); cursor:pointer }
-    button.clear-btn:hover{ background:#f1f5f9 }
-    button.search-btn{ padding:6px 12px; border-radius:8px; border:0; background:var(--accent); color:#fff; cursor:pointer }
-    button.search-btn:hover{ opacity:0.95 }
-    .count-badge{ background:linear-gradient(90deg,#ffffff,#f7fbff); border:1px solid var(--border); padding:6px 10px; border-radius:999px; color:var(--muted); font-weight:600 }
+      /* Controls */
+      .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin: 12px 0;
+        justify-content: space-between;
+      }
+      .filter-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .filter-group label {
+        font-weight: 600;
+        color: var(--muted);
+        margin-right: 6px;
+      }
+      select.filter-select {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        background: #fff;
+      }
+      input.filter-input {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        background: #fff;
+        min-width: 160px;
+      }
+      button.clear-btn {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      button.clear-btn:hover {
+        background: #f1f5f9;
+      }
+      button.search-btn {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+      }
+      button.search-btn:hover {
+        opacity: 0.95;
+      }
+      .count-badge {
+        background: linear-gradient(90deg, #ffffff, #f7fbff);
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        border-radius: 999px;
+        color: var(--muted);
+        font-weight: 600;
+      }
 
-    /* Customers card */
-    .customers-card{ background:var(--card); border:1px solid var(--border); padding:16px; border-radius:var(--radius); box-shadow:var(--shadow); margin-top:10px }
-    .customers-card h5{ margin:0 0 10px 0; font-size:16px }
+      /* Customers card */
+      .customers-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-top: 10px;
+      }
+      .customers-card h5 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+      }
 
-    /* Table */
-    .customers-table{ width:100%; border-collapse:collapse }
-    .customers-table thead th{ text-align:left; padding:10px 12px; font-weight:700; background:linear-gradient(180deg,#fff,#fbfdff); border-bottom:1px solid var(--border) }
-    .customers-table tbody td{ padding:10px 12px; border-bottom:1px solid rgba(0,0,0,0.04); vertical-align:middle }
-    .customers-table tbody tr:hover{ background:linear-gradient(90deg,#fbfdff,#fff) }
-    .small{ color:var(--muted) }
-    .center{ text-align:center }
+      /* Table */
+      .customers-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .customers-table thead th {
+        text-align: left;
+        padding: 10px 12px;
+        font-weight: 700;
+        background: linear-gradient(180deg, #fff, #fbfdff);
+        border-bottom: 1px solid var(--border);
+      }
+      .customers-table tbody td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        vertical-align: middle;
+      }
+      .customers-table tbody tr:hover {
+        background: linear-gradient(90deg, #fbfdff, #fff);
+      }
+      .small {
+        color: var(--muted);
+      }
+      .center {
+        text-align: center;
+      }
 
-    /* Responsive: convert rows to cards on small screens */
-    @media (max-width:576px){
-      .customers-table thead{ display:none }
-      .customers-table, .customers-table tbody, .customers-table tr, .customers-table td{ display:block; width:100% }
-      .customers-table tr{ margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:8px; background:#fff }
-      .customers-table td{ display:flex; justify-content:space-between; padding:8px; border:0 }
-      .customers-table td:before{ content: attr(data-label); font-weight:600; color:var(--muted); margin-right:8px }
-      .customers-table td[data-label='#']{ display:none }
-    }
-    .pagination-controls{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px }
-    .pagination-controls .page-buttons{ display:flex; gap:6px; align-items:center }
-    .pagination-controls select.page-size{ padding:6px 8px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); background:#fff }
-    .pagination-controls button.page-btn{ padding:6px 8px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); background:#fff; cursor:pointer }
-    .pagination-controls button.page-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent) }
-    /* Modal / login input styling (copied from target.html for consistent look) */
-    .modal .modal-dialog{ max-width:420px }
-    .modal .modal-content{ border-radius:12px; padding:0; overflow:hidden }
-    .modal .modal-header{ border-bottom:0; padding:16px 20px }
-    .modal .modal-title{ margin:0; font-weight:700; font-size:18px }
-    .modal .modal-body{ padding:18px 20px }
-    .modal .form-label{ font-weight:600; font-size:14px }
-    .modal .input-group{ border:1px solid #e6eef9; border-radius:10px; overflow:hidden; display:flex; align-items:center }
-    .modal .input-group .form-control{ border:0; box-shadow:none; border-radius:0; padding:10px 12px }
-    .modal .input-group .btn{ border:0; box-shadow:none; min-width:44px; padding:6px 8px; background:transparent }
-    #loginError{ font-size:14px }
-    @media (max-width:420px){ .modal .modal-dialog{ max-width:92% } }
-  </style>
-</head>
-<body>
-  <header>
+      /* Responsive: convert rows to cards on small screens */
+      @media (max-width: 576px) {
+        .customers-table thead {
+          display: none;
+        }
+        .customers-table,
+        .customers-table tbody,
+        .customers-table tr,
+        .customers-table td {
+          display: block;
+          width: 100%;
+        }
+        .customers-table tr {
+          margin-bottom: 10px;
+          border: 1px solid rgba(0, 0, 0, 0.06);
+          border-radius: 8px;
+          padding: 8px;
+          background: #fff;
+        }
+        .customers-table td {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px;
+          border: 0;
+        }
+        .customers-table td:before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: var(--muted);
+          margin-right: 8px;
+        }
+        .customers-table td[data-label="#"] {
+          display: none;
+        }
+      }
+      .pagination-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .pagination-controls .page-buttons {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .pagination-controls select.page-size {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        background: #fff;
+      }
+      .pagination-controls button.page-btn {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: #fff;
+        cursor: pointer;
+      }
+      .pagination-controls button.page-btn.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      /* Modal / login input styling (copied from target.html for consistent look) */
+      .modal .modal-dialog {
+        max-width: 420px;
+      }
+      .modal .modal-content {
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+      }
+      .modal .modal-header {
+        border-bottom: 0;
+        padding: 16px 20px;
+      }
+      .modal .modal-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      .modal .modal-body {
+        padding: 18px 20px;
+      }
+      .modal .form-label {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .modal .input-group {
+        border: 1px solid #e6eef9;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+      }
+      .modal .input-group .form-control {
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 10px 12px;
+      }
+      .modal .input-group .btn {
+        border: 0;
+        box-shadow: none;
+        min-width: 44px;
+        padding: 6px 8px;
+        background: transparent;
+      }
+      #loginError {
+        font-size: 14px;
+      }
+      @media (max-width: 420px) {
+        .modal .modal-dialog {
+          max-width: 92%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
       <div class="logo">🚗 Batch 41</div>
       <nav class="desktop-nav">
         <a href="./index.html">Tính trả góp</a>
@@ -110,6 +325,7 @@
         <a href="./target.html">Tổng quan chỉ tiêu</a>
         <a href="./customers.html">Danh sách khách hàng</a>
         <a href="./customer_search.html">Tìm khách hàng</a>
+        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
       </nav>
       <!-- HAMBURGER -->
@@ -136,11 +352,20 @@
           >📊 Tính trả góp</a
         >
         <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
-        >❌ Huỷ hợp đồng</a
+          >❌ Huỷ hợp đồng</a
         >
-        <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
-        <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
-        <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
+        <a class="btn btn-light w-100 mb-2" href="./target.html"
+          >📈 Tổng quan chỉ tiêu</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./customers.html"
+          >👥 Dan sách khách hàng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./customer_search.html"
+          >🔎 Tìm khách hàng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html"
+          >📅 Tìm lịch làm việc</a
+        >
         <hr />
         <button class="btn btn-danger w-100" onclick="logout()">
           🔐 Đăng xuất
@@ -148,388 +373,657 @@
       </div>
     </div>
 
-  <div class="page">
-  <h5 class="text-center mb-3">DANH SÁCH KHÁCH HÀNG</h5>
-  <div class="controls">
-    <div>
-      <div class="filter-group">
-        <label for="daySelect">Chỉ lọc theo ngày</label>
-        <select id="daySelect" class="filter-select">
-          <option value="">-- chọn ngày --</option>
-          <option value="2">2</option>
-          <option value="7">7</option>
-          <option value="12">12</option>
-          <option value="17">17</option>
-          <option value="22">22</option>
-          <option value="27">27</option>
-        </select>
-        <button id="clearFilter" class="clear-btn">Xóa</button>
-        <button id="searchBtn" class="search-btn">Tìm</button>
-        <span id="apiIdStatus" class="small" style="margin-left:8px;color:var(--muted)"></span>
-      </div>
-      <div class="filter-row">
-        <input id="filterName" class="filter-input" placeholder="Tìm theo Họ tên" />
-        <input id="filterContract" class="filter-input" placeholder="Tìm theo Số HĐ" />
-        <input id="filterPhone" class="filter-input" placeholder="Tìm theo Số điện thoại" />
-        <input id="filterCmnd" class="filter-input" placeholder="Tìm theo CMND/CCCD" />
-        <input id="apiId" type="hidden" />
-      </div>
-    </div>
-    <div id="count" class="count-badge">Tìm thấy <strong id="countNum">0</strong> khách</div>
-  </div>
-
-  <div id="listContainer" aria-live="polite"></div>
-
-  </div>
-
-  <!-- Login modal (for API 401 handling) -->
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Đăng nhập</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="loginError" class="text-danger mb-2" style="display:none;"></div>
-          <div class="mb-3">
-            <label class="form-label">Tài khoản</label>
-            <input id="loginUsername" class="form-control" autocomplete="username" />
+    <div class="page">
+      <h5 class="text-center mb-3">DANH SÁCH KHÁCH HÀNG</h5>
+      <div class="controls">
+        <div>
+          <div class="filter-group">
+            <label for="daySelect">Chỉ lọc theo ngày</label>
+            <select id="daySelect" class="filter-select">
+              <option value="">-- chọn ngày --</option>
+              <option value="2">2</option>
+              <option value="7">7</option>
+              <option value="12">12</option>
+              <option value="17">17</option>
+              <option value="22">22</option>
+              <option value="27">27</option>
+            </select>
+            <button id="clearFilter" class="clear-btn">Xóa</button>
+            <button id="searchBtn" class="search-btn">Tìm</button>
+            <span
+              id="apiIdStatus"
+              class="small"
+              style="margin-left: 8px; color: var(--muted)"
+            ></span>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
-            <div class="input-group">
-              <input id="loginPassword" type="password" class="form-control" autocomplete="current-password" />
-              <button class="btn btn-outline-secondary" type="button" id="togglePassBtn" aria-label="Hiển thị mật khẩu">👁️</button>
+          <div class="filter-row">
+            <input
+              id="filterName"
+              class="filter-input"
+              placeholder="Tìm theo Họ tên"
+            />
+            <input
+              id="filterContract"
+              class="filter-input"
+              placeholder="Tìm theo Số HĐ"
+            />
+            <input
+              id="filterPhone"
+              class="filter-input"
+              placeholder="Tìm theo Số điện thoại"
+            />
+            <input
+              id="filterCmnd"
+              class="filter-input"
+              placeholder="Tìm theo CMND/CCCD"
+            />
+            <input id="apiId" type="hidden" />
+          </div>
+        </div>
+        <div id="count" class="count-badge">
+          Tìm thấy <strong id="countNum">0</strong> khách
+        </div>
+      </div>
+
+      <div id="listContainer" aria-live="polite"></div>
+    </div>
+
+    <!-- Login modal (for API 401 handling) -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Đăng nhập</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              id="loginError"
+              class="text-danger mb-2"
+              style="display: none"
+            ></div>
+            <div class="mb-3">
+              <label class="form-label">Tài khoản</label>
+              <input
+                id="loginUsername"
+                class="form-control"
+                autocomplete="username"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <div class="input-group">
+                <input
+                  id="loginPassword"
+                  type="password"
+                  class="form-control"
+                  autocomplete="current-password"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="togglePassBtn"
+                  aria-label="Hiển thị mật khẩu"
+                >
+                  👁️
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          <div class="modal-footer">
+            <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <script>
-    // pagination defaults
-    window._currentPage = 1;
-    window._pageSize = 10;
-    window._pageSizes = [10,25,50,100];
-
-    function fullname(c){
-      if(!c) return '';
-      return [c.lastName, c.middleName, c.firstName].filter(Boolean).join(' ');
-    }
-
-    function renderTable(customers){
-      const container=document.getElementById('listContainer');
-      if(!customers || customers.length===0){
-        container.innerHTML='<p>Không có khách hàng để hiển thị.</p>';
-        return;
+    <script>
+      if (sessionStorage.getItem("logged") !== "1") {
+        window.location.href = "index.html";
       }
-      // remember last filtered set for pagination actions
-      window._lastFiltered = customers.slice();
-      // ensure page bounds
-      const total = customers.length;
-      const pageSize = window._pageSize || 10;
-      const totalPages = Math.max(1, Math.ceil(total / pageSize));
-      let currentPage = window._currentPage || 1;
-      if(currentPage > totalPages) currentPage = totalPages;
-      if(currentPage < 1) currentPage = 1;
-      window._currentPage = currentPage;
-      const start = (currentPage - 1) * pageSize;
-      const end = start + pageSize;
-      const pageItems = customers.slice(start, end);
-      const card = document.createElement('div');
-      card.className = 'customers-card';
-      const title = document.createElement('h5');
-      title.textContent = 'Danh sách khách hàng';
-      card.appendChild(title);
+      function logout() {
+        sessionStorage.removeItem("logged");
+        location.href = "index.html";
+      }
+    </script>
+    <script>
+      // pagination defaults
+      window._currentPage = 1;
+      window._pageSize = 10;
+      window._pageSizes = [10, 25, 50, 100];
 
-      const table=document.createElement('table');
-      table.className = 'table table-sm table-hover customers-table';
-      table.id = 'customersListTable';
-          const thead=document.createElement('thead');
-          thead.innerHTML='<tr><th>#</th><th>Họ tên</th><th>Số HĐ</th><th>Số điện thoại</th><th>CMND/CCCD</th><th>Địa chỉ</th><th>Ngày đóng tiền</th><th>Tra cứu</th></tr>';
-      table.appendChild(thead);
-      const tbody=document.createElement('tbody');
-      pageItems.forEach((c,idx)=>{
-        const tr=document.createElement('tr');
-        const addr=(c.familyBookAddressStreet || c.temporaryResidentAddressStreet || '') + ' ' + (c.familyBookAddressProvince || c.temporaryResidentAddressProvince || '');
-        const startDate = c._startingInstallmentDate ? new Date(c._startingInstallmentDate) : null;
-        const startLabel = startDate ? startDate.toLocaleDateString('vi-VN') : '';
-          const contractCell = (c._contractNumbers && c._contractNumbers.length) ? c._contractNumbers.join(', ') : '';
-            // build tra cứu links per contract number
-            let lookupHtml = '';
-            if(c._contractNumbers && c._contractNumbers.length){
-              const cmnd = encodeURIComponent(c.nationalId || '');
-              lookupHtml = c._contractNumbers.map(no => {
+      function fullname(c) {
+        if (!c) return "";
+        return [c.lastName, c.middleName, c.firstName]
+          .filter(Boolean)
+          .join(" ");
+      }
+
+      function renderTable(customers) {
+        const container = document.getElementById("listContainer");
+        if (!customers || customers.length === 0) {
+          container.innerHTML = "<p>Không có khách hàng để hiển thị.</p>";
+          return;
+        }
+        // remember last filtered set for pagination actions
+        window._lastFiltered = customers.slice();
+        // ensure page bounds
+        const total = customers.length;
+        const pageSize = window._pageSize || 10;
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        let currentPage = window._currentPage || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        window._currentPage = currentPage;
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = customers.slice(start, end);
+        const card = document.createElement("div");
+        card.className = "customers-card";
+        const title = document.createElement("h5");
+        title.textContent = "Danh sách khách hàng";
+        card.appendChild(title);
+
+        const table = document.createElement("table");
+        table.className = "table table-sm table-hover customers-table";
+        table.id = "customersListTable";
+        const thead = document.createElement("thead");
+        thead.innerHTML =
+          "<tr><th>#</th><th>Họ tên</th><th>Số HĐ</th><th>Số điện thoại</th><th>CMND/CCCD</th><th>Địa chỉ</th><th>Ngày đóng tiền</th><th>Tra cứu</th></tr>";
+        table.appendChild(thead);
+        const tbody = document.createElement("tbody");
+        pageItems.forEach((c, idx) => {
+          const tr = document.createElement("tr");
+          const addr =
+            (c.familyBookAddressStreet ||
+              c.temporaryResidentAddressStreet ||
+              "") +
+            " " +
+            (c.familyBookAddressProvince ||
+              c.temporaryResidentAddressProvince ||
+              "");
+          const startDate = c._startingInstallmentDate
+            ? new Date(c._startingInstallmentDate)
+            : null;
+          const startLabel = startDate
+            ? startDate.toLocaleDateString("vi-VN")
+            : "";
+          const contractCell =
+            c._contractNumbers && c._contractNumbers.length
+              ? c._contractNumbers.join(", ")
+              : "";
+          // build tra cứu links per contract number
+          let lookupHtml = "";
+          if (c._contractNumbers && c._contractNumbers.length) {
+            const cmnd = encodeURIComponent(c.nationalId || "");
+            lookupHtml = c._contractNumbers
+              .map((no) => {
                 const contract = encodeURIComponent(no);
                 const href = `https://www.hdsaison.com.vn/vn/khach-hang/tra-cuu-khoan-vay.html?contract_code=${contract}&cmnd=${cmnd}`;
                 return `<a href="${href}" target="_blank" class="small">Tra cứu</a>`;
-              }).join(' ');
-            }
+              })
+              .join(" ");
+          }
 
-            tr.innerHTML=`<td data-label="#" class="center">${start + idx + 1}</td>
+          tr.innerHTML = `<td data-label="#" class="center">${start + idx + 1}</td>
               <td data-label="Họ tên">${fullname(c)}</td>
               <td data-label="Số HĐ">${contractCell}</td>
-              <td data-label="Số điện thoại">${c.phoneNumber||''}</td>
-              <td data-label="CMND/CCCD">${c.nationalId||''}</td>
+              <td data-label="Số điện thoại">${c.phoneNumber || ""}</td>
+              <td data-label="CMND/CCCD">${c.nationalId || ""}</td>
               <td data-label="Địa chỉ" class="small">${addr}</td>
               <td data-label="Ngày đóng tiền" class="small">${startLabel}</td>
               <td data-label="Tra cứu">${lookupHtml}</td>`;
-        tbody.appendChild(tr);
-      });
-      table.appendChild(tbody);
-      container.innerHTML='';
-      card.appendChild(table);
-      // pagination controls
-      const pagination = document.createElement('div');
-      pagination.className = 'pagination-controls';
-      const left = document.createElement('div');
-      left.className = 'small';
-      left.textContent = `Hiển thị ${Math.min(pageSize, total)} trên ${total}`;
-      const right = document.createElement('div');
-      right.className = 'page-buttons';
-      // page size select
-      const sizeSelect = document.createElement('select');
-      sizeSelect.className = 'page-size';
-      (window._pageSizes || [10,25,50,100]).forEach(s=>{ const o = document.createElement('option'); o.value = s; o.textContent = s; if(s === pageSize) o.selected = true; sizeSelect.appendChild(o); });
-      // prev
-      const prevBtn = document.createElement('button'); prevBtn.className = 'page-btn'; prevBtn.textContent = '‹ Trước'; prevBtn.disabled = (currentPage<=1);
-      // page indicator
-      const pageIndicator = document.createElement('span'); pageIndicator.className = 'small'; pageIndicator.style.margin = '0 8px'; pageIndicator.textContent = `Trang ${currentPage} / ${totalPages}`;
-      // next
-      const nextBtn = document.createElement('button'); nextBtn.className = 'page-btn'; nextBtn.textContent = 'Tiếp ›'; nextBtn.disabled = (currentPage>=totalPages);
-      right.appendChild(sizeSelect);
-      right.appendChild(prevBtn);
-      right.appendChild(pageIndicator);
-      right.appendChild(nextBtn);
-      pagination.appendChild(left);
-      pagination.appendChild(right);
-      card.appendChild(pagination);
-      container.appendChild(card);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        container.innerHTML = "";
+        card.appendChild(table);
+        // pagination controls
+        const pagination = document.createElement("div");
+        pagination.className = "pagination-controls";
+        const left = document.createElement("div");
+        left.className = "small";
+        left.textContent = `Hiển thị ${Math.min(pageSize, total)} trên ${total}`;
+        const right = document.createElement("div");
+        right.className = "page-buttons";
+        // page size select
+        const sizeSelect = document.createElement("select");
+        sizeSelect.className = "page-size";
+        (window._pageSizes || [10, 25, 50, 100]).forEach((s) => {
+          const o = document.createElement("option");
+          o.value = s;
+          o.textContent = s;
+          if (s === pageSize) o.selected = true;
+          sizeSelect.appendChild(o);
+        });
+        // prev
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "page-btn";
+        prevBtn.textContent = "‹ Trước";
+        prevBtn.disabled = currentPage <= 1;
+        // page indicator
+        const pageIndicator = document.createElement("span");
+        pageIndicator.className = "small";
+        pageIndicator.style.margin = "0 8px";
+        pageIndicator.textContent = `Trang ${currentPage} / ${totalPages}`;
+        // next
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "page-btn";
+        nextBtn.textContent = "Tiếp ›";
+        nextBtn.disabled = currentPage >= totalPages;
+        right.appendChild(sizeSelect);
+        right.appendChild(prevBtn);
+        right.appendChild(pageIndicator);
+        right.appendChild(nextBtn);
+        pagination.appendChild(left);
+        pagination.appendChild(right);
+        card.appendChild(pagination);
+        container.appendChild(card);
 
-      // attach events
-      sizeSelect.addEventListener('change', (e)=>{ window._pageSize = Number(e.target.value) || 10; window._currentPage = 1; renderTable(window._lastFiltered || window._customersAll || []); });
-      prevBtn.addEventListener('click', ()=>{ if(window._currentPage > 1){ window._currentPage -= 1; renderTable(window._lastFiltered || window._customersAll || []); } });
-      nextBtn.addEventListener('click', ()=>{ const tp = Math.max(1, Math.ceil((window._lastFiltered || window._customersAll || []).length / (window._pageSize||10))); if(window._currentPage < tp){ window._currentPage += 1; renderTable(window._lastFiltered || window._customersAll || []); } });
-      const countEl = document.getElementById('count');
-      const countNum = document.getElementById('countNum');
-      if(countNum) countNum.textContent = customers.length;
-      else countEl.textContent = `Tìm thấy ${customers.length} khách hàng`;
-    }
-
-    (function initWithoutLocalData(){
-      // Do not load data.json. Start with empty customers list; data will be loaded when user clicks "Tìm".
-      window._customersAll = [];
-      document.getElementById('listContainer').innerHTML = '<p class="small">Chưa có dữ liệu</p>';
-
-      // wire filters: day selector + field filters
-      const daySelect = document.getElementById('daySelect');
-      const clearBtn = document.getElementById('clearFilter');
-      const filterName = document.getElementById('filterName');
-      const filterContract = document.getElementById('filterContract');
-      const filterPhone = document.getElementById('filterPhone');
-      const filterCmnd = document.getElementById('filterCmnd');
-      const apiIdInput = document.getElementById('apiId');
-
-      // Auto-fill API user id from localStorage.authUser if available
-      try{
-        const stored = localStorage.getItem('authUser');
-        const apiIdStatus = document.getElementById('apiIdStatus');
-        if(stored){
-          const parsed = JSON.parse(stored);
-          const uid = parsed && (parsed.id || parsed.userId || parsed.user_id);
-          if(uid){ apiIdInput.value = uid; apiIdInput.disabled = true; apiIdInput.title = 'Lấy từ localStorage (authUser.id)';}
-          else if(apiIdStatus) apiIdStatus.textContent = '';
-        } else if(apiIdStatus) apiIdStatus.textContent = '';
-      }catch(e){ /* ignore */ }
-
-      function processContracts(contracts){
-        const seen=new Map();
-        const uniq=[];
-        (contracts||[]).forEach(ct=>{
-          const c = ct.customer;
-          if(!c) return;
-          const start = ct.startingInstallmentDate || ct.disbursementDate || null;
-          const contractNo = ct.number || ct.code || null;
-          const key = c.nationalId || c.id || JSON.stringify(c);
-          if(!seen.has(key)){
-            c._startingInstallmentDate = start;
-            c._contractNumbers = contractNo ? [contractNo] : [];
-            seen.set(key,true);
-            uniq.push(c);
-          } else {
-            const existing = uniq.find(x=> (x.nationalId||x.id) === (c.nationalId||c.id));
-            if(existing){
-              const prev = existing._startingInstallmentDate;
-              if(start && (!prev || new Date(start) < new Date(prev))) existing._startingInstallmentDate = start;
-              if(contractNo && Array.isArray(existing._contractNumbers) && !existing._contractNumbers.includes(contractNo)) existing._contractNumbers.push(contractNo);
-            }
+        // attach events
+        sizeSelect.addEventListener("change", (e) => {
+          window._pageSize = Number(e.target.value) || 10;
+          window._currentPage = 1;
+          renderTable(window._lastFiltered || window._customersAll || []);
+        });
+        prevBtn.addEventListener("click", () => {
+          if (window._currentPage > 1) {
+            window._currentPage -= 1;
+            renderTable(window._lastFiltered || window._customersAll || []);
           }
         });
-        return uniq;
+        nextBtn.addEventListener("click", () => {
+          const tp = Math.max(
+            1,
+            Math.ceil(
+              (window._lastFiltered || window._customersAll || []).length /
+                (window._pageSize || 10),
+            ),
+          );
+          if (window._currentPage < tp) {
+            window._currentPage += 1;
+            renderTable(window._lastFiltered || window._customersAll || []);
+          }
+        });
+        const countEl = document.getElementById("count");
+        const countNum = document.getElementById("countNum");
+        if (countNum) countNum.textContent = customers.length;
+        else countEl.textContent = `Tìm thấy ${customers.length} khách hàng`;
       }
 
-      // --- Auth helpers (use localStorage like target.html) ---
-      function getAuthToken(){ return localStorage.getItem('authToken'); }
-      function setAuthToken(t){ try{ localStorage.setItem('authToken', t); }catch(e){} }
-      function clearAuthToken(){ try{ localStorage.removeItem('authToken'); }catch(e){} }
-      function getStoredAuthUser(){ try{ const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; }catch(e){ return null; } }
-      function parseJwtPayload(token){ try{ const parts = token.split('.'); if(parts.length < 2) return null; const payload = parts[1].replace(/-/g,'+').replace(/_/g,'/'); const json = decodeURIComponent(atob(payload).split('').map(function(c){ return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(json); }catch(e){ return null; } }
-      function isTokenValid(token){ if(!token) return false; const p = parseJwtPayload(token); if(!p) return false; if(p.exp && typeof p.exp === 'number'){ const now = Math.floor(Date.now()/1000); return p.exp > now; } return true; }
-      function showLogin(){ try{ const lm = new bootstrap.Modal(document.getElementById('loginModal'), { backdrop: 'static' }); document.getElementById('loginError').style.display = 'none'; document.getElementById('loginError').textContent = ''; document.getElementById('loginUsername').value = ''; document.getElementById('loginPassword').value = ''; lm.show(); }catch(e){ console.warn('showLogin failed', e); } }
+      (function initWithoutLocalData() {
+        // Do not load data.json. Start with empty customers list; data will be loaded when user clicks "Tìm".
+        window._customersAll = [];
+        document.getElementById("listContainer").innerHTML =
+          '<p class="small">Chưa có dữ liệu</p>';
 
-      async function fetchApiContracts(id, fromApi, toApi){
-        if(!id) throw new Error('Missing id');
-        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
-        const headers = { 'Accept': 'application/json' };
-        const token = getAuthToken();
-        if(token) headers['Authorization'] = 'Bearer ' + token;
-        const res = await fetch(url, { headers });
-          if(res.status === 401 || res.status === 409){
+        // wire filters: day selector + field filters
+        const daySelect = document.getElementById("daySelect");
+        const clearBtn = document.getElementById("clearFilter");
+        const filterName = document.getElementById("filterName");
+        const filterContract = document.getElementById("filterContract");
+        const filterPhone = document.getElementById("filterPhone");
+        const filterCmnd = document.getElementById("filterCmnd");
+        const apiIdInput = document.getElementById("apiId");
+
+        // Auto-fill API user id from localStorage.authUser if available
+        try {
+          const stored = localStorage.getItem("authUser");
+          const apiIdStatus = document.getElementById("apiIdStatus");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            const uid =
+              parsed && (parsed.id || parsed.userId || parsed.user_id);
+            if (uid) {
+              apiIdInput.value = uid;
+              apiIdInput.disabled = true;
+              apiIdInput.title = "Lấy từ localStorage (authUser.id)";
+            } else if (apiIdStatus) apiIdStatus.textContent = "";
+          } else if (apiIdStatus) apiIdStatus.textContent = "";
+        } catch (e) {
+          /* ignore */
+        }
+
+        function processContracts(contracts) {
+          const seen = new Map();
+          const uniq = [];
+          (contracts || []).forEach((ct) => {
+            const c = ct.customer;
+            if (!c) return;
+            const start =
+              ct.startingInstallmentDate || ct.disbursementDate || null;
+            const contractNo = ct.number || ct.code || null;
+            const key = c.nationalId || c.id || JSON.stringify(c);
+            if (!seen.has(key)) {
+              c._startingInstallmentDate = start;
+              c._contractNumbers = contractNo ? [contractNo] : [];
+              seen.set(key, true);
+              uniq.push(c);
+            } else {
+              const existing = uniq.find(
+                (x) => (x.nationalId || x.id) === (c.nationalId || c.id),
+              );
+              if (existing) {
+                const prev = existing._startingInstallmentDate;
+                if (start && (!prev || new Date(start) < new Date(prev)))
+                  existing._startingInstallmentDate = start;
+                if (
+                  contractNo &&
+                  Array.isArray(existing._contractNumbers) &&
+                  !existing._contractNumbers.includes(contractNo)
+                )
+                  existing._contractNumbers.push(contractNo);
+              }
+            }
+          });
+          return uniq;
+        }
+
+        // --- Auth helpers (use localStorage like target.html) ---
+        function getAuthToken() {
+          return localStorage.getItem("authToken");
+        }
+        function setAuthToken(t) {
+          try {
+            localStorage.setItem("authToken", t);
+          } catch (e) {}
+        }
+        function clearAuthToken() {
+          try {
+            localStorage.removeItem("authToken");
+          } catch (e) {}
+        }
+        function getStoredAuthUser() {
+          try {
+            const j = localStorage.getItem("authUser");
+            return j ? JSON.parse(j) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+        function parseJwtPayload(token) {
+          try {
+            const parts = token.split(".");
+            if (parts.length < 2) return null;
+            const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+            const json = decodeURIComponent(
+              atob(payload)
+                .split("")
+                .map(function (c) {
+                  return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                })
+                .join(""),
+            );
+            return JSON.parse(json);
+          } catch (e) {
+            return null;
+          }
+        }
+        function isTokenValid(token) {
+          if (!token) return false;
+          const p = parseJwtPayload(token);
+          if (!p) return false;
+          if (p.exp && typeof p.exp === "number") {
+            const now = Math.floor(Date.now() / 1000);
+            return p.exp > now;
+          }
+          return true;
+        }
+        function showLogin() {
+          try {
+            const lm = new bootstrap.Modal(
+              document.getElementById("loginModal"),
+              { backdrop: "static" },
+            );
+            document.getElementById("loginError").style.display = "none";
+            document.getElementById("loginError").textContent = "";
+            document.getElementById("loginUsername").value = "";
+            document.getElementById("loginPassword").value = "";
+            lm.show();
+          } catch (e) {
+            console.warn("showLogin failed", e);
+          }
+        }
+
+        async function fetchApiContracts(id, fromApi, toApi) {
+          if (!id) throw new Error("Missing id");
+          const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+          const headers = { Accept: "application/json" };
+          const token = getAuthToken();
+          if (token) headers["Authorization"] = "Bearer " + token;
+          const res = await fetch(url, { headers });
+          if (res.status === 401 || res.status === 409) {
             // unauthorized or session conflict -> clear token and prompt login
             clearAuthToken();
             showLogin();
-            throw new Error('Authentication required (status '+res.status+')');
+            throw new Error(
+              "Authentication required (status " + res.status + ")",
+            );
           }
-        if(!res.ok) throw new Error('API lỗi: '+res.status);
-        const data = await res.json();
-        const contracts = data.contracts || data;
-        return contracts;
-      }
+          if (!res.ok) throw new Error("API lỗi: " + res.status);
+          const data = await res.json();
+          const contracts = data.contracts || data;
+          return contracts;
+        }
 
-      function applyFilters(){
-        const dayVal = daySelect.value ? Number(daySelect.value) : null;
-        const nameVal = (filterName.value || '').trim().toLowerCase();
-        const contractVal = (filterContract.value || '').trim().toLowerCase();
-        const phoneVal = (filterPhone.value || '').trim();
-        const cmndVal = (filterCmnd.value || '').trim();
+        function applyFilters() {
+          const dayVal = daySelect.value ? Number(daySelect.value) : null;
+          const nameVal = (filterName.value || "").trim().toLowerCase();
+          const contractVal = (filterContract.value || "").trim().toLowerCase();
+          const phoneVal = (filterPhone.value || "").trim();
+          const cmndVal = (filterCmnd.value || "").trim();
 
-        const filtered = window._customersAll.filter(c=>{
-          // day filter
-          if(dayVal){
-            if(!c._startingInstallmentDate) return false;
-            const d = new Date(c._startingInstallmentDate);
-            if(d.getDate() !== dayVal) return false;
-          }
-          // name filter
-          if(nameVal){
-            const full = fullname(c).toLowerCase();
-            if(!full.includes(nameVal)) return false;
-          }
-          // contract filter (check among collected contract numbers)
-          if(contractVal){
-            const contracts = (c._contractNumbers || []).join(' ').toLowerCase();
-            if(!contracts.includes(contractVal.toLowerCase())) return false;
-          }
-          // phone filter (substring)
-          if(phoneVal){
-            if(!( (c.phoneNumber||'').includes(phoneVal) )) return false;
-          }
-          // cmnd filter (exact or substring)
-          if(cmndVal){
-            if(!((c.nationalId||'').includes(cmndVal))) return false;
-          }
-          return true;
-        });
-
-        // reset to first page on new filter
-        window._currentPage = 1;
-        window._lastFiltered = filtered.slice();
-        renderTable(filtered);
-      }
-
-      // events
-      daySelect.addEventListener('change', applyFilters);
-      const searchBtn = document.getElementById('searchBtn');
-      if(searchBtn){
-        searchBtn.addEventListener('click', async ()=>{
-          const id = (apiIdInput.value || '').trim();
-          const fromApi = '';
-          const toApi = '';
-          if(!id){
-            // if no api id, prompt login like target.html
-            showLogin();
-            return;
-          }
-          // if token missing or expired, show login modal first
-          const token = getAuthToken();
-          if(!token || !isTokenValid(token)){
-            showLogin();
-            return;
-          }
-          try{
-            searchBtn.disabled = true;
-            searchBtn.textContent = 'Đang tải...';
-            const contracts = await fetchApiContracts(id, fromApi, toApi);
-            const customers = processContracts(contracts);
-            window._customersAll = customers;
-            applyFilters();
-          }catch(e){
-            // if unauthorized or auth required, fetchApiContracts already triggered showLogin(); show message otherwise
-            const msg = (e && e.message) ? e.message : e;
-            if(String(msg).toLowerCase().includes('authentication required')){
-              document.getElementById('listContainer').innerHTML = '<p class="small">Yêu cầu đăng nhập để gọi API.</p>';
-            } else {
-              document.getElementById('listContainer').innerHTML = '<p class="small">Lỗi khi gọi API: '+msg+'</p>';
+          const filtered = window._customersAll.filter((c) => {
+            // day filter
+            if (dayVal) {
+              if (!c._startingInstallmentDate) return false;
+              const d = new Date(c._startingInstallmentDate);
+              if (d.getDate() !== dayVal) return false;
             }
-          }finally{
-            searchBtn.disabled = false;
-            searchBtn.textContent = 'Tìm';
-          }
+            // name filter
+            if (nameVal) {
+              const full = fullname(c).toLowerCase();
+              if (!full.includes(nameVal)) return false;
+            }
+            // contract filter (check among collected contract numbers)
+            if (contractVal) {
+              const contracts = (c._contractNumbers || [])
+                .join(" ")
+                .toLowerCase();
+              if (!contracts.includes(contractVal.toLowerCase())) return false;
+            }
+            // phone filter (substring)
+            if (phoneVal) {
+              if (!(c.phoneNumber || "").includes(phoneVal)) return false;
+            }
+            // cmnd filter (exact or substring)
+            if (cmndVal) {
+              if (!(c.nationalId || "").includes(cmndVal)) return false;
+            }
+            return true;
+          });
+
+          // reset to first page on new filter
+          window._currentPage = 1;
+          window._lastFiltered = filtered.slice();
+          renderTable(filtered);
+        }
+
+        // events
+        daySelect.addEventListener("change", applyFilters);
+        const searchBtn = document.getElementById("searchBtn");
+        if (searchBtn) {
+          searchBtn.addEventListener("click", async () => {
+            const id = (apiIdInput.value || "").trim();
+            const fromApi = "";
+            const toApi = "";
+            if (!id) {
+              // if no api id, prompt login like target.html
+              showLogin();
+              return;
+            }
+            // if token missing or expired, show login modal first
+            const token = getAuthToken();
+            if (!token || !isTokenValid(token)) {
+              showLogin();
+              return;
+            }
+            try {
+              searchBtn.disabled = true;
+              searchBtn.textContent = "Đang tải...";
+              const contracts = await fetchApiContracts(id, fromApi, toApi);
+              const customers = processContracts(contracts);
+              window._customersAll = customers;
+              applyFilters();
+            } catch (e) {
+              // if unauthorized or auth required, fetchApiContracts already triggered showLogin(); show message otherwise
+              const msg = e && e.message ? e.message : e;
+              if (
+                String(msg).toLowerCase().includes("authentication required")
+              ) {
+                document.getElementById("listContainer").innerHTML =
+                  '<p class="small">Yêu cầu đăng nhập để gọi API.</p>';
+              } else {
+                document.getElementById("listContainer").innerHTML =
+                  '<p class="small">Lỗi khi gọi API: ' + msg + "</p>";
+              }
+            } finally {
+              searchBtn.disabled = false;
+              searchBtn.textContent = "Tìm";
+            }
+          });
+        }
+        // realtime filtering removed for text inputs to rely on search button
+        // optional: keep realtime by uncommenting the following line
+        // [filterName, filterContract, filterPhone, filterCmnd].forEach(el=> el && el.addEventListener('input', applyFilters));
+        clearBtn.addEventListener("click", () => {
+          daySelect.value = "";
+          filterName.value = "";
+          filterContract.value = "";
+          filterPhone.value = "";
+          filterCmnd.value = "";
+          if (!apiIdInput.disabled) apiIdInput.value = "";
+          renderTable(window._customersAll);
         });
-      }
-      // realtime filtering removed for text inputs to rely on search button
-      // optional: keep realtime by uncommenting the following line
-      // [filterName, filterContract, filterPhone, filterCmnd].forEach(el=> el && el.addEventListener('input', applyFilters));
-      clearBtn.addEventListener('click', ()=>{ daySelect.value=''; filterName.value=''; filterContract.value=''; filterPhone.value=''; filterCmnd.value=''; if(!apiIdInput.disabled) apiIdInput.value=''; renderTable(window._customersAll); });
-      // Login modal handlers
-      const loginBtn = document.getElementById('loginBtn');
-      const loginUserEl = document.getElementById('loginUsername');
-      const loginPassEl = document.getElementById('loginPassword');
-      const togglePassBtn = document.getElementById('togglePassBtn');
-      if(togglePassBtn){ togglePassBtn.addEventListener('click', ()=>{ if(loginPassEl.type === 'password'){ loginPassEl.type='text'; togglePassBtn.textContent='🙈'; } else { loginPassEl.type='password'; togglePassBtn.textContent='👁️'; } }); }
-      if(loginBtn){
-        loginBtn.addEventListener('click', async ()=>{
-          const u = (loginUserEl.value || '').trim();
-          const p = (loginPassEl.value || '').trim();
-          const loginError = document.getElementById('loginError');
-          if(!u || !p){ loginError.style.display='block'; loginError.textContent='Nhập tài khoản và mật khẩu'; return; }
-          loginBtn.disabled = true;
-          try{
-            const res = await fetch('https://hpo.hdsaison.com.vn/hpo/api/v1/login', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p })
-            });
-            const body = await res.json().catch(()=>null);
-            if(!res.ok){ const msg = body && (body.message || body.error) ? (body.message || body.error) : ('HTTP ' + res.status); loginError.style.display='block'; loginError.textContent = msg; loginBtn.disabled = false; return; }
-            const accessToken = body && (body.accessToken || body.token || (body.data && (body.data.accessToken || body.data.token)));
-            if(!accessToken){ loginError.style.display='block'; loginError.textContent='Không nhận được accessToken từ server'; loginBtn.disabled = false; return; }
-            setAuthToken(accessToken);
-            // derive user payload
-            let userPayload = null;
-            if(body){ if(body.user) userPayload = body.user; else if(body.data && body.data.user) userPayload = body.data.user; else if(body.data && (body.data.id || body.data.userId)) userPayload = body.data; else if(body.id || body.userId) userPayload = body; }
-            if(!userPayload) userPayload = {};
-            const maybeId = userPayload.id || userPayload.userId || (body && body.data && (body.data.id || body.data.userId)) || (body && (body.id || body.userId));
-            if(maybeId) userPayload.id = maybeId;
-            try{ localStorage.setItem('authUser', JSON.stringify(userPayload)); }catch(e){}
-            // update apiId status and hidden input
-            try{ const apiIdStatus = document.getElementById('apiIdStatus'); if(userPayload && userPayload.id){ apiIdInput.value = userPayload.id; apiIdInput.disabled = true; } }catch(e){}
-            // close modal
-            const lm = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-            if(lm) lm.hide();
-            // populate apiId if empty/disabled
-            try{ if(userPayload && userPayload.id){ apiIdInput.value = userPayload.id; apiIdInput.disabled = true; apiIdInput.title = 'Lấy từ localStorage (authUser.id)'; } }catch(e){}
-            // retry search automatically
-            try{ if(searchBtn) searchBtn.click(); }catch(e){}
-          }catch(err){ loginError.style.display='block'; loginError.textContent = 'Lỗi kết nối: ' + (err.message || err); }
-          finally{ loginBtn.disabled = false; }
-        });
-      }
-    })();
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        // Login modal handlers
+        const loginBtn = document.getElementById("loginBtn");
+        const loginUserEl = document.getElementById("loginUsername");
+        const loginPassEl = document.getElementById("loginPassword");
+        const togglePassBtn = document.getElementById("togglePassBtn");
+        if (togglePassBtn) {
+          togglePassBtn.addEventListener("click", () => {
+            if (loginPassEl.type === "password") {
+              loginPassEl.type = "text";
+              togglePassBtn.textContent = "🙈";
+            } else {
+              loginPassEl.type = "password";
+              togglePassBtn.textContent = "👁️";
+            }
+          });
+        }
+        if (loginBtn) {
+          loginBtn.addEventListener("click", async () => {
+            const u = (loginUserEl.value || "").trim();
+            const p = (loginPassEl.value || "").trim();
+            const loginError = document.getElementById("loginError");
+            if (!u || !p) {
+              loginError.style.display = "block";
+              loginError.textContent = "Nhập tài khoản và mật khẩu";
+              return;
+            }
+            loginBtn.disabled = true;
+            try {
+              const res = await fetch(
+                "https://hpo.hdsaison.com.vn/hpo/api/v1/login",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ username: u, password: p }),
+                },
+              );
+              const body = await res.json().catch(() => null);
+              if (!res.ok) {
+                const msg =
+                  body && (body.message || body.error)
+                    ? body.message || body.error
+                    : "HTTP " + res.status;
+                loginError.style.display = "block";
+                loginError.textContent = msg;
+                loginBtn.disabled = false;
+                return;
+              }
+              const accessToken =
+                body &&
+                (body.accessToken ||
+                  body.token ||
+                  (body.data && (body.data.accessToken || body.data.token)));
+              if (!accessToken) {
+                loginError.style.display = "block";
+                loginError.textContent =
+                  "Không nhận được accessToken từ server";
+                loginBtn.disabled = false;
+                return;
+              }
+              setAuthToken(accessToken);
+              // derive user payload
+              let userPayload = null;
+              if (body) {
+                if (body.user) userPayload = body.user;
+                else if (body.data && body.data.user)
+                  userPayload = body.data.user;
+                else if (body.data && (body.data.id || body.data.userId))
+                  userPayload = body.data;
+                else if (body.id || body.userId) userPayload = body;
+              }
+              if (!userPayload) userPayload = {};
+              const maybeId =
+                userPayload.id ||
+                userPayload.userId ||
+                (body && body.data && (body.data.id || body.data.userId)) ||
+                (body && (body.id || body.userId));
+              if (maybeId) userPayload.id = maybeId;
+              try {
+                localStorage.setItem("authUser", JSON.stringify(userPayload));
+              } catch (e) {}
+              // update apiId status and hidden input
+              try {
+                const apiIdStatus = document.getElementById("apiIdStatus");
+                if (userPayload && userPayload.id) {
+                  apiIdInput.value = userPayload.id;
+                  apiIdInput.disabled = true;
+                }
+              } catch (e) {}
+              // close modal
+              const lm = bootstrap.Modal.getInstance(
+                document.getElementById("loginModal"),
+              );
+              if (lm) lm.hide();
+              // populate apiId if empty/disabled
+              try {
+                if (userPayload && userPayload.id) {
+                  apiIdInput.value = userPayload.id;
+                  apiIdInput.disabled = true;
+                  apiIdInput.title = "Lấy từ localStorage (authUser.id)";
+                }
+              } catch (e) {}
+              // retry search automatically
+              try {
+                if (searchBtn) searchBtn.click();
+              } catch (e) {}
+            } catch (err) {
+              loginError.style.display = "block";
+              loginError.textContent = "Lỗi kết nối: " + (err.message || err);
+            } finally {
+              loginBtn.disabled = false;
+            }
+          });
+        }
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
