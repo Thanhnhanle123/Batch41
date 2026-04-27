@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biểu đồ tổng quan</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --accent: #2b8be6;
+        --accent-2: #1e88e5;
+        --danger: #e53935;
+        --muted: #6b7280;
+        --border: #e6eef9;
+        --shadow: 0 8px 30px rgba(43, 67, 99, 0.08);
+        --radius: 12px;
+        --max-width: 1100px;
+      }
+      * {
+        box-sizing: border-box;
+        font-family:
+          Roboto,
+          Inter,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Arial;
+      }
+      body {
+        background: var(--bg);
+        color: #24313a;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1 {
+        font-size: 20px;
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+      }
+      .logo {
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 16px;
+      }
+      .desktop-nav a {
+        margin-left: 15px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #333;
+      }
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none;
+        }
+      }
+      .page {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding-top: 92px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .chart-wrap {
+        max-width: 1000px;
+        height: 460px;
+        margin: 0 auto;
+        border-radius: var(--radius);
+        background: var(--card);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        padding: 18px;
+      }
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+
+      /* Inputs */
+      .mb-3 .form-control {
+        border: 1px solid #e6eef9;
+        border-radius: 10px;
+        background: linear-gradient(180deg, #fff, #fbfdff);
+        padding: 10px 12px;
+      }
+      .mb-3 label {
+        font-weight: 600;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      input[type="text"] {
+        text-align: right;
+      }
+
+      /* Summary boxes */
+      #summaryBox {
+        margin-top: 18px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      #summaryBox > div {
+        flex: 1;
+        min-width: 220px;
+      }
+      #summaryBox table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+      }
+      #summaryBox td {
+        padding: 10px;
+        border-bottom: 1px solid rgba(46, 66, 90, 0.06);
+        background-clip: padding-box;
+      }
+      #summaryBox tr:last-child td {
+        border-bottom: 0;
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: var(--accent);
+        border: none;
+        box-shadow: none;
+      }
+      .btn-outline-secondary {
+        border-radius: 10px;
+      }
+      /* Save button sizing to match inputs */
+      #saveTargetsBtn {
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: 10px;
+      }
+
+      /* Modal / login input styling */
+      .modal .modal-dialog {
+        max-width: 420px;
+      }
+      .modal .modal-content {
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+      }
+      .modal .modal-header {
+        border-bottom: 0;
+        padding: 16px 20px;
+      }
+      .modal .modal-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      .modal .modal-body {
+        padding: 18px 20px;
+      }
+      .modal .form-label {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .modal .input-group {
+        border: 1px solid #e6eef9;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+      }
+      .modal .input-group .form-control {
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 10px 12px;
+      }
+      .modal .input-group .btn {
+        border: 0;
+        box-shadow: none;
+        min-width: 44px;
+        padding: 6px 8px;
+        background: transparent;
+      }
+      #loginError {
+        font-size: 14px;
+      }
+      @media (max-width: 420px) {
+        .modal .modal-dialog {
+          max-width: 92%;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .chart-wrap {
+          height: 340px;
+        }
+        .page {
+          padding-top: 86px;
+        }
+      }
+      @media (max-width: 480px) {
+        #summaryBox > div {
+          min-width: 160px;
+        }
+        #summaryBox table {
+          font-size: 13px;
+        }
+      }
+      .badge {
+        padding: 6px 10px;
+        font-size: 13px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+
+      /* Có bảo hiểm */
+      .badge-insurance {
+        background: linear-gradient(135deg, #00c853, #00e676);
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 200, 83, 0.4);
+        animation: pulse 1.5s infinite;
+      }
+
+      /* Không bảo hiểm */
+      .badge-none {
+        background: #e0e0e0;
+        color: #555;
+      }
+
+      /* Hiệu ứng nhẹ cho badge xanh */
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.6);
+        }
+        70% {
+          box-shadow: 0 0 0 8px rgba(0, 200, 83, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 200, 83, 0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">🚗 Batch 41</div>
+      <nav class="desktop-nav">
+        <a href="./index.html">Tính trả góp</a>
+        <a href="./cancel_contract.html">Huỷ HĐ</a>
+        <a href="./target.html">Tổng quan chỉ tiêu</a>
+        <a href="./customers.html">Danh sách khách hàng</a>
+        <a href="./customer_search.html">Tìm khách hàng</a>
+        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
+        <a href="./bonus.html">Thưởng SI</a>
+        <a href="#" onclick="logout()">Đăng xuất</a>
+      </nav>
+      <!-- HAMBURGER -->
+      <button
+        class="btn btn-outline-primary d-md-none"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileMenu"
+      >
+        ☰
+      </button>
+    </header>
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🚗 Batch 41</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <a class="btn btn-light w-100 mb-2" href="index.html"
+          >📊 Tính trả góp</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
+          >❌ Huỷ hợp đồng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./target.html"
+          >📈 Tổng quan chỉ tiêu</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./customers.html"
+          >👥 Dan sách khách hàng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./customer_search.html"
+          >🔎 Tìm khách hàng</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html"
+          >📅 Tìm lịch làm việc</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
+        <hr />
+        <button class="btn btn-danger w-100" onclick="logout()">
+          🔐 Đăng xuất
+        </button>
+      </div>
+    </div>
+
+    <div class="page">
+      <h5 class="text-center mb-3">THƯỞNG SI</h5>
+      <!-- INPUT -->
+      <div class="card summary-card mb-3">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label>PR3 (%)</label>
+              <input type="number" id="pr3" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+              <label>PR6 (%)</label>
+              <input type="number" id="pr6" class="form-control" />
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <input type="date" id="fromDate" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+              <input type="date" id="toDate" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+              <button
+                id="btnLoad"
+                class="btn btn-primary w-100"
+                onclick="reloadData()"
+              >
+                🔄 Tải dữ liệu
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="card summary-card mb-4">
+        <div class="card-body">
+          <h5>📋 Danh sách hợp đồng</h5>
+          <div class="table-responsive" style="max-height: 400px">
+            <table class="table table-hover text-center">
+              <thead>
+                <tr>
+                  <th>HĐ</th>
+                  <th>Kỳ hạn</th>
+                  <th>Giải ngân</th>
+                  <th>Có BH</th>
+                  <th>Scheme</th>
+                  <th>Thưởng DS</th>
+                  <th>BH</th>
+                  <th>Tổng</th>
+                </tr>
+              </thead>
+              <tbody id="contracts-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="row" id="summary"></div>
+    </div>
+
+    <!-- Login modal: will appear if no auth token is stored -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Đăng nhập</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              id="loginError"
+              class="text-danger mb-2"
+              style="display: none"
+            ></div>
+            <div class="mb-3">
+              <label class="form-label">Tài khoản</label>
+              <input
+                id="loginUsername"
+                class="form-control"
+                autocomplete="username"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <div class="input-group">
+                <input
+                  id="loginPassword"
+                  type="password"
+                  class="form-control"
+                  autocomplete="current-password"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="togglePassBtn"
+                  aria-label="Hiển thị mật khẩu"
+                >
+                  👁️
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Chart.js and datalabels plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      if (sessionStorage.getItem("logged") !== "1") {
+        window.location.href = "index.html";
+      }
+      function logout() {
+        sessionStorage.removeItem("logged");
+        showLogin();
+      }
+    </script>
+    <script>
+      const loginModalEl = document.getElementById("loginModal");
+      const loginModal = new bootstrap.Modal(loginModalEl, {
+        backdrop: "static",
+        keyboard: false,
+      });
+      const loginBtnEl = document.getElementById("loginBtn");
+      const loginErrorEl = document.getElementById("loginError");
+      const loginUserEl = document.getElementById("loginUsername");
+      const loginPassEl = document.getElementById("loginPassword");
+      const togglePassBtn = document.getElementById("togglePassBtn");
+      if (togglePassBtn) {
+        togglePassBtn.addEventListener("click", () => {
+          if (loginPassEl.type === "password") {
+            loginPassEl.type = "text";
+            togglePassBtn.textContent = "🙈";
+            togglePassBtn.setAttribute("aria-label", "Ẩn mật khẩu");
+          } else {
+            loginPassEl.type = "password";
+            togglePassBtn.textContent = "👁️";
+            togglePassBtn.setAttribute("aria-label", "Hiển thị mật khẩu");
+          }
+        });
+      }
+      loginBtnEl.addEventListener("click", async () => {
+        const u = (loginUserEl.value || "").trim();
+        const p = loginPassEl.value || "";
+        if (!u || !p) {
+          loginErrorEl.style.display = "block";
+          loginErrorEl.textContent = "Nhập tài khoản và mật khẩu";
+          return;
+        }
+        loginBtnEl.disabled = true;
+        loginErrorEl.style.display = "none";
+        try {
+          const res = await fetch(
+            "https://hpo.hdsaison.com.vn/hpo/api/v1/login",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: u, password: p }),
+            },
+          );
+          const body = await res.json().catch(() => null);
+          if (!res.ok) {
+            const msg =
+              body && (body.message || body.error)
+                ? body.message || body.error
+                : "HTTP " + res.status;
+            loginErrorEl.style.display = "block";
+            loginErrorEl.textContent = msg;
+            loginBtnEl.disabled = false;
+            return;
+          }
+          // Extract accessToken from common response shapes
+          const accessToken =
+            body &&
+            (body.accessToken ||
+              body.token ||
+              (body.data && (body.data.accessToken || body.data.token)));
+          if (!accessToken) {
+            loginErrorEl.style.display = "block";
+            loginErrorEl.textContent = "Không nhận được accessToken từ server";
+            loginBtnEl.disabled = false;
+            return;
+          }
+          setAuthToken(accessToken);
+          // Normalize and store user payload. API responses vary; try common locations and ensure `id` exists.
+          let userPayload = null;
+          if (body) {
+            if (body.user) userPayload = body.user;
+            else if (body.data && body.data.user) userPayload = body.data.user;
+            else if (body.data && (body.data.id || body.data.userId))
+              userPayload = body.data;
+            else if (body.id || body.userId) userPayload = body;
+          }
+          // Fallback: if we couldn't find a user object, store an empty object (prevents missing id errors)
+          if (!userPayload) userPayload = {};
+          // Ensure `id` exists on the stored payload by searching common locations
+          try {
+            const maybeId =
+              userPayload.id ||
+              userPayload.userId ||
+              (body && body.data && (body.data.id || body.data.userId)) ||
+              (body && (body.id || body.userId));
+            if (maybeId) userPayload.id = maybeId;
+          } catch (e) {}
+          try {
+            localStorage.setItem("authUser", JSON.stringify(userPayload));
+          } catch (e) {}
+          loginModal.hide();
+          loginBtnEl.disabled = false;
+          startApp();
+        } catch (err) {
+          loginErrorEl.style.display = "block";
+          loginErrorEl.textContent = "Lỗi kết nối: " + (err.message || err);
+          loginBtnEl.disabled = false;
+        }
+      });
+      function showLogin() {
+        loginErrorEl.style.display = "none";
+        loginErrorEl.textContent = "";
+        loginUserEl.value = "";
+        loginPassEl.value = "";
+        loginModal.show();
+      }
+      function setLoading(isLoading) {
+        const btn = document.getElementById("btnLoad");
+
+        if (isLoading) {
+          btn.disabled = true;
+          btn.innerHTML = `
+      <span class="spinner-border spinner-border-sm"></span>
+      Đang tải...
+    `;
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = "🔄 Tải dữ liệu";
+        }
+      }
+      function isWithinOneMonth(from, to) {
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+
+        if (toDate < fromDate) return false;
+
+        const diffTime = toDate - fromDate;
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+        return diffDays <= 31; // giới hạn 31 ngày
+      }
+      function getStoredAuthUser() {
+        try {
+          const j = localStorage.getItem("authUser");
+          return j ? JSON.parse(j) : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function formatApiDateFromInput(d) {
+        // 'YYYY-MM-DD' -> 'DD-MM-YYYY'
+        if (!d) return "";
+        const parts = d.split("-");
+        if (parts.length !== 3) return d;
+        return parts[2] + "-" + parts[1] + "-" + parts[0];
+      }
+
+      function fetchAchievedFromData(fromInput, toInput) {
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+        // ensure token is present and not expired
+        if (!token || !isTokenValid(token)) {
+          clearAuthToken();
+          try {
+            localStorage.removeItem("authUser");
+          } catch (e) {}
+          showLogin();
+          return Promise.reject(
+            new Error("Token expired or missing. Please login."),
+          );
+        }
+        // require user id
+        if (!(authUser && authUser.id)) {
+          showLogin();
+          return Promise.reject(
+            new Error("No user info available. Please login."),
+          );
+        }
+        const id = authUser.id;
+        const fromApi = fromInput
+          ? formatApiDateFromInput(fromInput)
+          : formatApiDateFromInput(defaultFromDate());
+        const toApi = toInput
+          ? formatApiDateFromInput(toInput)
+          : formatApiDateFromInput(defaultToDate());
+        // include pagination params (page & size) - API rejects requests without them
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+        return fetch(url, {
+          headers: {
+            Authorization: "Bearer " + token,
+            Accept: "application/json",
+          },
+        })
+          .then(async (r) => {
+            if (!r.ok) {
+              // try to read response body (json or text) to show better error
+              let bodyText = "";
+              try {
+                bodyText = await r.text();
+              } catch (e) {}
+              const trace =
+                r.headers.get("tracelogid") ||
+                r.headers.get("TraceLogId") ||
+                "";
+              const msg =
+                `HTTP ${r.status}` +
+                (bodyText ? ": " + bodyText : "") +
+                (trace ? " (trace:" + trace + ")" : "");
+              throw new Error(msg);
+            }
+            return r.json();
+          })
+          .then((data) => {
+            // expect API returns either a paged object (`content`), an object with `contracts`, or a raw array
+            const arr =
+              data && (data.content || data.contracts)
+                ? data.content || data.contracts
+                : Array.isArray(data)
+                  ? data
+                  : [];
+            mcAch = 0;
+            dlAch = 0;
+            contractArr = [];
+            // console.log("Fetched contracts:", arr);
+            arr.forEach((c) => {
+              const ty = c.type === "2W" ? "MC" : c.type === "DL" ? "DL" : null;
+              if (!ty) return;
+              const val = Number(c.financedAmount || c.totalPurchase || 0);
+              if (ty === "MC") mcAch += val;
+              else if (ty === "DL") dlAch += val;
+              contractArr.push(c.number || null);
+            });
+            return { mcAch, dlAch, contractArr };
+          });
+      }
+      function clearAuthToken() {
+        try {
+          localStorage.removeItem("authToken");
+        } catch (e) {}
+      }
+      function fetchContractByNumber(contractNumber) {
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+
+        // check token
+        if (!token || !isTokenValid(token)) {
+          clearAuthToken();
+          try {
+            localStorage.removeItem("authUser");
+          } catch (e) {}
+          showLogin();
+          return Promise.reject(
+            new Error("Token expired or missing. Please login."),
+          );
+        }
+
+        // check user
+        if (!(authUser && authUser.id)) {
+          showLogin();
+          return Promise.reject(
+            new Error("No user info available. Please login."),
+          );
+        }
+
+        if (!contractNumber) {
+          return Promise.reject(new Error("Contract number is required"));
+        }
+
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/contractnumber/${contractNumber}`;
+
+        return fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+            Accept: "application/json",
+          },
+        })
+          .then(async (r) => {
+            if (!r.ok) {
+              let bodyText = "";
+              try {
+                bodyText = await r.text();
+              } catch (e) {}
+
+              const trace =
+                r.headers.get("tracelogid") ||
+                r.headers.get("TraceLogId") ||
+                "";
+
+              const msg =
+                `HTTP ${r.status}` +
+                (bodyText ? ": " + bodyText : "") +
+                (trace ? " (trace:" + trace + ")" : "");
+
+              throw new Error(msg);
+            }
+            return r.json();
+          })
+          .then((c) => {
+            const financedAmount = Number(c.financedAmount || 0);
+            const tenure = c.tenorInMonths || 0;
+
+            // check bảo hiểm
+            const insurance = !!c.submittedPosScheme?.schemeLiCode;
+
+            // lấy ký tự cuối schemeName
+            let scheme = "";
+            if (c.submittedPosScheme?.schemeName) {
+              const name = c.submittedPosScheme.schemeName.trim();
+              scheme = name.slice(-1);
+            }
+
+            return {
+              contractId: c.number,
+              tenure: tenure,
+              amount: financedAmount,
+              insurance: insurance,
+              scheme: scheme,
+            };
+          });
+      }
+      function parseNumberInput(s) {
+        if (s === null || s === undefined) return 0;
+        // loại bỏ dấu phân nhóm và khoảng trắng
+        const cleaned = String(s).replace(/[\.\,\s]/g, "");
+        const n = Number(cleaned);
+        return isNaN(n) ? 0 : n;
+      }
+      function getStoredTargets() {
+        const m =
+          parseNumberInput(localStorage.getItem("targetMC")) || DEFAULT_MC;
+        const d =
+          parseNumberInput(localStorage.getItem("targetDL")) || DEFAULT_DL;
+        return { mcTarget: m, dlTarget: d };
+      }
+      async function reloadData() {
+        const from = document.getElementById("fromDate").value;
+        const to = document.getElementById("toDate").value;
+        const pr3 = Number(document.getElementById("pr3").value);
+        const pr6 = Number(document.getElementById("pr6").value);
+        if (!from || !to) {
+          alert("Vui lòng chọn đầy đủ ngày");
+          return;
+        }
+
+        if (isNaN(pr3) || isNaN(pr6)) {
+          alert("Vui lòng nhập PR3 và PR6");
+          return;
+        }
+
+        if (!isWithinOneMonth(from, to)) {
+          alert("Khoảng thời gian không được vượt quá 1 tháng");
+          return;
+        }
+        setLoading(true); // ✅ bật loading
+        try {
+          const dataAchieved = await fetchAchievedFromData(from, to);
+          let data = {
+            targetMC: 0,
+            targetDL: 0,
+            totalTarget: 0,
+            achievedMC: 0,
+            achievedDL: 0,
+            achievedTotal: 0,
+            PR3: pr3 || 0,
+            PR6: pr6 || 0,
+            customers: [],
+          };
+          data.achievedMC = dataAchieved.mcAch || 0;
+          data.achievedDL = dataAchieved.dlAch || 0;
+          data.achievedTotal = data.achievedMC + data.achievedDL;
+          data.targetMC = getStoredTargets().mcTarget || 0;
+          data.targetDL = getStoredTargets().dlTarget || 0;
+          data.totalTarget = data.targetMC + data.targetDL;
+          // giả lập thêm customers từ API
+          if (
+            dataAchieved.contractArr &&
+            Array.isArray(dataAchieved.contractArr)
+          ) {
+            for (const contractNumber of dataAchieved.contractArr) {
+              try {
+                const c = await fetchContractByNumber(contractNumber);
+                data.customers.push(c);
+              } catch (e) {
+                console.error(
+                  "Error fetching contract detail for",
+                  contractNumber,
+                  e,
+                );
+              }
+            }
+          }
+          console.log("Data:", data);
+          loadData(data);
+          // return data;
+        } catch (err) {
+          showLogin();
+          return Promise.reject(
+            new Error("Token expired or missing. Please login."),
+          );
+        } finally {
+          setLoading(false); // ✅ tắt loading
+        }
+      }
+      function getAuthToken() {
+        return localStorage.getItem("authToken");
+      }
+      function setAuthToken(t) {
+        localStorage.setItem("authToken", t);
+      }
+      function isTokenValid(token) {
+        if (!token) return false;
+        const p = parseJwtPayload(token);
+        if (!p) return false;
+        if (p.exp && typeof p.exp === "number") {
+          const now = Math.floor(Date.now() / 1000);
+          return p.exp > now;
+        }
+        return true; // nếu không có exp, giả sử còn hợp lệ
+      }
+      function parseJwtPayload(token) {
+        try {
+          const parts = token.split(".");
+          if (parts.length < 2) return null;
+          const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+          const json = decodeURIComponent(
+            atob(payload)
+              .split("")
+              .map(function (c) {
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+              })
+              .join(""),
+          );
+          return JSON.parse(json);
+        } catch (e) {
+          return null;
+        }
+      }
+      function getSchemeRate(scheme, tenure) {
+        // Định nghĩa đầy đủ bảng hệ số từ hình ảnh
+        const table = {
+          A: { lt12: 0.9, gte12: 1.2, gte15: 1.3, gte18: 1.5, gte24: 1.6 },
+          B: { lt12: 0.7, gte12: 1,   gte15: 1.1, gte18: 1.3, gte24: 1.4 },
+          C: { lt12: 0,   gte12: 0.1, gte15: 0.3, gte18: 0.4, gte24: 0.5 },
+          D: { lt12: 0,   gte12: 0,   gte15: 0,   gte18: 0,   gte24: 0 },
+        };
+
+        // Kiểm tra nếu Scheme không tồn tại trong bảng
+        const rates = table[scheme.toUpperCase()];
+        if (!rates) return 0;
+
+        // Logic phân loại kỳ hạn (tenure)
+        if (tenure >= 24) return rates.gte24;
+        if (tenure >= 18) return rates.gte18;
+        if (tenure >= 15) return rates.gte15;
+        if (tenure >= 12) return rates.gte12;
+
+        return rates.lt12; // Trường hợp < 12 tháng
+      }
+
+      function getInsuranceBonus(tenure, amount) {
+        // Chuyển đổi amount sang đơn vị triệu đồng để khớp với bảng (DSGN)
+        const dsgn = amount / 1000000;
+
+        // 1. Xác định hàng (Dựa trên doanh số DSGN)
+        let row;
+        if (dsgn >= 50)      row = { 12: 34000, 15: 39000, 18: 44000 };
+        else if (dsgn >= 25) row = { 12: 26000, 15: 31000, 18: 36000 };
+        else if (dsgn >= 12) row = { 12: 18000, 15: 23000, 18: 28000 };
+        else                 row = { 12: 10000, 15: 15000, 18: 20000 };
+
+        // 2. Trả về giá trị dựa trên kỳ hạn (tenure)
+        // Nếu tenure không khớp chính xác 12, 15, 18, ta lấy mức thấp nhất gần nhất hoặc mặc định
+        return row[tenure] || row[12];
+      }
+
+      function getRiskFactor(pr3, pr6) {
+        // Hàm phụ để xác định chỉ số index của hàng và cột
+        const getIdx = (val) => {
+          if (val === null || val === undefined || val === "N/A") return 4; // Vị trí N/A
+          if (val >= 0.9)  return 3; // >= 90%
+          if (val >= 0.85) return 2; // >= 85%
+          if (val >= 0.75) return 1; // >= 75%
+          return 0; // < 75%
+        };
+
+        // Ma trận dữ liệu (Hàng là PR3, Cột là PR6)
+        // Mỗi hàng ứng với: [<75%, >=75%, >=85%, N/A]
+        const matrix = [
+          [0,   0,   0,   0],   // PR3 < 75%
+          [0,   0.6, 0.8, 0.8], // PR3 >= 75%
+          [0.2, 0.8, 1.1, 1],   // PR3 >= 85%
+          [0.4, 1.1, 1.3, 1],   // PR3 >= 90%
+          [0,   0.8, 1,   1],   // PR3 N/A
+        ];
+
+        const rowIdx = getIdx(pr3);
+        const colIdx = getIdx(pr6);
+
+        // Cần lưu ý: Cột N/A trong bảng của bạn là cột thứ 4
+        // Nhưng hàm getIdx trả về 4 cho N/A, nên ta map lại index cột một chút
+        const columnMap = [0, 1, 2, 3]; // Index thực tế của mảng matrix[row]
+
+        // Vì cột 3 trong bảng là >=85%, cột 4 mới là N/A
+        // Ta lấy dữ liệu từ ma trận
+        return matrix[rowIdx][colIdx === 4 ? 3 : colIdx];
+      }
+
+      function getBonusTargetDL(targetDL) {
+        // Đơn vị targetDL truyền vào giả định là triệu đồng (ví dụ: 150)
+
+        if (targetDL >= 300) return 1800000;
+        if (targetDL >= 200) return 1300000;
+        if (targetDL >= 150) return 1100000;
+        if (targetDL >= 100) return 800000;
+        if (targetDL >= 60)  return 600000;
+
+        return 0; // Trường hợp < 60
+      }
+
+      function getDLBonusFactor(achieved, target) {
+        const percent = (achieved / target) * 100;
+        if (percent >= 120) return 1.6;
+        if (percent >= 110) return 1.3;
+        if (percent >= 100) return 1.0;
+        if (percent >= 90)  return 0.7;
+        return 0;
+      }
+
+      function getCTFactor(mcPercent, totalPercent) {
+        // 1. Xác định chỉ số hàng dựa trên % CT MC/ED (Dọc)
+        let rowIdx;
+        if (mcPercent >= 90) rowIdx = 3;
+        else if (mcPercent >= 75) rowIdx = 2;
+        else if (mcPercent >= 50) rowIdx = 1;
+        else rowIdx = 0; // < 50%
+
+        // 2. Xác định chỉ số cột dựa trên % CT Tổng (Ngang)
+        let colIdx;
+        if (totalPercent >= 115) colIdx = 4;
+        else if (totalPercent >= 100) colIdx = 3;
+        else if (totalPercent >= 90) colIdx = 2;
+        else if (totalPercent >= 75) colIdx = 1;
+        else colIdx = 0; // <= 75%
+
+        // 3. Ma trận dữ liệu (Mapping y hệt như trong ảnh)
+        const matrix = [
+          [0, 0, 0, 0, 0], // Hàng < 50%
+          [0, 0.6, 0.8, 1.1, 1.3], // Hàng >= 50%
+          [0, 0.7, 0.9, 1.2, 1.5], // Hàng >= 75%
+          [0, 1, 1.1, 1.4, 1.8], // Hàng >= 90%
+        ];
+
+        return matrix[rowIdx][colIdx];
+      }
+
+      /**
+       * Định dạng số thành đơn vị tiền tệ VND
+       * @param {number} amount - Số tiền cần định dạng
+       * @returns {string} - Chuỗi đã định dạng (VD: 1.000.000 ₫)
+       */
+      function formatVND(amount) {
+        // Kiểm tra nếu amount không phải là số hoặc là null/undefined
+        if (isNaN(amount) || amount === null) {
+          return "0 ₫";
+        }
+
+        return new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(amount);
+      }
+
+      function initDefaultDates() {
+        const today = new Date();
+
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        const format = (d) => {
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          return `${yyyy}-${mm}-${dd}`;
+        };
+
+        document.getElementById("fromDate").value = format(firstDay);
+        document.getElementById("toDate").value = format(today);
+      }
+
+      async function loadData(data) {
+        const tbody = document.getElementById("contracts-table-body");
+
+        let totalA = 0;
+        let totalB = 0;
+
+        const risk = getRiskFactor(data.PR3, data.PR6);
+        data.customers.forEach((c) => {
+          const rate = getSchemeRate(c.scheme, c.tenure) / 100;
+          const bonusA = c.amount * rate;
+          const bonusB = c.insurance
+            ? getInsuranceBonus(c.tenure, c.amount)
+            : 0;
+
+          totalA += bonusA;
+          totalB += bonusB;
+          
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+  <td data-label="HĐ">${c.contractId}</td>
+  <td data-label="Kỳ hạn">${c.tenure}</td>
+  <td data-label="Giải ngân">${formatVND(c.amount)}</td>
+  <td data-label="BH">
+    <span class="badge ${c.insurance ? "badge-insurance" : "badge-none"}">
+      ${c.insurance ? "✔" : "-"}
+    </span>
+  </td>
+  <td data-label="Scheme">${c.scheme}</td>
+  <td data-label="Thưởng DS" class="text-success">${formatVND(bonusA)}</td>
+  <td data-label="BH Bonus" class="text-primary">${formatVND(bonusB)}</td>
+  <td data-label="Tổng" class="fw-bold text-danger">${formatVND(bonusA + bonusB)}</td>
+`;
+          tbody.appendChild(tr);
+        });
+
+        const bonusDL =
+          getBonusTargetDL(data.targetDL) *
+          getDLBonusFactor(data.achievedDL, data.targetDL);
+
+        const ctFactor = getCTFactor(
+          (data.achievedMC / data.targetMC) * 100,
+          (data.achievedTotal / data.totalTarget) * 100,
+        );
+
+        // ✅ TOTAL FINAL
+        const finalTotal = (totalA * risk + bonusDL) * ctFactor + totalB;
+
+        document.getElementById("summary").innerHTML = `
+
+        <div class="col-md-12">
+          <div class="card p-4 text-center" style="
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 16px;
+          ">
+            <h4>💰 TỔNG THƯỞNG</h4>
+
+            <div style="font-size: 34px; font-weight: 700;">
+              ${formatVND(finalTotal)}
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.3)" />
+
+            <div class="row text-start mt-3">
+              <div class="col-md-3">
+                <small>Thưởng doanh số x Hệ số Pr3,Pr6</small>
+                <div><b>${formatVND(totalA * risk)}</b></div>
+              </div>
+
+              <div class="col-md-3">
+                <small>Thưởng đạt chỉ tiêu x Hệ số đạt chỉ tiêu</small>
+                <div><b>${formatVND(bonusDL)}</b></div>
+              </div>
+
+              <div class="col-md-3">
+                <small>Hệ số đạt chỉ tiêu(CT) ngành hàng chính và tổng</small>
+                <div><b>x ${ctFactor}</b></div>
+              </div>
+
+              <div class="col-md-3">
+                <small>Thưởng bảo hiểm</small>
+                <div><b>${formatVND(totalB)}</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      }
+
+      window.onload = function () {
+        initDefaultDates();
+      };
+    </script>
+  </body>
+</html>
