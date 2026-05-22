@@ -1,730 +1,862 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Công cụ HD SaiSon</title>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Công cụ HD SaiSon</title>
 
-    <style>
-      * {
-        box-sizing: border-box;
-        font-family: Roboto;
-      }
-      body {
-        background: #f0f4f8;
-        padding-top: 56px;
-      }
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-      #loginScreen {
-        position: fixed;
-        inset: 0;
-        background: linear-gradient(135deg, #007bff, #00c6ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-      }
-      .login-box {
-        background: #fff;
-        padding: 30px;
-        width: 320px;
-        border-radius: 16px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-        text-align: center;
-      }
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Roboto;
+    }
 
-      header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 56px;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        z-index: 1000;
-      }
-      .logo {
-        font-weight: 700;
-        color: #007bff;
-        font-size: 16px;
-      }
-      .desktop-nav a {
-        margin-left: 15px;
-        font-size: 14px;
-        text-decoration: none;
-        color: #333;
-      }
-      @media (max-width: 768px) {
-        .desktop-nav {
-          display: none;
-        }
-      }
+    body {
+      background: #f0f4f8;
+      padding-top: 56px;
+    }
 
-      .container-custom {
-        max-width: 520px;
-        margin: auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      }
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
 
-      input {
-        text-align: right;
-        font-size: 16px;
-        padding: 12px;
-      }
-      label {
-        font-weight: 500;
-      }
+    .login-box {
+      background: #fff;
+      padding: 30px;
+      width: 320px;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
 
-      .result {
-        margin-top: 20px;
-        padding: 15px;
-        background: #e7f3ff;
-        border-left: 5px solid #007bff;
-        border-radius: 12px;
-      }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+    }
 
-      .plan-box {
-        background: #fff;
-        border-radius: 14px;
-        padding: 14px;
-        margin-bottom: 12px;
-        border: 1px solid #e3eaf3;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        position: relative;
-        cursor: pointer;
-        transition: 0.25s;
-      }
-      .plan-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-      }
-      .plan-row .value {
-        font-weight: 600;
-        color: #0d47a1;
-      }
-      .plan-row.total .value {
-        color: #e53935;
-        font-weight: 700;
-      }
-      .divider {
-        height: 1px;
-        background: #e0e0e0;
-        margin: 8px 0;
-      }
+    .logo {
+      font-weight: 700;
+      color: #007bff;
+      font-size: 16px;
+    }
 
-      .plan-box.active {
-        border: 3px solid #ff9800 !important;
-        background: #fff3e0;
-        box-shadow: 0 6px 18px rgba(255, 152, 0, 0.4);
-      }
-      .plan-box.active::after {
-        content: "👉 ĐANG CHỌN";
-        position: absolute;
-        top: -10px;
-        left: 10px;
-        background: #ff9800;
-        color: #fff;
-        font-size: 12px;
-        padding: 2px 8px;
-        border-radius: 12px;
-      }
+    .desktop-nav a {
+      margin-left: 15px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #333;
+    }
 
-      .list-group button {
-        font-size: 14px;
-        text-align: left;
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
       }
-      .small-checkbox .form-check-input {
-        transform: scale(0.8);
-        margin-top: 0.25rem;
-      }
-      .age-result-error {
-        background: #fff1f1;
-        color: #d93025;
-        padding: 8px;
-        border-radius: 8px;
-      }
-    </style>
-  </head>
+    }
 
-  <body>
-    <div id="loginScreen">
-      <div class="login-box">
-        <h4>🔐 Đăng nhập</h4>
-        <input
-          id="loginKey"
-          type="password"
-          class="form-control mb-3"
-          placeholder="Nhập khoá"
-        />
-        <button class="btn btn-primary w-100" onclick="login()">
-          Xác nhận
-        </button>
-        <p id="loginError" class="text-danger mt-2"></p>
-      </div>
-    </div>
+    .container-custom {
+      max-width: 520px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
 
-    <header>
-      <div class="logo">🚗 Batch 41</div>
-      <nav class="desktop-nav">
-        <a href="./index.html">Tính trả góp</a>
-        <a href="./cancel_contract.html">Huỷ HĐ</a>
-        <a href="./target.html">Tổng quan chỉ tiêu</a>
-        <a href="./customers.html">Danh sách khách hàng</a>
-        <a href="./customer_search.html">Tìm khách hàng</a>
-        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
-        <a href="./bonus.html">Thưởng SI</a>
-        <a href="#" onclick="logout()">Đăng xuất</a>
-      </nav>
-      <!-- HAMBURGER -->
-      <button
-        class="btn btn-outline-primary d-md-none"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#mobileMenu"
-      >
-        ☰
+    input {
+      text-align: right;
+      font-size: 16px;
+      padding: 12px;
+    }
+
+    label {
+      font-weight: 500;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e7f3ff;
+      border-left: 5px solid #007bff;
+      border-radius: 12px;
+    }
+
+    .plan-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #e3eaf3;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      position: relative;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .plan-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .plan-row .value {
+      font-weight: 600;
+      color: #0d47a1;
+    }
+
+    .plan-row.total .value {
+      color: #e53935;
+      font-weight: 700;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 8px 0;
+    }
+
+    .plan-box.active {
+      border: 3px solid #ff9800 !important;
+      background: #fff3e0;
+      box-shadow: 0 6px 18px rgba(255, 152, 0, 0.4);
+    }
+
+    .plan-box.active::after {
+      content: "👉 ĐANG CHỌN";
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #ff9800;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .list-group button {
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .small-checkbox .form-check-input {
+      transform: scale(0.8);
+      margin-top: 0.25rem;
+    }
+
+    .age-result-error {
+      background: #fff1f1;
+      color: #d93025;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .low-risk-box {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1.5px solid #e5e7eb;
+      background: #fff;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .low-risk-box:hover {
+      border-color: #f59e0b;
+      background: #fffaf0;
+    }
+
+    #lowRiskVehicle:checked {
+      background-color: #f59e0b;
+      border-color: #f59e0b;
+    }
+
+    .risk-info-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #f59e0b;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .risk-info-btn:hover {
+      transform: scale(1.08);
+    }
+
+    .low-risk-content {
+      line-height: 1.3;
+    }
+
+    .low-risk-title {
+      font-size: 15px;
+      color: #111827;
+    }
+
+    .low-risk-subtitle {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .question-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f59e0b;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loginScreen">
+    <div class="login-box">
+      <h4>🔐 Đăng nhập</h4>
+      <input id="loginKey" type="password" class="form-control mb-3" placeholder="Nhập khoá" />
+      <button class="btn btn-primary w-100" onclick="login()">
+        Xác nhận
       </button>
-    </header>
-    <!-- ===== MOBILE MENU ===== -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">🚗 Batch 41</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="offcanvas"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <a class="btn btn-light w-100 mb-2" href="index.html"
-          >📊 Tính trả góp</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
-          >❌ Huỷ hợp đồng</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="./target.html"
-          >📈 Tổng quan chỉ tiêu</a
-        >
-          <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
-          <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
-          <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Lịch làm việc</a>
-          <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
-        <hr />
-        <button class="btn btn-danger w-100" onclick="logout()">
-          🔐 Đăng xuất
-        </button>
-      </div>
+      <p id="loginError" class="text-danger mt-2"></p>
     </div>
+  </div>
 
-    <div class="container-custom mt-3">
-      <h5 class="text-center">TÍNH TRẢ GÓP XE</h5>
-
-      <label>Giá xe</label>
-      <input id="giaXe" class="form-control mb-3" oninput="onGiaXeChange()" />
-      <div id="suggestGiaXe" class="list-group mb-2"></div>
-
-      <label>Trả trước (VNĐ)</label>
-      <input
-        id="traTien"
-        class="form-control mb-3"
-        oninput="onTraTienChange()"
-      />
-      <div id="suggestTraTien" class="list-group mb-2"></div>
-
-      <label>Trả trước (%)</label>
-      <input
-        id="traPercent"
-        class="form-control mb-2"
-        oninput="onTraPercentChange()"
-      />
-
-      <div class="d-flex gap-2 mb-3">
-        <button
-          class="btn btn-outline-secondary w-100"
-          onclick="setPercent(20)"
-        >
-          20%
-        </button>
-        <button
-          class="btn btn-outline-secondary w-100"
-          onclick="setPercent(30)"
-        >
-          30%
-        </button>
-        <button
-          class="btn btn-outline-secondary w-100"
-          onclick="setPercent(40)"
-        >
-          40%
-        </button>
-      </div>
-
-      <!-- Dynamic package buttons -->
-      <div id="packageButtons" class="d-flex gap-2 mb-3"></div>
-
-      <label>Ngày sinh</label>
-      <input
-        id="dob"
-        class="form-control mb-2"
-        placeholder="DD/MM/YYYY"
-        maxlength="10"
-        inputmode="numeric"
-        oninput="formatDate(this)"
-      />
-      <div
-        id="ageResult"
-        class="mb-3"
-        style="font-weight: 600; color: #1e4fd6"
-      ></div>
-      <div
-        id="ageAlert"
-        class="mb-3"
-        style="color: #d93025; font-weight: 600"
-      ></div>
-
-      <div id="result" class="result" style="display: none"></div>
-      <button class="btn btn-warning w-100 mt-2" onclick="openExportModal()">
-        Xuất file báo giá
+  <header>
+    <div class="logo">🚗 Batch 41</div>
+    <nav class="desktop-nav">
+      <a href="./index.html">Tính trả góp</a>
+      <a href="./cancel_contract.html">Huỷ HĐ</a>
+      <a href="./target.html">Tổng quan chỉ tiêu</a>
+      <a href="./customers.html">Danh sách khách hàng</a>
+      <a href="./customer_search.html">Tìm khách hàng</a>
+      <a href="./employee_schedule.html">Tìm lịch làm việc</a>
+      <a href="./bonus.html">Thưởng SI</a>
+      <a href="#" onclick="logout()">Đăng xuất</a>
+    </nav>
+    <!-- HAMBURGER -->
+    <button class="btn btn-outline-primary d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+      ☰
+    </button>
+  </header>
+  <!-- ===== MOBILE MENU ===== -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">🚗 Batch 41</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
+      <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
+      <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
+      <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
+      <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
+      <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Lịch làm việc</a>
+      <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
+      <hr />
+      <button class="btn btn-danger w-100" onclick="logout()">
+        🔐 Đăng xuất
       </button>
     </div>
+  </div>
 
-    <!-- EXPORT MODAL -->
-    <div class="modal fade" id="exportModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content" style="border-radius: 16px">
-          <div class="modal-header">
-            <h5 class="modal-title">📄 Thông tin xuất</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="modal-body">
-              <div class="mb-3">
-                <label class="form-label">Tư vấn viên</label>
-                <input
-                  type="text"
-                  id="modalTuVanVien"
-                  class="form-control text-uppercase"
-                  placeholder="VD: A 0701234560"
-                />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Loại xe</label>
-                <input
-                  type="text"
-                  id="modalLoaiXe"
-                  class="form-control text-uppercase"
-                  oninput="forceUpper(this)"
-                  placeholder="VD: SH 160I ABS"
-                />
+  <div class="container-custom mt-3">
+    <h5 class="text-center">TÍNH TRẢ GÓP XE</h5>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold">Giá xe</label>
+
+      <input id="giaXe" class="form-control" oninput="onGiaXeChange()" />
+
+      <div id="suggestGiaXe" class="list-group mt-2"></div>
+
+      <!-- Low risk -->
+      <label for="lowRiskVehicle" class="low-risk-box mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+
+          <div class="d-flex align-items-center gap-3">
+
+            <input type="checkbox" id="lowRiskVehicle" oninput="onDocumentChange()" class="form-check-input m-0">
+
+            <div class="low-risk-content">
+              <div class="fw-semibold low-risk-title">
+                Bạn đang làm các dòng xe rủi ro thấp?
               </div>
 
-              <div class="mb-3">
-                <label class="form-label">Màu sơn</label>
-                <input
-                  type="text"
-                  id="modalMauSon"
-                  class="form-control"
-                  oninput="formatNumberInput(this)"
-                  placeholder="VD: 1500000"
-                />
+              <div class="low-risk-subtitle">
+                Xem danh sách chi tiết tại nút
+                <span class="question-mark">?</span>
               </div>
-
-              <div class="mb-3">
-                <label class="form-label">Giấy tờ</label>
-                <input
-                  type="text"
-                  id="modalGiayTo"
-                  class="form-control"
-                  oninput="formatNumberInput(this)"
-                  placeholder="VD: 800000"
-                />
-                <div class="form-check mb-3 small-checkbox">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="showInterest"
-                    checked
-                  />
-                  <label class="form-check-label" for="showInterest">
-                    Xuất kèm tổng lãi
-                  </label>
-                </div>
-              </div>
-              <p>Lưu ý: Có thể xuất không cần nhập thông tin ở trên !</p>
             </div>
           </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">
-              Huỷ
-            </button>
-            <button class="btn btn-warning" onclick="confirmExport()">
-              Xuất
-            </button>
+
+          <!-- Info button -->
+          <button type="button" class="risk-info-btn" onclick="showLowRiskInfo(event)">
+            ?
+          </button>
+        </div>
+      </label>
+    </div>
+
+    <label>Trả trước (VNĐ)</label>
+    <input id="traTien" class="form-control mb-3" oninput="onTraTienChange()" />
+    <div id="suggestTraTien" class="list-group mb-2"></div>
+
+    <label>Trả trước (%)</label>
+    <input id="traPercent" class="form-control mb-2" oninput="onTraPercentChange()" />
+
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-outline-secondary w-100" onclick="setPercent(20)">
+        20%
+      </button>
+
+      <button class="btn btn-outline-secondary w-100" onclick="setPercent(30)">
+        30%
+      </button>
+
+      <button class="btn btn-outline-secondary w-100" onclick="setPercent(40)">
+        40%
+      </button>
+    </div>
+
+    <!-- Dynamic package buttons -->
+    <div id="packageButtons" class="d-flex gap-2 mb-3"></div>
+    <div id="documentAlert" class="mb-3" style="color: #d93025; font-weight: 600"></div>
+    <label>Ngày sinh</label>
+
+    <input id="dob" class="form-control mb-2" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"
+      oninput="formatDate(this)" />
+
+    <div id="ageResult" class="mb-3" style="font-weight: 600; color: #1e4fd6"></div>
+
+    <div id="ageAlert" class="mb-3" style="color: #d93025; font-weight: 600"></div>
+
+    <div id="result" class="result" style="display: none"></div>
+
+
+
+    <button class="btn btn-warning w-100 mt-2" onclick="openExportModal()">
+      Xuất file báo giá
+    </button>
+  </div>
+
+  <!-- EXPORT MODAL -->
+  <div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content" style="border-radius: 16px">
+        <div class="modal-header">
+          <h5 class="modal-title">📄 Thông tin xuất</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tư vấn viên</label>
+              <input type="text" id="modalTuVanVien" class="form-control text-uppercase"
+                placeholder="VD: A 0701234560" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Loại xe</label>
+              <input type="text" id="modalLoaiXe" class="form-control text-uppercase" oninput="forceUpper(this)"
+                placeholder="VD: SH 160I ABS" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Màu sơn</label>
+              <input type="text" id="modalMauSon" class="form-control" oninput="formatNumberInput(this)"
+                placeholder="VD: 1500000" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Giấy tờ</label>
+              <input type="text" id="modalGiayTo" class="form-control" oninput="formatNumberInput(this)"
+                placeholder="VD: 800000" />
+              <div class="form-check mb-3 small-checkbox">
+                <input class="form-check-input" type="checkbox" id="showInterest" checked />
+                <label class="form-check-label" for="showInterest">
+                  Xuất kèm tổng lãi
+                </label>
+              </div>
+            </div>
+            <p>Lưu ý: Có thể xuất không cần nhập thông tin ở trên !</p>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">
+            Huỷ
+          </button>
+          <button class="btn btn-warning" onclick="confirmExport()">
+            Xuất
+          </button>
         </div>
       </div>
     </div>
-    <script src="./he_so.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script>
-      const ACCESS_KEY = "B41";
-      const $ = (id) => document.getElementById(id);
+  </div>
+  <script src="./he_so.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    function showLowRiskInfo(event) {
 
-      function login() {
-        if ($("loginKey").value === ACCESS_KEY) {
-          $("loginScreen").style.display = "none";
-          sessionStorage.setItem("logged", "1");
-        } else $("loginError").innerText = "Sai khoá";
-      }
+      event.preventDefault();
+      event.stopPropagation();
 
-      function forceUpper(el) {
-        el.value = el.value.toUpperCase();
-      }
+      alert(
+        `Danh sách xe rủi ro thấp:
 
-      function formatNumberInput(el) {
-        let value = el.value.replace(/\D/g, ""); // chỉ cho số
-        el.value = Number(value).toLocaleString("vi-VN");
-      }
+• Piaggio
+• Honda SH 125/150/300
+• Honda SH 125i Việt Nam
+• Honda SH 150i Việt Nam
+• Honda SH 350i Việt Nam
+• Honda SH 160i
+• Honda PCX
+• Honda MSX125
+• Yamaha FZ
+• Yamaha FZ 150
+• Yamaha FZ 150i
+• Yamaha YZF
+• Peugeot Django`
+      );
+    }
+    const ACCESS_KEY = "B41";
+    const $ = (id) => document.getElementById(id);
 
-      function logout() {
-        sessionStorage.clear();
-        location.reload();
-      }
+    function login() {
+      if ($("loginKey").value === ACCESS_KEY) {
+        $("loginScreen").style.display = "none";
+        sessionStorage.setItem("logged", "1");
+      } else $("loginError").innerText = "Sai khoá";
+    }
 
-      // HE_SO coefficients are loaded from external file he_so.js
-      // Make sure he_so.js is present at the project root.
+    function forceUpper(el) {
+      el.value = el.value.toUpperCase();
+    }
 
-      let currentPackage = 1.28,
-        lock = false;
+    function formatNumberInput(el) {
+      let value = el.value.replace(/\D/g, ""); // chỉ cho số
+      el.value = Number(value).toLocaleString("vi-VN");
+    }
 
-      const format = (n) => Number(n).toLocaleString("vi-VN");
-      const parse = (v) => parseFloat(String(v).replace(/\./g, "")) || 0;
-      const ceil = (n) => Math.ceil(n / 1000) * 1000;
-      const formatInput = (el) =>
-        (el.value = format(el.value.replace(/\D/g, "")));
-      // selected tenor from UI
-      let selectedTenor = null;
+    function logout() {
+      sessionStorage.clear();
+      location.reload();
+    }
 
-      // Helper: normalize HE_SO entry formats (support new array-of-objects and legacy object mapping)
-      function getHeSoEntries(pkg) {
-        const raw = HE_SO[pkg];
-        if (!raw) return [];
-        if (Array.isArray(raw)) {
-          return raw.map((e) => ({
-            tenor: parseInt(e.tenor, 10),
-            coef: parseFloat(e.coef),
-            minPercent: typeof e.minPercent === "number" ? e.minPercent : null,
-            maxPercent: typeof e.maxPercent === "number" ? e.maxPercent : null,
-          }));
-        }
-        // legacy format: object mapping tenor->coef
-        return Object.entries(raw).map(([t, hs]) => ({
-          tenor: parseInt(t, 10),
-          coef: parseFloat(hs),
-          minPercent: null,
-          maxPercent: null,
+    // HE_SO coefficients are loaded from external file he_so.js
+    // Make sure he_so.js is present at the project root.
+
+    let currentPackage = 1.28,
+      lock = false;
+
+    const format = (n) => Number(n).toLocaleString("vi-VN");
+    const parse = (v) => parseFloat(String(v).replace(/\./g, "")) || 0;
+    const ceil = (n) => Math.ceil(n / 1000) * 1000;
+    const formatInput = (el) =>
+      (el.value = format(el.value.replace(/\D/g, "")));
+    // selected tenor from UI
+    let selectedTenor = null;
+
+    // Helper: normalize HE_SO entry formats (support new array-of-objects and legacy object mapping)
+    function getHeSoEntries(pkg) {
+      const raw = HE_SO[pkg];
+      if (!raw) return [];
+      if (Array.isArray(raw)) {
+        return raw.map((e) => ({
+          tenor: parseInt(e.tenor, 10),
+          coef: parseFloat(e.coef),
+          minPercent: typeof e.minPercent === "number" ? e.minPercent : null,
+          maxPercent: typeof e.maxPercent === "number" ? e.maxPercent : null,
         }));
       }
+      // legacy format: object mapping tenor->coef
+      return Object.entries(raw).map(([t, hs]) => ({
+        tenor: parseInt(t, 10),
+        coef: parseFloat(hs),
+        minPercent: null,
+        maxPercent: null,
+      }));
+    }
 
-      // Percent tolerance (in percent points). e.g. 0.5 allows 10.12% to match 10% bucket
-      const PERCENT_TOLERANCE = 0.5;
+    // Percent tolerance (in percent points). e.g. 0.5 allows 10.12% to match 10% bucket
+    const PERCENT_TOLERANCE = 0.5;
 
-      function percentAllowed(entry, percentVal) {
-        const tol = PERCENT_TOLERANCE;
-        if (entry.minPercent !== null && percentVal + tol < entry.minPercent) return false;
-        if (entry.maxPercent !== null && percentVal - tol > entry.maxPercent) return false;
-        return true;
+    function percentAllowed(entry, percentVal) {
+      const tol = PERCENT_TOLERANCE;
+      if (entry.minPercent !== null && percentVal + tol < entry.minPercent) return false;
+      if (entry.maxPercent !== null && percentVal - tol > entry.maxPercent) return false;
+      return true;
+    }
+
+    function renderPackageButtons() {
+      const container = $("packageButtons");
+      container.innerHTML = "";
+      Object.keys(HE_SO).forEach((key) => {
+        const value = parseFloat(key);
+        const btn = document.createElement("button");
+        btn.id = "btn_" + key.replace(".", "");
+        btn.className =
+          value === currentPackage
+            ? "btn btn-primary w-100"
+            : "btn btn-secondary w-100";
+        btn.innerText = key;
+        btn.onclick = () => setPackage(value);
+        container.appendChild(btn);
+      });
+    }
+
+    function setPackage(p) {
+      currentPackage = p;
+      Object.keys(HE_SO).forEach((key) => {
+        const btn = $("btn_" + key.replace(".", ""));
+        if (!btn) return;
+        btn.className =
+          parseFloat(key) === p
+            ? "btn btn-primary w-100"
+            : "btn btn-secondary w-100";
+      });
+      autoTinh();
+    }
+
+    function setPercent(p) {
+      $("traPercent").value = p;
+      onTraPercentChange();
+    }
+    function onDocumentChange() {
+      genTraTienSuggest();
+      autoTinh();
+    }
+    function onGiaXeChange() {
+      formatInput($("giaXe"));
+      genTraTienSuggest();
+      autoTinh();
+    }
+
+    function onTraTienChange() {
+      if (lock) return;
+      lock = true;
+      formatInput($("traTien"));
+      let gia = parse($("giaXe").value);
+      if (gia > 0)
+        $("traPercent").value = (
+          (parse($("traTien").value) / gia) *
+          100
+        ).toFixed(2);
+      lock = false;
+      genTraTienSuggest();
+      autoTinh();
+    }
+
+    function onTraPercentChange() {
+      if (lock) return;
+      lock = true;
+      let gia = parse($("giaXe").value);
+      let percent = parseFloat($("traPercent").value || 0);
+      $("traTien").value = format(ceil((gia * percent) / 100));
+      lock = false;
+      genTraTienSuggest();
+      autoTinh();
+    }
+
+    function genTraTienSuggest() {
+      let gia = parse($("giaXe").value);
+      if (!gia) return;
+      let percentStart = parseFloat($("traPercent").value) || 10;
+      let list = [];
+      for (let p = percentStart; p <= 80; p += 10) list.push(gia * (p / 100));
+      let v = parse($("traTien").value);
+      if (v > 0) {
+        list.push(Math.round(v / 50000) * 50000);
+        list.push(Math.round(v / 100000) * 100000);
+      }
+      list = [
+        ...new Set(
+          list
+            .map((n) => Math.ceil(n / 10000) * 10000)
+            .filter((n) => n > 0 && n < gia),
+        ),
+      ].sort((a, b) => a - b);
+      let box = $("suggestTraTien");
+      box.innerHTML = "";
+      list.forEach((n) => {
+        let percent = ((n / gia) * 100).toFixed(1);
+        let btn = document.createElement("button");
+        btn.className =
+          "list-group-item list-group-item-action d-flex justify-content-between";
+        btn.innerHTML = `<span>${format(n)} đ</span><span style="color:#007bff;font-weight:600">${percent}%</span>`;
+        btn.onclick = () => {
+          $("traTien").value = format(n);
+          box.innerHTML = "";
+          onTraTienChange();
+        };
+        box.appendChild(btn);
+      });
+    }
+
+    function autoTinh() {
+      let gia = parse($("giaXe").value);
+      let tra = parse($("traTien").value);
+      if (gia > 0 && tra < gia) tinhTraGop();
+      else $("result").style.display = "none";
+    }
+    function getRequiredDocuments(fa, dp, vehicleType = 'normal') {
+
+      // vehicleType:
+      // 'low_risk' = dòng xe rủi ro thấp
+      // 'normal'   = các dòng xe khác
+      if (fa <= 0) {
+        return {
+          success: false,
+          documents: [],
+          message: 'Khoản vay phải là số dương'
+        };
       }
 
-      function renderPackageButtons() {
-        const container = $("packageButtons");
-        container.innerHTML = "";
-        Object.keys(HE_SO).forEach((key) => {
-          const value = parseFloat(key);
-          const btn = document.createElement("button");
-          btn.id = "btn_" + key.replace(".", "");
-          btn.className =
-            value === currentPackage
-              ? "btn btn-primary w-100"
-              : "btn btn-secondary w-100";
-          btn.innerText = key;
-          btn.onclick = () => setPackage(value);
-          container.appendChild(btn);
-        });
-      }
-
-      function setPackage(p) {
-        currentPackage = p;
-        Object.keys(HE_SO).forEach((key) => {
-          const btn = $("btn_" + key.replace(".", ""));
-          if (!btn) return;
-          btn.className =
-            parseFloat(key) === p
-              ? "btn btn-primary w-100"
-              : "btn btn-secondary w-100";
-        });
-        autoTinh();
-      }
-
-      function setPercent(p) {
-        $("traPercent").value = p;
-        onTraPercentChange();
-      }
-
-      function onGiaXeChange() {
-        formatInput($("giaXe"));
-        genTraTienSuggest();
-        autoTinh();
-      }
-
-      function onTraTienChange() {
-        if (lock) return;
-        lock = true;
-        formatInput($("traTien"));
-        let gia = parse($("giaXe").value);
-        if (gia > 0)
-          $("traPercent").value = (
-            (parse($("traTien").value) / gia) *
-            100
-          ).toFixed(2);
-        lock = false;
-        genTraTienSuggest();
-        autoTinh();
-      }
-
-      function onTraPercentChange() {
-        if (lock) return;
-        lock = true;
-        let gia = parse($("giaXe").value);
-        let percent = parseFloat($("traPercent").value || 0);
-        $("traTien").value = format(ceil((gia * percent) / 100));
-        lock = false;
-        genTraTienSuggest();
-        autoTinh();
-      }
-
-      function genTraTienSuggest() {
-        let gia = parse($("giaXe").value);
-        if (!gia) return;
-        let percentStart = parseFloat($("traPercent").value) || 10;
-        let list = [];
-        for (let p = percentStart; p <= 80; p += 10) list.push(gia * (p / 100));
-        let v = parse($("traTien").value);
-        if (v > 0) {
-          list.push(Math.round(v / 50000) * 50000);
-          list.push(Math.round(v / 100000) * 100000);
-        }
-        list = [
-          ...new Set(
-            list
-              .map((n) => Math.ceil(n / 10000) * 10000)
-              .filter((n) => n > 0 && n < gia),
-          ),
-        ].sort((a, b) => a - b);
-        let box = $("suggestTraTien");
-        box.innerHTML = "";
-        list.forEach((n) => {
-          let percent = ((n / gia) * 100).toFixed(1);
-          let btn = document.createElement("button");
-          btn.className =
-            "list-group-item list-group-item-action d-flex justify-content-between";
-          btn.innerHTML = `<span>${format(n)} đ</span><span style="color:#007bff;font-weight:600">${percent}%</span>`;
-          btn.onclick = () => {
-            $("traTien").value = format(n);
-            box.innerHTML = "";
-            onTraTienChange();
+      let documents = ['CCCD'];
+      if (fa >= 80000000) {
+        if (dp >= 50) {
+          return {
+            success: true,
+            documents: documents,
+            message: `Cần các chứng từ: ${documents.join(', ')}`
           };
-          box.appendChild(btn);
-        });
-      }
-
-      function autoTinh() {
-        let gia = parse($("giaXe").value);
-        let tra = parse($("traTien").value);
-        if (gia > 0 && tra < gia) tinhTraGop();
-        else $("result").style.display = "none";
-      }
-
-      function tinhTraGop() {
-        let gia = parse($("giaXe").value);
-        let tra = parse($("traTien").value);
-        let vay = gia - tra;
-        let min = Infinity,
-          plans = [];
-
-        const allowed = getAllowedTenors();
-
-        if (allowed && allowed.length === 0) {
-          $("ageAlert").innerText = "Khách không đủ điều kiện vay theo tuổi.";
-          $("result").style.display = "none";
-          return;
-        } else if (Array.isArray(allowed)) {
-          if (allowed.length === 1)
-            $("ageAlert").innerText = `Chỉ được vay ${allowed[0]} tháng.`;
-          else
-            $("ageAlert").innerText =
-              `Chỉ được vay ${allowed[0]} - ${allowed[allowed.length - 1]} tháng.`;
+        } else if (dp >= 30 && dp < 50) {
+          documents.push('POA', 'POI');
         } else {
-          $("ageAlert").innerText = "";
+          documents.push('POA', 'POI', 'Field check');
         }
+        return {
+          success: true,
+          documents: documents,
+          message: `Cần các chứng từ: ${documents.join(', ')}`
+        };
+      }
+      if (fa >= 50000000 && fa < 80000000) {
+        if (vehicleType === 'low_risk') {
+          if (dp < 30) {
+            documents.push('POA', 'POI');
+          }
+        } else {
+          if (dp < 50) {
+            documents.push('POA', 'POI');
+          }
+        }
+        return {
+          success: true,
+          documents: documents,
+          message: `Cần các chứng từ: ${documents.join(', ')}`
+        };
+      }
+      if (fa >= 35000000 && fa < 50000000) {
+        if (dp < 10) {
+          documents.push('POA/BHYT/GPLX', 'Field check');
+        }
+        return {
+          success: true,
+          documents: documents,
+          message: `Cần các chứng từ: ${documents.join(', ')}`
+        };
+      }
+      if (fa < 35000000) {
+        return {
+          success: true,
+          documents: documents,
+          message: `Cần các chứng từ: ${documents.join(', ')}`
+        };
+      }
 
-        const percentVal = parseFloat($("traPercent").value || 0);
-        const heSoEntries = getHeSoEntries(currentPackage);
+    }
+    function tinhTraGop() {
+      let gia = parse($("giaXe").value);
+      let tra = parse($("traTien").value);
+      let vay = gia - tra;
+      const checkDocument = getRequiredDocuments(vay, (tra / gia) * 100, $("lowRiskVehicle").checked ? 'low_risk' : 'normal');
+      if (checkDocument.success) {
+        $("documentAlert").innerText = checkDocument.message;
+        $("result").style.display = "none";
+      } else {
+        $("documentAlert").innerText = "";
+      }
+      let min = Infinity,
+        plans = [];
 
-        heSoEntries.forEach((entry) => {
-          const tenor = entry.tenor;
-          // filter by age-allowed tenor
-          if (allowed && !allowed.includes(tenor)) return;
-          // filter by percent constraints if present
-          if (!percentAllowed(entry, percentVal)) return;
+      const allowed = getAllowedTenors();
 
-          let thang = ceil(vay * entry.coef + 12000);
-          let lai = thang * tenor - vay;
-          if (lai < min) min = lai;
-          plans.push({ t: tenor, thang, lai });
-        });
+      if (allowed && allowed.length === 0) {
+        $("ageAlert").innerText = "Khách không đủ điều kiện vay theo tuổi.";
+        $("result").style.display = "none";
+        return;
+      } else if (Array.isArray(allowed)) {
+        if (allowed.length === 1)
+          $("ageAlert").innerText = `Chỉ được vay ${allowed[0]} tháng.`;
+        else
+          $("ageAlert").innerText =
+            `Chỉ được vay ${allowed[0]} - ${allowed[allowed.length - 1]} tháng.`;
+      } else {
+        $("ageAlert").innerText = "";
+      }
 
-        let html = `
+      const percentVal = parseFloat($("traPercent").value || 0);
+      const heSoEntries = getHeSoEntries(currentPackage);
+
+      heSoEntries.forEach((entry) => {
+        const tenor = entry.tenor;
+        // filter by age-allowed tenor
+        if (allowed && !allowed.includes(tenor)) return;
+        // filter by percent constraints if present
+        if (!percentAllowed(entry, percentVal)) return;
+
+        let thang = ceil(vay * entry.coef + 12000);
+        let lai = thang * tenor - vay;
+        if (lai < min) min = lai;
+        plans.push({ t: tenor, thang, lai });
+      });
+
+      let html = `
 <b>Giá xe:</b> ${format(gia)} đ<br>
 <b>Trả trước:</b> ${format(tra)} đ<br>
 <b>Khoản vay:</b> ${format(vay)} đ<br><br>
 `;
 
-        plans.forEach((p) => {
-          html += `
+      plans.forEach((p) => {
+        html += `
 <div class="plan-box ${p.lai === min ? "best-plan" : ""}" data-tenor="${p.t}" onclick="selectPlan(this)">
 <div class="plan-row"><strong>${p.t} tháng</strong></div>
 <div class="plan-row"><span>Trả/tháng</span><span class="value">${format(p.thang)} đ</span></div>
 <div class="divider"></div>
 <div class="plan-row total"><span>Tổng lãi</span><span class="value">${format(p.lai)} đ</span></div>
 </div>`;
-        });
+      });
 
-        $("result").innerHTML = html;
-        $("result").style.display = "block";
-        // reset selection when plans change
-        selectedTenor = null;
+      $("result").innerHTML = html;
+      $("result").style.display = "block";
+      // reset selection when plans change
+      selectedTenor = null;
+    }
+
+    function selectPlan(el) {
+      document
+        .querySelectorAll(".plan-box")
+        .forEach((p) => p.classList.remove("active"));
+      el.classList.add("active");
+      selectedTenor = parseInt(el.getAttribute("data-tenor") || 0);
+    }
+
+    function openExportModal() {
+      let gia = parse($("giaXe").value);
+      let tra = parse($("traTien").value);
+
+      if (!gia || !tra || tra >= gia) {
+        alert("Chưa có dữ liệu hợp lệ");
+        return;
       }
 
-      function selectPlan(el) {
-        document
-          .querySelectorAll(".plan-box")
-          .forEach((p) => p.classList.remove("active"));
-        el.classList.add("active");
-        selectedTenor = parseInt(el.getAttribute("data-tenor") || 0);
+      const modal = new bootstrap.Modal(
+        document.getElementById("exportModal"),
+      );
+      modal.show();
+    }
+
+    async function confirmExport() {
+      const allowedBeforeExport = getAllowedTenors();
+      if (allowedBeforeExport && allowedBeforeExport.length === 0) {
+        $("ageAlert").innerText =
+          "Không thể xuất báo giá: khách không đủ điều kiện vay theo tuổi.";
+        return;
       }
+      const tuVanVien = $("modalTuVanVien").value.trim();
 
-      function openExportModal() {
-        let gia = parse($("giaXe").value);
-        let tra = parse($("traTien").value);
-
-        if (!gia || !tra || tra >= gia) {
-          alert("Chưa có dữ liệu hợp lệ");
-          return;
-        }
-
-        const modal = new bootstrap.Modal(
-          document.getElementById("exportModal"),
-        );
-        modal.show();
+      // Lưu vào localStorage
+      if (tuVanVien) {
+        localStorage.setItem("tuVanVien", tuVanVien);
       }
+      const showInterest = $("showInterest").checked;
 
-      async function confirmExport() {
-        const allowedBeforeExport = getAllowedTenors();
-        if (allowedBeforeExport && allowedBeforeExport.length === 0) {
-          $("ageAlert").innerText =
-            "Không thể xuất báo giá: khách không đủ điều kiện vay theo tuổi.";
-          return;
-        }
-        const tuVanVien = $("modalTuVanVien").value.trim();
+      let gia = parse($("giaXe").value);
+      let tra = parse($("traTien").value);
+      let vay = gia - tra;
 
-        // Lưu vào localStorage
-        if (tuVanVien) {
-          localStorage.setItem("tuVanVien", tuVanVien);
-        }
-        const showInterest = $("showInterest").checked;
+      const loaiXe = $("modalLoaiXe").value.trim().toUpperCase();
+      const mauSon = $("modalMauSon").value || "";
+      const giayTo = $("modalGiayTo").value || "";
 
-        let gia = parse($("giaXe").value);
-        let tra = parse($("traTien").value);
-        let vay = gia - tra;
+      const heSo = HE_SO[currentPackage];
 
-        const loaiXe = $("modalLoaiXe").value.trim().toUpperCase();
-        const mauSon = $("modalMauSon").value || "";
-        const giayTo = $("modalGiayTo").value || "";
+      let plans = {};
+      const allowed = getAllowedTenors();
+      const percentVal = parseFloat($("traPercent").value || 0);
+      const heSoEntries = getHeSoEntries(currentPackage);
+      heSoEntries.forEach((entry) => {
+        const t = entry.tenor;
+        if (allowed && !allowed.includes(t)) return;
+        if (!percentAllowed(entry, percentVal)) return;
+        let thang = ceil(vay * entry.coef + 12000);
+        let tongLai = thang * t - vay;
 
-        const heSo = HE_SO[currentPackage];
+        plans[t] = {
+          thang: format(thang) + " đ",
+          lai: showInterest ? " | Lãi: " + format(tongLai) + " đ" : "",
+        };
+      });
 
-        let plans = {};
-        const allowed = getAllowedTenors();
-        const percentVal = parseFloat($("traPercent").value || 0);
-        const heSoEntries = getHeSoEntries(currentPackage);
-        heSoEntries.forEach((entry) => {
-          const t = entry.tenor;
-          if (allowed && !allowed.includes(t)) return;
-          if (!percentAllowed(entry, percentVal)) return;
-          let thang = ceil(vay * entry.coef + 12000);
-          let tongLai = thang * t - vay;
+      // Tạo div tạm để render
+      let exportDiv = document.createElement("div");
+      exportDiv.style.width = "600px";
+      exportDiv.style.padding = "30px";
+      exportDiv.style.background = "#fff";
+      exportDiv.style.fontFamily = "Times New Roman";
+      exportDiv.style.fontSize = "26px";
+      exportDiv.style.lineHeight = "1.6";
 
-          plans[t] = {
-            thang: format(thang) + " đ",
-            lai: showInterest ? " | Lãi: " + format(tongLai) + " đ" : "",
-          };
-        });
+      // build dynamic plan rows so we only show available tenors
+      const planKeys = Object.keys(plans)
+        .map((k) => parseInt(k, 10))
+        .filter((n) => !isNaN(n))
+        .sort((a, b) => a - b);
+      let plansRows = "";
+      planKeys.forEach((k) => {
+        const p = plans[k];
+        if (!p) return;
+        plansRows += `${k} THÁNG: ${p.thang + (p.lai || "")}<br>`;
+      });
 
-        // Tạo div tạm để render
-        let exportDiv = document.createElement("div");
-        exportDiv.style.width = "600px";
-        exportDiv.style.padding = "30px";
-        exportDiv.style.background = "#fff";
-        exportDiv.style.fontFamily = "Times New Roman";
-        exportDiv.style.fontSize = "26px";
-        exportDiv.style.lineHeight = "1.6";
-
-        // build dynamic plan rows so we only show available tenors
-        const planKeys = Object.keys(plans)
-          .map((k) => parseInt(k, 10))
-          .filter((n) => !isNaN(n))
-          .sort((a, b) => a - b);
-        let plansRows = "";
-        planKeys.forEach((k) => {
-          const p = plans[k];
-          if (!p) return;
-          plansRows += `${k} THÁNG: ${p.thang + (p.lai || "")}<br>`;
-        });
-
-        exportDiv.innerHTML = `
+      exportDiv.innerHTML = `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
   
   <img src="./images/logo.png" style="max-width:170px;">
 
-  ${
-    tuVanVien
-      ? `<div style="font-size:26px;font-weight:bold">
+  ${tuVanVien
+          ? `<div style="font-size:26px;font-weight:bold">
   ${tuVanVien}
   </div>`
-      : ""
-  }
+          : ""
+        }
 
 </div>
   ${loaiXe ? `<b>LOẠI XE:</b> ${loaiXe}<br>` : ""}
@@ -741,150 +873,151 @@
   <b>THỦ TỤC:</b> CCCD CHIP + ĐTDĐ
 `;
 
-        document.body.appendChild(exportDiv);
+      document.body.appendChild(exportDiv);
 
-        const canvas = await html2canvas(exportDiv, {
-          scale: 2,
-          useCORS: true,
-        });
-        const imgData = canvas.toDataURL("image/png");
+      const canvas = await html2canvas(exportDiv, {
+        scale: 2,
+        useCORS: true,
+      });
+      const imgData = canvas.toDataURL("image/png");
 
-        const { jsPDF } = window.jspdf;
+      const { jsPDF } = window.jspdf;
 
-        // ✅ A6 size (A4 chia 4)
-        const pdf = new jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: [105, 148],
-        });
+      // ✅ A6 size (A4 chia 4)
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [105, 148],
+      });
 
-        pdf.addImage(imgData, "PNG", 0, 0, 105, 148);
-        pdf.save("bang-tra-gop-hdsaison.pdf");
+      pdf.addImage(imgData, "PNG", 0, 0, 105, 148);
+      pdf.save("bang-tra-gop-hdsaison.pdf");
 
-        document.body.removeChild(exportDiv);
+      document.body.removeChild(exportDiv);
 
-        bootstrap.Modal.getInstance(
-          document.getElementById("exportModal"),
-        ).hide();
-      }
+      bootstrap.Modal.getInstance(
+        document.getElementById("exportModal"),
+      ).hide();
+    }
 
-      // ===== TUỔI (từ check_old.html) =====
-      function formatDate(input) {
-        let v = input.value.replace(/\D/g, "");
-        if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
-        if (v.length > 5) v = v.slice(0, 5) + "/" + v.slice(5, 9);
-        input.value = v;
+    // ===== TUỔI (từ check_old.html) =====
+    function formatDate(input) {
+      let v = input.value.replace(/\D/g, "");
+      if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+      if (v.length > 5) v = v.slice(0, 5) + "/" + v.slice(5, 9);
+      input.value = v;
 
-        if (v.length === 10) tinhTuoi(v);
-        else {
-          $("ageResult").innerText = "";
-          $("ageResult").classList.remove("age-result-error");
-          // Re-render packages and plans when DOB cleared/invalid
-          $("ageAlert").innerText = "";
-          renderPackageButtons();
-          autoTinh();
-        }
-      }
-
-      function tinhTuoi(dateStr) {
-        const [d, m, y] = dateStr.split("/").map(Number);
-        const dob = new Date(y, m - 1, d);
-        const today = new Date();
-
-        if (
-          dob.getFullYear() !== y ||
-          dob.getMonth() !== m - 1 ||
-          dob.getDate() !== d ||
-          dob > today
-        ) {
-          $("ageResult").innerText = "Ngày sinh không hợp lệ";
-          $("ageResult").classList.add("age-result-error");
-          return;
-        }
-
-        let years = today.getFullYear() - y;
-        let months = today.getMonth() - (m - 1);
-
-        if (today.getDate() < d) months--;
-        if (months < 0) {
-          years--;
-          months += 12;
-        }
-
-        $("ageResult").innerText = `${years} tuổi • ${months} tháng`;
+      if (v.length === 10) tinhTuoi(v);
+      else {
+        $("ageResult").innerText = "";
         $("ageResult").classList.remove("age-result-error");
-        // Update UI: show/hide age alert, re-render packages and recompute plans
-        const allowedNow = getAllowedTenors();
-        if (allowedNow && allowedNow.length === 0) {
-          $("ageAlert").innerText = "Khách không đủ điều kiện vay theo tuổi.";
-        } else if (Array.isArray(allowedNow)) {
-          if (allowedNow.length === 1)
-            $("ageAlert").innerText = `Chỉ được vay ${allowedNow[0]} tháng.`;
-          else
-            $("ageAlert").innerText =
-              `Chỉ được vay ${allowedNow[0]} - ${allowedNow[allowedNow.length - 1]} tháng.`;
-        } else {
-          $("ageAlert").innerText = "";
-        }
+        // Re-render packages and plans when DOB cleared/invalid
+        $("ageAlert").innerText = "";
         renderPackageButtons();
         autoTinh();
       }
+    }
 
-      // Return allowed tenor list based on DOB rules (uses months precision).
-      // - null = no DOB provided (no restriction)
-      // - [] = explicit no-loan
-      // - otherwise: array of allowed tenors (subset of AVAILABLE_TENORS)
-      const AVAILABLE_TENORS = [9, 12, 15, 18, 21, 24, 36];
-      function getAllowedTenors() {
-        const v = $("dob").value || "";
-        if (!v) return null;
-        const parts = v.split("/").map(Number);
-        if (parts.length !== 3) return null;
-        const [d, m, y] = parts;
-        const dob = new Date(y, m - 1, d);
-        const today = new Date();
-        if (
-          dob.getFullYear() !== y ||
-          dob.getMonth() !== m - 1 ||
-          dob.getDate() !== d ||
-          dob > today
-        )
-          return null;
+    function tinhTuoi(dateStr) {
+      const [d, m, y] = dateStr.split("/").map(Number);
+      const dob = new Date(y, m - 1, d);
+      const today = new Date();
 
-        // compute exact age in years and months
-        let years = today.getFullYear() - y;
-        let months = today.getMonth() - (m - 1);
-        if (today.getDate() < d) months--;
-        if (months < 0) {
-          years--;
-          months += 12;
-        }
-        const totalMonths = years * 12 + months;
-
-        // For each available tenor, compute age at loan end (in months).
-        // Disallow tenor if (totalMonths + tenorMonths) > 70 years (70*12 months).
-        const MAX_MONTHS = 70 * 12; // 840
-
-        const allowed = AVAILABLE_TENORS.filter((tenor) => {
-          return totalMonths + tenor <= MAX_MONTHS && totalMonths >= 18 * 12; // allowed when <= 70 years and >= 18 months
-        });
-
-        // If no tenor is allowed, return empty array to indicate not eligible
-        return allowed.length ? allowed : [];
+      if (
+        dob.getFullYear() !== y ||
+        dob.getMonth() !== m - 1 ||
+        dob.getDate() !== d ||
+        dob > today
+      ) {
+        $("ageResult").innerText = "Ngày sinh không hợp lệ";
+        $("ageResult").classList.add("age-result-error");
+        return;
       }
 
-      window.onload = () => {
-        if (sessionStorage.getItem("logged") === "1")
-          $("loginScreen").style.display = "none";
-        renderPackageButtons();
-        // Load tư vấn viên từ localStorage
-        const savedTVV = localStorage.getItem("tuVanVien");
-        if (savedTVV) {
-          $("modalTuVanVien").value = savedTVV;
-        }
-      };
-    </script>
+      let years = today.getFullYear() - y;
+      let months = today.getMonth() - (m - 1);
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+      if (today.getDate() < d) months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      $("ageResult").innerText = `${years} tuổi • ${months} tháng`;
+      $("ageResult").classList.remove("age-result-error");
+      // Update UI: show/hide age alert, re-render packages and recompute plans
+      const allowedNow = getAllowedTenors();
+      if (allowedNow && allowedNow.length === 0) {
+        $("ageAlert").innerText = "Khách không đủ điều kiện vay theo tuổi.";
+      } else if (Array.isArray(allowedNow)) {
+        if (allowedNow.length === 1)
+          $("ageAlert").innerText = `Chỉ được vay ${allowedNow[0]} tháng.`;
+        else
+          $("ageAlert").innerText =
+            `Chỉ được vay ${allowedNow[0]} - ${allowedNow[allowedNow.length - 1]} tháng.`;
+      } else {
+        $("ageAlert").innerText = "";
+      }
+      renderPackageButtons();
+      autoTinh();
+    }
+
+    // Return allowed tenor list based on DOB rules (uses months precision).
+    // - null = no DOB provided (no restriction)
+    // - [] = explicit no-loan
+    // - otherwise: array of allowed tenors (subset of AVAILABLE_TENORS)
+    const AVAILABLE_TENORS = [9, 12, 15, 18, 21, 24, 36];
+    function getAllowedTenors() {
+      const v = $("dob").value || "";
+      if (!v) return null;
+      const parts = v.split("/").map(Number);
+      if (parts.length !== 3) return null;
+      const [d, m, y] = parts;
+      const dob = new Date(y, m - 1, d);
+      const today = new Date();
+      if (
+        dob.getFullYear() !== y ||
+        dob.getMonth() !== m - 1 ||
+        dob.getDate() !== d ||
+        dob > today
+      )
+        return null;
+
+      // compute exact age in years and months
+      let years = today.getFullYear() - y;
+      let months = today.getMonth() - (m - 1);
+      if (today.getDate() < d) months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      const totalMonths = years * 12 + months;
+
+      // For each available tenor, compute age at loan end (in months).
+      // Disallow tenor if (totalMonths + tenorMonths) > 70 years (70*12 months).
+      const MAX_MONTHS = 70 * 12; // 840
+
+      const allowed = AVAILABLE_TENORS.filter((tenor) => {
+        return totalMonths + tenor <= MAX_MONTHS && totalMonths >= 18 * 12; // allowed when <= 70 years and >= 18 months
+      });
+
+      // If no tenor is allowed, return empty array to indicate not eligible
+      return allowed.length ? allowed : [];
+    }
+
+    window.onload = () => {
+      if (sessionStorage.getItem("logged") === "1")
+        $("loginScreen").style.display = "none";
+      renderPackageButtons();
+      // Load tư vấn viên từ localStorage
+      const savedTVV = localStorage.getItem("tuVanVien");
+      if (savedTVV) {
+        $("modalTuVanVien").value = savedTVV;
+      }
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
 </html>
