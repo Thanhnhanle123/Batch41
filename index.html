@@ -234,6 +234,123 @@
       font-size: 11px;
       font-weight: bold;
     }
+
+    .chat-float-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .25);
+      z-index: 9999;
+    }
+
+    .chat-box {
+      position: fixed;
+      right: 20px;
+      bottom: 90px;
+      width: 350px;
+      height: 540px;
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, .25);
+      z-index: 9999;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      background: #f5f7fb;
+    }
+
+    .chat-message {
+      margin-bottom: 12px;
+      display: flex;
+    }
+
+    .chat-message.user {
+      justify-content: flex-end;
+    }
+
+    .chat-message.bot {
+      justify-content: flex-start;
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .chat-message.user .chat-bubble {
+      background: #007bff;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-message.bot .chat-bubble {
+      background: white;
+      border: 1px solid #e5e7eb;
+      color: #111827;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-footer {
+      border-top: 1px solid #e5e7eb;
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      background: white;
+    }
+
+    .chat-footer input {
+      flex: 1;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .chat-footer button {
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 12px;
+      padding: 0 16px;
+      font-weight: 600;
+    }
+
+    @media(max-width:768px) {
+      .chat-box {
+        width: calc(100% - 20px);
+        right: 10px;
+        left: 10px;
+        bottom: 80px;
+      }
+    }
   </style>
 </head>
 
@@ -419,7 +536,49 @@
       </div>
     </div>
   </div>
+  <button class="chat-float-btn" onclick="toggleChat()">
+    💬
+  </button>
+
+  <div class="chat-box" id="chatBox">
+
+    <div class="chat-header">
+      <span>🤖 Hỗ trợ Batch 41</span>
+
+      <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:20px;">
+        ×
+      </button>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+
+      <div class="chat-message bot">
+        <div class="chat-bubble">
+          Xin chào 👋<br><br>
+
+          Tôi có thể hỗ trợ bạn về các link hỗ trợ khách hàng:
+          <br><br>
+
+          • Tạo hợp đồng<br>
+          • Tra cứu khoản vay<br>
+          • Cập nhật mật khẩu HPO <br>
+          <br>
+          Vui lòng nhập đúng chính tả để tôi có thể hiểu và hỗ trợ bạn tốt nhất nhé!
+        </div>
+      </div>
+
+    </div>
+
+    <div class="chat-footer">
+      <input type="text" id="chatInput" placeholder="Nhập nội dung..." onkeypress="handleChatEnter(event)">
+
+      <button onclick="sendChat()">
+        Gửi
+      </button>
+    </div>
+  </div>
   <script src="./he_so.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script>
     function showLowRiskInfo(event) {
@@ -1015,6 +1174,530 @@
         $("modalTuVanVien").value = savedTVV;
       }
     };
+
+    function toggleChat() {
+
+      const box = $("chatBox");
+
+      if (box.style.display === 'flex') {
+        box.style.display = 'none';
+      } else {
+        box.style.display = 'flex';
+      }
+    }
+
+    function handleChatEnter(e) {
+      if (e.key === 'Enter') {
+        sendChat();
+      }
+    }
+
+    function addChatMessage(type, text) {
+
+      const body = $("chatBody");
+
+      const wrapper = document.createElement('div');
+
+      wrapper.className = `chat-message ${type}`;
+
+      wrapper.innerHTML = `
+        <div class="chat-bubble">
+            ${text}
+        </div>
+    `;
+
+      body.appendChild(wrapper);
+
+      body.scrollTop = body.scrollHeight;
+
+      // save history
+      saveChatHistory();
+    }
+
+
+    const LINKS = [
+      {
+        stt: 1,
+        keywords: [
+          'portal',
+          'hportal',
+          'cổng thông tin',
+          'nội bộ',
+          'chính sách'
+        ],
+        name: 'HPortal',
+        url: 'https://hportal.hdsaison.com.vn/',
+        note: 'Cổng thông tin nội bộ của HD SAISON'
+      },
+
+      {
+        stt: 2,
+        keywords: [
+          'hpo',
+          'đơn hàng',
+          'tạo hợp đồng',
+          'dashboard',
+          'quản lý đơn'
+        ],
+        name: 'HPO',
+        url: 'https://hpo.hdsaison.com.vn/login?returnUrl=%2Fdashboard',
+        note: 'Hệ thống quản lý đơn hàng của HD SAISON'
+      },
+
+      {
+        stt: 3,
+        keywords: [
+          'mail',
+          'email',
+          'outlook',
+          'owa',
+          'thư'
+        ],
+        name: 'Email nội bộ',
+        url: 'https://mail.hdsaison.com.vn/owa/auth/logon.aspx',
+        note: 'Hệ thống email nội bộ của HD SAISON'
+      },
+
+      {
+        stt: 4,
+        keywords: [
+          'account',
+          'authorization',
+          'reset password',
+          'quản lý tài khoản'
+        ],
+        name: 'Quản lý tài khoản',
+        url: 'https://quanlytk.hdsaison.com.vn:9251/authorization.do',
+        note: 'Hệ thống quản lý tài khoản của HD SAISON'
+      },
+
+      {
+        stt: 5,
+        keywords: [
+          'icard',
+          'thẻ',
+          'credit card',
+          'thẻ tín dụng'
+        ],
+        name: 'Thẻ tín dụng (iCard)',
+        url: 'https://icard.hdsaison.com.vn/',
+        note: 'Hệ thống quản lý thẻ tín dụng của HD SAISON'
+      },
+
+      {
+        stt: 6,
+        keywords: [
+          'tra cứu khoản vay',
+          'tra cứu kv',
+          'check hợp đồng',
+          'khoản vay',
+          'tra cuu khoan vay',
+          'tra cuu kv'
+        ],
+        name: 'Tra cứu khoản vay',
+        url: 'https://www.hdsaison.com.vn/vn/khach-hang/tra-cuu-khoan-vay.html',
+        note: 'Hệ thống tra cứu khoản vay của HD SAISON'
+      },
+
+      {
+        stt: 7,
+        keywords: [
+          'elearning',
+          'đào tạo',
+          'learning',
+          'học online'
+        ],
+        name: 'Elearning HD SAISON',
+        url: 'https://elearning.hdsaison.com.vn/login/index.php',
+        note: 'Hệ thống học tập trực tuyến của HD SAISON'
+      },
+
+      {
+        stt: 8,
+        keywords: [
+          'xuất cavet',
+          'cavet',
+          'rút cavet'
+        ],
+        name: 'Yêu cầu xuất cavet',
+        url: 'https://forms.office.com/pages/responsepage.aspx?id=v-ZoGBHKMUC4C0evO-91b2zwrFemGJ1HtKwpV4rW0tVUQTI0WkpKMjNQRUZUOFVLR1lKMVI5VTNEQy4u',
+        note: 'Hệ thống yêu cầu xuất cavet'
+      },
+
+      {
+        stt: 9,
+        keywords: [
+          'upload cavet',
+          'up cavet',
+          'tải cavet'
+        ],
+        name: 'Upload cavet',
+        url: 'https://forms.office.com/pages/responsepage.aspx?id=v-ZoGBHKMUC4C0evO-91b2zwrFemGJ1HtKwpV4rW0tVUOUNQOTdCN01PTlJWVEYxU0U4MFJIUEI1SS4u',
+        note: 'Hệ thống upload cavet'
+      },
+
+      {
+        stt: 10,
+        keywords: [
+          'hỗ trợ tín dụng',
+          'credit support',
+          'support tín dụng'
+        ],
+        name: 'Hỗ trợ tín dụng',
+        url: 'https://forms.office.com/pages/responsepage.aspx?id=v-ZoGBHKMUC4C0evO-91b2zwrFemGJ1HtKwpV4rW0tVUOU1PRlBCREk2Q1VXMjFRVzRCSU4wRUM5VC4u',
+        note: 'Hệ thống hỗ trợ tín dụng'
+      },
+
+      {
+        stt: 11,
+        keywords: [
+          'update payment',
+          'thanh toán',
+          'cập nhật thanh toán'
+        ],
+        name: 'Cập nhật thanh toán khách hàng',
+        url: 'https://forms.office.com/pages/responsepage.aspx?id=v-ZoGBHKMUC4C0evO-91b8AAWMp0y69JimmTZeaMwMpUNjJPOFBWRDZNNUdBRTlVTUxSV0RJS1BTTS4u&route=shorturl',
+        note: 'Hệ thống cập nhật thanh toán khách hàng'
+      },
+
+      {
+        stt: 12,
+        keywords: [
+          'hr',
+          'nhân sự',
+          'salary',
+          'lương'
+        ],
+        name: 'HR - Nhân sự',
+        url: 'https://hr.hdsaison.com.vn/',
+        note: 'Hệ thống nhân sự của HD SAISON'
+      },
+
+      {
+        stt: 13,
+        keywords: [
+          'bhyt',
+          'bảo hiểm',
+          'tra cứu bhyt'
+        ],
+        name: 'Tra cứu BHYT',
+        url: 'https://baohiemxahoi.gov.vn/tracuu/Pages/tra-cuu-thoi-han-su-dung-the-bhyt.aspx',
+        note: 'Hệ thống tra cứu BHYT'
+      },
+
+      {
+        stt: 14,
+        keywords: [
+          'gplx',
+          'bằng lái',
+          'giấy phép lái xe'
+        ],
+        name: 'Tra cứu GPLX',
+        url: 'https://gplx.csgt.bocongan.gov.vn/',
+        note: 'Hệ thống tra cứu GPLX'
+      }
+    ];
+
+    const CHAT_STORAGE_KEY = 'HD_SAISON_CHAT_HISTORY';
+
+    function saveChatHistory() {
+
+      const body = $("chatBody");
+
+      localStorage.setItem(
+        CHAT_STORAGE_KEY,
+        body.innerHTML
+      );
+    }
+
+    function loadChatHistory() {
+
+      const history = localStorage.getItem(
+        CHAT_STORAGE_KEY
+      );
+
+      if (history) {
+
+        $("chatBody").innerHTML = history;
+      }
+    }
+
+    function clearChatHistory() {
+
+      localStorage.removeItem(
+        CHAT_STORAGE_KEY
+      );
+
+      $("chatBody").innerHTML = `
+        <div class="chat-message bot">
+            <div class="chat-bubble">
+                Xin chào 👋
+            </div>
+        </div>
+    `;
+    }
+
+    window.addEventListener('load', () => {
+      localStorage.removeItem(CHAT_STORAGE_KEY);
+      // loadChatHistory();
+    });
+
+
+
+    function searchLinks(query) {
+
+      const fuseData = LINKS.map(item => ({
+
+        ...item,
+
+        searchText: `
+            ${item.name}
+            ${item.note}
+            ${item.keywords.join(' ')}
+        `
+      }));
+
+      const fuse = new Fuse(fuseData, {
+
+        keys: ['searchText'],
+
+        threshold: 0.4,
+
+        ignoreLocation: true,
+
+        minMatchCharLength: 2
+      });
+
+      const results = fuse.search(query);
+
+      return results.map(r => r.item);
+    }
+
+
+    async function askDeepSeek(message) {
+
+      const API_KEY = 'sk-1801bd64b20b42399fff0b7090acaadc';
+
+      try {
+
+        const response = await fetch(
+          'https://api.deepseek.com/chat/completions',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${API_KEY}`
+            },
+
+            body: JSON.stringify({
+
+              model: 'deepseek-chat',
+
+              messages: [
+                {
+                  role: 'system',
+                  content: `
+Bạn là chatbot hỗ trợ nhân viên HD SAISON.
+
+Nhiệm vụ:
+- Hỗ trợ tìm link hệ thống
+- Trả lời ngắn gọn
+- Hướng dẫn nhanh
+                                    `
+                },
+                {
+                  role: 'user',
+                  content: message
+                }
+              ],
+
+              temperature: 0.3,
+              max_tokens: 500
+
+            })
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('API ERROR');
+        }
+
+        const data = await response.json();
+
+        return data?.choices?.[0]?.message?.content
+          || 'Không có phản hồi';
+
+      } catch (error) {
+
+        console.error(error);
+
+        return `
+                    ❌ Không kết nối được AI
+                    <br><br>
+                    Kiểm tra API KEY hoặc Internet
+                `;
+      }
+    }
+    function formatBotMessage(text) {
+
+      if (!text) return '';
+
+      // ===== convert markdown **url** =====
+
+      text = text.replace(
+        /\*\*(https?:\/\/[^\s*]+)\*\*/g,
+        (match, url) => {
+          return `
+                <a 
+                    href="${url}"
+                    target="_blank"
+                    style="
+                        display:inline-block;
+                        margin-top:6px;
+                        padding:10px 14px;
+                        background:#007bff;
+                        color:white;
+                        border-radius:10px;
+                        text-decoration:none;
+                        font-weight:600;
+                    "
+                >
+                    🔗 Mở link
+                </a>
+            `;
+        }
+      );
+
+      // ===== convert normal url =====
+
+      text = text.replace(
+        /(^|[\s>])(https?:\/\/[^\s<]+)/g,
+        (match, prefix, url) => {
+
+          // tránh replace nếu đã nằm trong href
+          if (match.includes('href=')) {
+            return match;
+          }
+
+          return `
+                ${prefix}
+                <a 
+                    href="${url}"
+                    target="_blank"
+                    style="
+                        display:inline-block;
+                        margin-top:6px;
+                        padding:10px 14px;
+                        background:#007bff;
+                        color:white;
+                        border-radius:10px;
+                        text-decoration:none;
+                        font-weight:600;
+                    "
+                >
+                    🔗 Mở link
+                </a>
+            `;
+        }
+      );
+
+      return text;
+    }
+
+
+    async function sendChat() {
+
+      const input = $("chatInput");
+
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      addChatMessage('user', text);
+
+      input.value = '';
+
+      addChatMessage('bot', '⏳ Đang xử lý...');
+
+      const body = $("chatBody");
+
+      const loadingMessage = body.lastElementChild;
+
+      setTimeout(async () => {
+
+        let reply = '';
+
+        const foundLinks = searchLinks(text);
+
+        if (foundLinks.length > 0) {
+
+          reply = `
+                        Tôi tìm thấy ${foundLinks.length} link:<br><br>
+                    `;
+
+          foundLinks.forEach(item => {
+
+            reply += `
+                            <div style="
+                                padding:10px;
+                                border:1px solid #e5e7eb;
+                                border-radius:12px;
+                                margin-bottom:10px;
+                                background:white;
+                            ">
+
+                                <div style="font-weight:700">
+                                    ${item.name}
+                                </div>
+
+                                <div style="
+                                    font-size:13px;
+                                    color:#6b7280;
+                                    margin:4px 0 8px;
+                                ">
+                                    ${item.note}
+                                </div>
+
+                                <a 
+                                    href="${item.url}" 
+                                    target="_blank"
+                                    style="
+                                        color:#007bff;
+                                        font-weight:600;
+                                        text-decoration:none;
+                                    "
+                                >
+                                    🔗 Mở link
+                                </a>
+
+                            </div>
+                        `;
+          });
+
+        } else {
+
+          const msg = text.toLowerCase();
+
+          if (
+            msg.includes('giấy') ||
+            msg.includes('chứng từ')
+          ) {
+
+            reply = 'Kiểm tra chứng từ theo khoản vay.';
+
+          } else {
+
+            reply = await askDeepSeek(text);
+          }
+        }
+
+        loadingMessage.remove();
+
+        addChatMessage('bot', formatBotMessage(reply));
+
+      }, 300);
+    }
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
