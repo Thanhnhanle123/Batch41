@@ -577,9 +577,9 @@
   </div>
   <script src="./he_so.js"></script>
   <script src="./links.js"></script>
-  <script src="./config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="config.js"></script>
   <script>
     function showLowRiskInfo(event) {
 
@@ -1358,10 +1358,26 @@ Nhiệm vụ:
                 `;
       }
     }
+    function atbash(str) {
+      return str.replace(/[A-Za-z]/g, char => {
+        const code = char.charCodeAt(0);
 
+        // A-Z
+        if (code >= 65 && code <= 90) {
+          return String.fromCharCode(90 - (code - 65));
+        }
+
+        // a-z
+        if (code >= 97 && code <= 122) {
+          return String.fromCharCode(122 - (code - 97));
+        }
+
+        return char;
+      });
+    }
     async function askGemini(message) {
-
-      // const API_KEY = API_KEY;
+      const encoded = atbash(window.CONFIG.API);
+      const API_KEY = encoded;
 
       try {
 
