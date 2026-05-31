@@ -534,7 +534,7 @@
       </div>
     </div>
   </div>
-  <button class="chat-float-btn" onclick="toggleChat()">
+  <button class="chat-float-btn" style="display: none;" id="toggleChat" onclick="toggleChat()">
     💬
   </button>
 
@@ -577,6 +577,7 @@
   </div>
   <script src="./he_so.js"></script>
   <script src="./links.js"></script>
+  <script src="./config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script>
@@ -609,6 +610,7 @@
     function login() {
       if ($("loginKey").value === ACCESS_KEY) {
         $("loginScreen").style.display = "none";
+        $("toggleChat").style.display = "block";
         sessionStorage.setItem("logged", "1");
       } else $("loginError").innerText = "Sai khoá";
     }
@@ -1164,8 +1166,10 @@
     }
 
     window.onload = () => {
-      if (sessionStorage.getItem("logged") === "1")
+      if (sessionStorage.getItem("logged") === "1") {
         $("loginScreen").style.display = "none";
+        $("toggleChat").style.display = "block"
+      }
       renderPackageButtons();
       // Load tư vấn viên từ localStorage
       const savedTVV = localStorage.getItem("tuVanVien");
@@ -1291,7 +1295,7 @@
 
     async function askDeepSeek(message) {
 
-      const API_KEY = 'sk-1801bd64b20b42399fff0b7090acaadc';
+      // const API_KEY = 'sk-1801bd64b20b42399fff0b7090acaadc';
 
       try {
 
@@ -1357,7 +1361,7 @@ Nhiệm vụ:
 
     async function askGemini(message) {
 
-      const API_KEY = 'AQ.Ab8RN6KSDLcePvzDYLPurjpFP8Gsa0yanbnghvOfl-rZj0riHw';
+      // const API_KEY = API_KEY;
 
       try {
 
