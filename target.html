@@ -1,304 +1,699 @@
 <!doctype html>
 <html lang="vi">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Biểu đồ tổng quan</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <style>
-    :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --accent:#2b8be6;
-      --accent-2:#1e88e5;
-      --danger:#e53935;
-      --muted:#6b7280;
-      --border:#e6eef9;
-      --shadow: 0 8px 30px rgba(43,67,99,0.08);
-      --radius:12px;
-      --max-width:1100px;
-    }
-    *{ box-sizing: border-box; font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial; }
-    body{ background: var(--bg); color:#24313a; -webkit-font-smoothing:antialiased }
-    h1{font-size:20px; margin-bottom:12px; font-weight:700}
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 56px;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        z-index: 1000;
-    }
-    .logo{ font-weight:700; color:var(--accent); font-size:16px }
-    .desktop-nav a {
-        margin-left: 15px;
-        font-size: 14px;
-        text-decoration: none;
-        color: #333;
-    }
-    @media (max-width:768px){ .desktop-nav{ display:none } }
-    .page{ max-width:var(--max-width); margin:0 auto; padding-top:92px; padding-left:16px; padding-right:16px }
 
-    .chart-wrap{ max-width:1000px; height:460px; margin:0 auto; border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow); border:1px solid var(--border); padding:18px }
-    canvas{ width:100% !important; height:100% !important; display:block }
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --accent: #2b8be6;
+      --accent-2: #1e88e5;
+      --danger: #e53935;
+      --muted: #6b7280;
+      --border: #e6eef9;
+      --shadow: 0 8px 30px rgba(43, 67, 99, 0.08);
+      --radius: 12px;
+      --max-width: 1100px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial;
+    }
+
+    body {
+      background: var(--bg);
+      color: #24313a;
+      -webkit-font-smoothing: antialiased
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      font-weight: 700
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 16px
+    }
+
+    .desktop-nav a {
+      margin-left: 15px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    @media (max-width:768px) {
+      .desktop-nav {
+        display: none
+      }
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-top: 92px;
+      padding-left: 16px;
+      padding-right: 16px
+    }
+
+    .chart-wrap {
+      max-width: 1000px;
+      height: 460px;
+      margin: 0 auto;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 18px
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block
+    }
 
     /* Inputs */
-    .mb-3 .form-control{ border:1px solid #e6eef9; border-radius:10px; background:linear-gradient(180deg,#fff,#fbfdff); padding:10px 12px }
-    .mb-3 label{ font-weight:600; color:var(--muted); font-size:13px }
-    input[type='text']{ text-align:right }
+    .mb-3 .form-control {
+      border: 1px solid #e6eef9;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fff, #fbfdff);
+      padding: 10px 12px
+    }
+
+    .mb-3 label {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    input[type='text'] {
+      text-align: right
+    }
 
     /* Summary boxes */
-    #summaryBox{ margin-top:18px; display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start }
-    #summaryBox > div { flex:1; min-width:220px }
-    #summaryBox table{ width:100%; border-collapse:separate; border-spacing:0; border-radius:10px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.04) }
-    #summaryBox td{ padding:10px; border-bottom:1px solid rgba(46,66,90,0.06); background-clip:padding-box }
-    #summaryBox tr:last-child td{ border-bottom:0 }
+    #summaryBox {
+      margin-top: 18px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: flex-start
+    }
+
+    #summaryBox>div {
+      flex: 1;
+      min-width: 220px
+    }
+
+    #summaryBox table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04)
+    }
+
+    #summaryBox td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(46, 66, 90, 0.06);
+      background-clip: padding-box
+    }
+
+    #summaryBox tr:last-child td {
+      border-bottom: 0
+    }
 
     /* Buttons */
-    .btn-primary{ background:var(--accent); border:none; box-shadow:none }
-    .btn-outline-secondary{ border-radius:10px }
+    .btn-primary {
+      background: var(--accent);
+      border: none;
+      box-shadow: none
+    }
+
+    .btn-outline-secondary {
+      border-radius: 10px
+    }
+
     /* Save button sizing to match inputs */
-    #saveTargetsBtn{ height:40px; display:inline-flex; align-items:center; padding:6px 14px; border-radius:10px }
+    #saveTargetsBtn {
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 10px
+    }
 
     /* Modal / login input styling */
-    .modal .modal-dialog{ max-width:420px }
-    .modal .modal-content{ border-radius:12px; padding:0; overflow:hidden }
-    .modal .modal-header{ border-bottom:0; padding:16px 20px }
-    .modal .modal-title{ margin:0; font-weight:700; font-size:18px }
-    .modal .modal-body{ padding:18px 20px }
-    .modal .form-label{ font-weight:600; font-size:14px }
-    .modal .input-group{ border:1px solid #e6eef9; border-radius:10px; overflow:hidden; display:flex; align-items:center }
-    .modal .input-group .form-control{ border:0; box-shadow:none; border-radius:0; padding:10px 12px }
-    .modal .input-group .btn{ border:0; box-shadow:none; min-width:44px; padding:6px 8px; background:transparent }
-    #loginError{ font-size:14px }
-    @media (max-width:420px){ .modal .modal-dialog{ max-width:92% } }
+    .modal .modal-dialog {
+      max-width: 420px
+    }
 
-    @media (max-width:768px){ .chart-wrap{ height:340px } .page{ padding-top:86px } }
-    @media (max-width:480px){ #summaryBox > div{ min-width:160px } #summaryBox table{ font-size:13px } }
+    .modal .modal-content {
+      border-radius: 12px;
+      padding: 0;
+      overflow: hidden
+    }
+
+    .modal .modal-header {
+      border-bottom: 0;
+      padding: 16px 20px
+    }
+
+    .modal .modal-title {
+      margin: 0;
+      font-weight: 700;
+      font-size: 18px
+    }
+
+    .modal .modal-body {
+      padding: 18px 20px
+    }
+
+    .modal .form-label {
+      font-weight: 600;
+      font-size: 14px
+    }
+
+    .modal .input-group {
+      border: 1px solid #e6eef9;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center
+    }
+
+    .modal .input-group .form-control {
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 10px 12px
+    }
+
+    .modal .input-group .btn {
+      border: 0;
+      box-shadow: none;
+      min-width: 44px;
+      padding: 6px 8px;
+      background: transparent
+    }
+
+    #loginError {
+      font-size: 14px
+    }
+
+    @media (max-width:420px) {
+      .modal .modal-dialog {
+        max-width: 92%
+      }
+    }
+
+    @media (max-width:768px) {
+      .chart-wrap {
+        height: 340px
+      }
+
+      .page {
+        padding-top: 86px
+      }
+    }
+
+    @media (max-width:480px) {
+      #summaryBox>div {
+        min-width: 160px
+      }
+
+      #summaryBox table {
+        font-size: 13px
+      }
+    }
 
     /* Mobile-specific tweaks to make charts and cards fit smaller screens */
-    @media (max-width:768px){
-      .chart-wrap{ padding:12px; }
-      .chart-wrap canvas#overviewChart{ height:360px !important; }
-      #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:220px !important; height:220px !important }
-      #kpiRow{ flex-direction:row; gap:8px; }
-      #kpiRow .kpi-card{ min-width:140px; padding:10px; font-size:14px }
-      .modal .modal-dialog{ max-width:92% }
-      .chart-wrap{ height: auto !important; min-height: 0 !important; }
+    @media (max-width:768px) {
+      .chart-wrap {
+        padding: 12px;
+      }
+
+      .chart-wrap canvas#overviewChart {
+        height: 360px !important;
+      }
+
+      #analytics .card canvas,
+      #statusChart,
+      #revenueChart,
+      #tenorChart,
+      #topChart {
+        min-height: 220px !important;
+        height: 220px !important
+      }
+
+      #kpiRow {
+        flex-direction: row;
+        gap: 8px;
+      }
+
+      #kpiRow .kpi-card {
+        min-width: 140px;
+        padding: 10px;
+        font-size: 14px
+      }
+
+      .modal .modal-dialog {
+        max-width: 92%
+      }
+
+      .chart-wrap {
+        height: auto !important;
+        min-height: 0 !important;
+      }
     }
 
-    @media (max-width:576px){
-      .chart-wrap{ padding:10px; }
-      .chart-wrap canvas#overviewChart{ height:260px !important; }
-      #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:180px !important; height:180px !important }
-      #kpiRow{ flex-direction:column; }
-      #kpiRow .kpi-card{ width:100%; min-width:0; padding:10px; }
+    @media (max-width:576px) {
+      .chart-wrap {
+        padding: 10px;
+      }
+
+      .chart-wrap canvas#overviewChart {
+        height: 260px !important;
+      }
+
+      #analytics .card canvas,
+      #statusChart,
+      #revenueChart,
+      #tenorChart,
+      #topChart {
+        min-height: 180px !important;
+        height: 180px !important
+      }
+
+      #kpiRow {
+        flex-direction: column;
+      }
+
+      #kpiRow .kpi-card {
+        width: 100%;
+        min-width: 0;
+        padding: 10px;
+      }
+
       /* Make product modal full width-ish on phones */
-      #productModal .modal-dialog{ max-width:95%; margin:0 8px; }
+      #productModal .modal-dialog {
+        max-width: 95%;
+        margin: 0 8px;
+      }
+
       /* Reduce table padding for small screens */
-      #customersTable tbody td{ padding:6px 6px; }
-      .chart-wrap{ height: auto !important; min-height: 0 !important; }
+      #customersTable tbody td {
+        padding: 6px 6px;
+      }
+
+      .chart-wrap {
+        height: auto !important;
+        min-height: 0 !important;
+      }
     }
+
     /* Customers table mobile friendly: stack rows and show labels */
-    #customersTable td, #customersTable th{ white-space:nowrap; }
-    @media (max-width:576px){
-      #customersTable thead{ display:none; }
-      #customersTable{ border:0; }
-      #customersTable tbody tr{ display:block; margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:8px; background:#fff }
-      #customersTable tbody td{ display:flex; justify-content:space-between; padding:6px 8px; border:0; }
-      #customersTable tbody td:before{ content: attr(data-label); font-weight:600; color:var(--muted); margin-right:8px; }
-      #customersTable tbody td[data-label='#']{ display:none; }
+    #customersTable td,
+    #customersTable th {
+      white-space: nowrap;
     }
+
+    @media (max-width:576px) {
+      #customersTable thead {
+        display: none;
+      }
+
+      #customersTable {
+        border: 0;
+      }
+
+      #customersTable tbody tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 8px;
+        padding: 8px;
+        background: #fff
+      }
+
+      #customersTable tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 8px;
+        border: 0;
+      }
+
+      #customersTable tbody td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--muted);
+        margin-right: 8px;
+      }
+
+      #customersTable tbody td[data-label='#'] {
+        display: none;
+      }
+    }
+
     /* Contract details modal styling (card-like rows) */
-    #productModal .contract-details{ background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(15,23,42,0.06); margin-bottom:14px; }
-    #productModal .contract-details .row{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:10px 6px; border-bottom:1px solid #f1f5f9 }
-    #productModal .contract-details .row:last-child{ border-bottom:0 }
-    #productModal .contract-details .label{ color:#374151; font-weight:700 }
-    #productModal .contract-details .value{ color:#0f172a; font-weight:700 }
-    #productModal .contract-details .amount{ color:var(--accent-2); font-size:1.05rem }
-    #productModal .contract-details .muted{ color:#6b7280; font-weight:400; margin-left:8px }
+    #productModal .contract-details {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      margin-bottom: 14px;
+    }
+
+    #productModal .contract-details .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 6px;
+      border-bottom: 1px solid #f1f5f9
+    }
+
+    #productModal .contract-details .row:last-child {
+      border-bottom: 0
+    }
+
+    #productModal .contract-details .label {
+      color: #374151;
+      font-weight: 700
+    }
+
+    #productModal .contract-details .value {
+      color: #0f172a;
+      font-weight: 700
+    }
+
+    #productModal .contract-details .amount {
+      color: var(--accent-2);
+      font-size: 1.05rem
+    }
+
+    #productModal .contract-details .muted {
+      color: #6b7280;
+      font-weight: 400;
+      margin-left: 8px
+    }
+
     /* Highlighted date-range row: start and end close together */
-    #productModal .contract-details .date-range{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px; background:linear-gradient(90deg,#eef7ff,#f6fbff); border-radius:8px; margin:6px 0 12px 0 }
-    #productModal .contract-details .date-range .pill{ background:var(--accent-2); color:#fff; padding:6px 10px; border-radius:6px; font-weight:700; display:inline-block }
-    #productModal .contract-details .date-range .arrow{ margin:0 8px; color:#334155; font-weight:700 }
+    #productModal .contract-details .date-range {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: linear-gradient(90deg, #eef7ff, #f6fbff);
+      border-radius: 8px;
+      margin: 6px 0 12px 0
+    }
+
+    #productModal .contract-details .date-range .pill {
+      background: var(--accent-2);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      display: inline-block
+    }
+
+    #productModal .contract-details .date-range .arrow {
+      margin: 0 8px;
+      color: #334155;
+      font-weight: 700
+    }
+
     /* KPI cards */
-    #kpiRow .kpi-card{ flex:1; background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(15,23,42,0.06); display:flex; flex-direction:column }
-    #kpiRow .kpi-card .label{ color:var(--muted); font-weight:600; font-size:13px }
-    #kpiRow .kpi-card .value{ font-weight:800; font-size:1.15rem; color:var(--accent-2) }
+    #kpiRow .kpi-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column
+    }
+
+    #kpiRow .kpi-card .label {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px
+    }
+
+    #kpiRow .kpi-card .value {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--accent-2)
+    }
+
     /* Canvas sizing: keep overview large and analytics canvases readable */
-    canvas{ width:100% !important; height:100% !important; display:block }
-    .chart-wrap canvas#overviewChart{ height:420px !important; max-height:520px }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block
+    }
+
+    .chart-wrap canvas#overviewChart {
+      height: 420px !important;
+      max-height: 520px
+    }
+
     /* Make analytics charts equal height */
-    #analytics .card canvas { min-height:220px !important; height:220px !important; }
+    #analytics .card canvas {
+      min-height: 220px !important;
+      height: 220px !important;
+    }
+
     /* Customers summary banner (moved outside card) */
-    #customersSummary{ background: linear-gradient(180deg,#fff,#fcfeff); border:1px solid var(--border); padding:10px 14px; border-radius:10px; box-shadow:0 6px 18px rgba(15,23,42,0.04); color:var(--muted); display:flex; align-items:center; gap:12px; font-size:0.95rem; margin-bottom:12px }
-    #customersSummary .muted{ color:var(--muted) }
-    #customersSummary .text-danger{ margin-left:6px; font-weight:700 }
-    @media (max-width:576px){ #customersSummary{ font-size:0.88rem; padding:8px 10px } }
+    #customersSummary {
+      background: linear-gradient(180deg, #fff, #fcfeff);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      margin-bottom: 12px
+    }
+
+    #customersSummary .muted {
+      color: var(--muted)
+    }
+
+    #customersSummary .text-danger {
+      margin-left: 6px;
+      font-weight: 700
+    }
+
+    @media (max-width:576px) {
+      #customersSummary {
+        font-size: 0.88rem;
+        padding: 8px 10px
+      }
+    }
+
     /* Analytics cards: make each chart taller so MC/DL bars are visible and readable */
-    #analytics .card canvas, #statusChart, #revenueChart, #tenorChart, #topChart{ min-height:320px !important; height:320px !important }
+    #analytics .card canvas,
+    #statusChart,
+    #revenueChart,
+    #tenorChart,
+    #topChart {
+      min-height: 320px !important;
+      height: 320px !important
+    }
+
     /* Revenue chart container should flex to fill its card and stay readable */
-    .card.d-flex .flex-grow-1 canvas{ width:100% !important; height:100% !important; min-height:260px; }
+    .card.d-flex .flex-grow-1 canvas {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 260px;
+    }
+
     /* Centered revenue chart variant */
-    canvas.centered-chart{ display:block; margin:auto; }
+    canvas.centered-chart {
+      display: block;
+      margin: auto;
+    }
   </style>
 </head>
+
 <body>
   <header>
-      <div class="logo">🚗 Batch 41</div>
-      <nav class="desktop-nav">
-        <a href="./index.html">Tính trả góp</a>
-        <a href="./cancel_contract.html">Huỷ HĐ</a>
-        <a href="./target.html">Tổng quan chỉ tiêu</a>
-        <a href="./customers.html">Danh sách khách hàng</a>
-        <a href="./customer_search.html">Tìm khách hàng</a>
-        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
-        <a href="./bonus.html">Thưởng SI</a>
-        <a href="#" onclick="logout()">Đăng xuất</a>
-      </nav>
-      <!-- HAMBURGER -->
-      <button
-        class="btn btn-outline-primary d-md-none"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#mobileMenu"
-      >
-        ☰
-      </button>
-    </header>
-    <!-- ===== MOBILE MENU ===== -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">🚗 Batch 41</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="offcanvas"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <a class="btn btn-light w-100 mb-2" href="index.html"
-          >📊 Tính trả góp</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
-        >❌ Huỷ hợp đồng</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
-        <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
-        <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
-        <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Tìm lịch làm việc</a>
-        <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
-        <hr />
-        <button class="btn btn-danger w-100" onclick="logout()">
-          🔐 Đăng xuất
-        </button>
-      </div>
+    <div class="logo">🚗 Batch 41</div>
+    <nav class="desktop-nav">
+      <a href="./index.html">Tính trả góp</a>
+      <a href="./cancel_contract.html">Huỷ HĐ</a>
+      <a href="./target.html">Tổng quan chỉ tiêu</a>
+      <a href="./customers.html">Danh sách khách hàng</a>
+      <a href="./customer_search.html">Tìm khách hàng</a>
+      <a href="./employee_schedule.html">Tìm lịch làm việc</a>
+      <a href="./bonus.html">Thưởng SI</a>
+      <a href="#" onclick="logout()">Đăng xuất</a>
+    </nav>
+    <!-- HAMBURGER -->
+    <button class="btn btn-outline-primary d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+      ☰
+    </button>
+  </header>
+  <!-- ===== MOBILE MENU ===== -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">🚗 Batch 41</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
+    <div class="offcanvas-body">
+      <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
+      <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
+      <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
+      <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
+      <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
+      <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Tìm lịch làm việc</a>
+      <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
+      <hr />
+      <button class="btn btn-danger w-100" onclick="logout()">
+        🔐 Đăng xuất
+      </button>
+    </div>
+  </div>
 
   <div class="page">
-  <h5 class="text-center mb-3">TỔNG QUAN CHỈ TIÊU</h5>
+    <h5 class="text-center mb-3">TỔNG QUAN CHỈ TIÊU</h5>
 
-  <!-- Inputs for targets -->
-  <div class="mb-3">
-    <div class="d-flex w-100 gap-2 flex-column flex-md-row flex-wrap align-items-center">
-      <div class="d-flex align-items-center gap-2 me-3">
-        <label class="mb-0 me-2 text-muted">Chỉ tiêu MC:</label>
-        <input id="inputTargetMC" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <label class="mb-0 ms-0 me-2 text-muted">Chỉ tiêu DL:</label>
-        <input id="inputTargetDL" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
-      </div>
-      <div class="d-flex align-items-center gap-2">
-      <button id="saveTargetsBtn" class="btn btn-primary">Lưu</button>
-      <span id="saveStatus" class="text-success"></span>
+    <!-- Inputs for targets -->
+    <div class="mb-3">
+      <div class="d-flex w-100 gap-2 flex-column flex-md-row flex-wrap align-items-center">
+        <div class="d-flex align-items-center gap-2 me-3">
+          <label class="mb-0 me-2 text-muted">Chỉ tiêu MC:</label>
+          <input id="inputTargetMC" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="mb-0 ms-0 me-2 text-muted">Chỉ tiêu DL:</label>
+          <input id="inputTargetDL" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button id="saveTargetsBtn" class="btn btn-primary">Lưu</button>
+          <span id="saveStatus" class="text-success"></span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Date range for data -->
-  <div class="mb-3">
-    <div class="d-flex gap-2 flex-column flex-sm-row align-items-start">
-      <div class="d-flex flex-column">
-        <label class="mb-1 text-muted">Từ ngày</label>
-        <input id="inputFromDate" type="date" class="form-control" />
-      </div>
-      <div class="d-flex flex-column">
-        <label class="mb-1 text-muted">Đến ngày</label>
-        <input id="inputToDate" type="date" class="form-control" />
-      </div>
-      <div class="d-flex align-items-end">
+    <!-- Date range for data -->
+    <div class="mb-3">
+      <div class="d-flex gap-2 flex-column flex-sm-row align-items-start">
+        <div class="d-flex flex-column">
+          <label class="mb-1 text-muted">Từ ngày</label>
+          <input id="inputFromDate" type="date" class="form-control" />
+        </div>
+        <div class="d-flex flex-column">
+          <label class="mb-1 text-muted">Đến ngày</label>
+          <input id="inputToDate" type="date" class="form-control" />
+        </div>
+        <div class="d-flex align-items-end">
           <!-- Tải dữ liệu removed: auto-load on date change -->
+        </div>
       </div>
     </div>
-  </div>
 
     <div class="chart-wrap p-3 bg-white rounded shadow-sm">
-    <canvas id="overviewChart"></canvas>
-  </div>
-  <div class="text-muted small mt-2">Biểu đồ tổng quan: so sánh Chỉ tiêu (MC/DL) với Số tiền đã đạt (chỉ tính các hợp đồng LIVE).</div>
-  <!-- Analytics: KPI cards and charts -->
-  <div id="analytics" class="mt-4">
-    <div id="kpiRow" class="d-flex gap-3 mb-3"></div>
-    <div class="row g-3 align-items-stretch">
-      <div class="col-md-6">
-        <div class="card p-2 h-100">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div><strong>Phân bố trạng thái</strong></div>
-            <div>
-              <span class="small text-muted">Hiển thị tổng &amp; tách theo MC / DL</span>
-              <button id="manageStatusBtn" class="btn btn-sm btn-outline-secondary ms-2">Quản lý trạng thái</button>
+      <canvas id="overviewChart"></canvas>
+    </div>
+    <div class="text-muted small mt-2">Biểu đồ tổng quan: so sánh Chỉ tiêu (MC/DL) với Số tiền đã đạt (chỉ tính các hợp
+      đồng LIVE).</div>
+    <!-- Analytics: KPI cards and charts -->
+    <div id="analytics" class="mt-4">
+      <div id="kpiRow" class="d-flex gap-3 mb-3"></div>
+      <div class="row g-3 align-items-stretch">
+        <div class="col-md-6">
+          <div class="card p-2 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Phân bố trạng thái</strong></div>
+              <div>
+                <span class="small text-muted">Hiển thị tổng &amp; tách theo MC / DL</span>
+                <button id="manageStatusBtn" class="btn btn-sm btn-outline-secondary ms-2">Quản lý trạng thái</button>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-4"><canvas id="statusChartAll"></canvas>
+                <div class="text-center small mt-1">Tất cả</div>
+              </div>
+              <div class="col-4"><canvas id="statusChartMC"></canvas>
+                <div class="text-center small mt-1">MC</div>
+              </div>
+              <div class="col-4"><canvas id="statusChartDL"></canvas>
+                <div class="text-center small mt-1">DL</div>
+              </div>
+            </div>
+            <div id="statusLegend" class="d-flex flex-wrap gap-2 mt-2"></div>
+            <div class="text-muted small mt-1">Phân bố trạng thái hợp đồng: hiển thị số lượng hợp đồng theo từng trạng
+              thái (All / MC / DL).</div>
+            <div class="text-muted small mt-1">Ghi chú: biểu đồ "MC" và "DL" chỉ tính theo loại hợp đồng tương ứng; dùng
+              để so sánh phân bổ trạng thái giữa hai dòng sản phẩm.</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-2 h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Doanh số theo tháng</strong></div>
+              <div class="small text-muted">Doanh số theo tháng (MC/DL)</div>
+            </div>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+              <canvas id="revenueChart" class="centered-chart"
+                style="flex:0 0 auto; max-width:95%; max-height:100%;"></canvas>
             </div>
           </div>
-          <div class="row g-2">
-            <div class="col-4"><canvas id="statusChartAll"></canvas><div class="text-center small mt-1">Tất cả</div></div>
-            <div class="col-4"><canvas id="statusChartMC"></canvas><div class="text-center small mt-1">MC</div></div>
-            <div class="col-4"><canvas id="statusChartDL"></canvas><div class="text-center small mt-1">DL</div></div>
-          </div>
-          <div id="statusLegend" class="d-flex flex-wrap gap-2 mt-2"></div>
-          <div class="text-muted small mt-1">Phân bố trạng thái hợp đồng: hiển thị số lượng hợp đồng theo từng trạng thái (All / MC / DL).</div>
-          <div class="text-muted small mt-1">Ghi chú: biểu đồ "MC" và "DL" chỉ tính theo loại hợp đồng tương ứng; dùng để so sánh phân bổ trạng thái giữa hai dòng sản phẩm.</div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-2 h-100 d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div><strong>Doanh số theo tháng</strong></div>
-            <div class="small text-muted">Doanh số theo tháng (MC/DL)</div>
-          </div>
-          <div class="flex-grow-1 d-flex justify-content-center align-items-center">
-            <canvas id="revenueChart" class="centered-chart" style="flex:0 0 auto; max-width:95%; max-height:100%;"></canvas>
+        <div class="col-md-6">
+          <div class="card p-2 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Phân bố kỳ hạn</strong></div>
+              <div class="small text-muted">Số hợp đồng theo kỳ hạn (tháng)</div>
+            </div>
+            <canvas id="tenorChart"></canvas>
           </div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-2 h-100">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div><strong>Phân bố kỳ hạn</strong></div>
-            <div class="small text-muted">Số hợp đồng theo kỳ hạn (tháng)</div>
+        <div class="col-md-6">
+          <div class="card p-2 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Top hợp đồng</strong></div>
+              <div class="small text-muted">Hợp đồng giá trị lớn nhất</div>
+            </div>
+            <canvas id="topChart"></canvas>
           </div>
-          <canvas id="tenorChart"></canvas>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-2 h-100">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div><strong>Top hợp đồng</strong></div>
-            <div class="small text-muted">Hợp đồng giá trị lớn nhất</div>
-          </div>
-          <canvas id="topChart"></canvas>
         </div>
       </div>
     </div>
-  </div>
-  
+
     <!-- Customers table -->
     <div id="customersSummary" class="text-muted small mt-4 mb-2">&nbsp;</div>
     <div class="card mt-4 p-3" id="customersCard">
@@ -311,7 +706,16 @@
       <div class="table-responsive">
         <table class="table table-sm table-hover" id="customersTable">
           <thead>
-            <tr><th>#</th><th>Tên khách</th><th>SĐT</th><th>CCCD/CMND</th><th>Hợp đồng</th><th>Loại</th><th>Số tiền</th><th>Trạng thái</th></tr>
+            <tr>
+              <th>#</th>
+              <th>Tên khách</th>
+              <th>SĐT</th>
+              <th>CCCD/CMND</th>
+              <th>Hợp đồng</th>
+              <th>Loại</th>
+              <th>Số tiền</th>
+              <th>Trạng thái</th>
+            </tr>
           </thead>
           <tbody id="customersTbody"></tbody>
         </table>
@@ -324,9 +728,9 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-                  <h5 class="modal-title">Đăng nhập</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+            <h5 class="modal-title">Đăng nhập</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
           <div class="modal-body">
             <div id="loginError" class="text-danger mb-2" style="display:none;"></div>
             <div class="mb-3">
@@ -337,7 +741,8 @@
               <label class="form-label">Mật khẩu</label>
               <div class="input-group">
                 <input id="loginPassword" type="password" class="form-control" autocomplete="current-password" />
-                <button class="btn btn-outline-secondary" type="button" id="togglePassBtn" aria-label="Hiển thị mật khẩu">👁️</button>
+                <button class="btn btn-outline-secondary" type="button" id="togglePassBtn"
+                  aria-label="Hiển thị mật khẩu">👁️</button>
               </div>
             </div>
           </div>
@@ -347,138 +752,131 @@
         </div>
       </div>
     </div>
-  <!-- Chart.js and datalabels plugin -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js and datalabels plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- <script>
-      if (sessionStorage.getItem("logged") !== "1") {
-        window.location.href = "index.html";
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+      // Utility to format currency (VND)
+      function fmt(v) {
+        return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' ₫';
       }
-      function logout() {
-        sessionStorage.removeItem("logged");
-        location.href = "index.html";
+
+      // Defaults for targets (can be overridden by user/localStorage)
+      const DEFAULT_MC = 100000000; // 100 million VND
+      const DEFAULT_DL = 1000000000; // 1 billion VND
+      // Color palette for charts
+      const PALETTE = ['#2b8be6', '#e64b4b', '#10b981', '#f59e0b', '#9ca3af', '#60a5fa'];
+      // Achieved numbers will be computed from data.json (API) below
+      let mcAch = 0;
+      let dlAch = 0;
+
+      // (removed simple data-only fetchAchievedFromData) - consolidated version below handles API + fallback
+
+      // Chuyển giá trị input (chuỗi có thể chứa '.' hoặc ',' hoặc khoảng trắng) sang Number.
+      // Trả về 0 khi giá trị không hợp lệ hoặc rỗng.
+      function parseNumberInput(s) {
+        if (s === null || s === undefined) return 0;
+        // loại bỏ dấu phân nhóm và khoảng trắng
+        const cleaned = String(s).replace(/[\.\,\s]/g, '');
+        const n = Number(cleaned);
+        return isNaN(n) ? 0 : n;
       }
-  </script> -->
-  <script>
-    
-    // Utility to format currency (VND)
-    function fmt(v){
-      return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' ₫';
-    }
 
-    // Defaults for targets (can be overridden by user/localStorage)
-    const DEFAULT_MC = 100000000; // 100 million VND
-    const DEFAULT_DL = 1000000000; // 1 billion VND
-    // Color palette for charts
-    const PALETTE = ['#2b8be6','#e64b4b','#10b981','#f59e0b','#9ca3af','#60a5fa'];
-    // Achieved numbers will be computed from data.json (API) below
-    let mcAch = 0;
-    let dlAch = 0;
+      // Lấy chỉ tiêu MC và DL từ localStorage. Nếu chưa có, trả về giá trị mặc định.
+      function getStoredTargets() {
+        const m = parseNumberInput(localStorage.getItem('targetMC')) || DEFAULT_MC;
+        const d = parseNumberInput(localStorage.getItem('targetDL')) || DEFAULT_DL;
+        return { mcTarget: m, dlTarget: d };
+      }
 
-    // (removed simple data-only fetchAchievedFromData) - consolidated version below handles API + fallback
+      // Set up initial input values
+      const inputMC = document.getElementById('inputTargetMC');
+      const inputDL = document.getElementById('inputTargetDL');
+      const saveBtn = document.getElementById('saveTargetsBtn');
+      const saveStatus = document.getElementById('saveStatus');
 
-    // Chuyển giá trị input (chuỗi có thể chứa '.' hoặc ',' hoặc khoảng trắng) sang Number.
-    // Trả về 0 khi giá trị không hợp lệ hoặc rỗng.
-    function parseNumberInput(s){
-      if(s === null || s === undefined) return 0;
-      // loại bỏ dấu phân nhóm và khoảng trắng
-      const cleaned = String(s).replace(/[\.\,\s]/g,'');
-      const n = Number(cleaned);
-      return isNaN(n) ? 0 : n;
-    }
+      // Format helpers for target inputs (thousand separator '.' for vi-VN)
+      // Định dạng chuỗi số: thêm dấu chấm nhóm hàng nghìn (dùng cho hiển thị trong input).
+      function formatNumberStringWithDots(s) {
+        const digits = String(s || '').replace(/[^0-9]/g, '');
+        if (!digits) return '';
+        return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      }
 
-    // Lấy chỉ tiêu MC và DL từ localStorage. Nếu chưa có, trả về giá trị mặc định.
-    function getStoredTargets(){
-      const m = parseNumberInput(localStorage.getItem('targetMC')) || DEFAULT_MC;
-      const d = parseNumberInput(localStorage.getItem('targetDL')) || DEFAULT_DL;
-      return { mcTarget: m, dlTarget: d };
-    }
-
-    // Set up initial input values
-    const inputMC = document.getElementById('inputTargetMC');
-    const inputDL = document.getElementById('inputTargetDL');
-    const saveBtn = document.getElementById('saveTargetsBtn');
-    const saveStatus = document.getElementById('saveStatus');
-
-    // Format helpers for target inputs (thousand separator '.' for vi-VN)
-    // Định dạng chuỗi số: thêm dấu chấm nhóm hàng nghìn (dùng cho hiển thị trong input).
-    function formatNumberStringWithDots(s){
-      const digits = String(s || '').replace(/[^0-9]/g, '');
-      if(!digits) return '';
-      return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
-
-    // Apply dynamic formatting: remove separators on focus, format with locale on blur, keep grouping while typing
-    [inputMC, inputDL].forEach(el => {
-      if(!el) return;
-      el.addEventListener('focus', ()=>{ el.value = (el.value || '').toString().replace(/\./g,''); });
-      el.addEventListener('input', ()=>{
-        const raw = (el.value || '').replace(/[^0-9]/g, '');
-        el.value = formatNumberStringWithDots(raw);
+      // Apply dynamic formatting: remove separators on focus, format with locale on blur, keep grouping while typing
+      [inputMC, inputDL].forEach(el => {
+        if (!el) return;
+        el.addEventListener('focus', () => { el.value = (el.value || '').toString().replace(/\./g, ''); });
+        el.addEventListener('input', () => {
+          const raw = (el.value || '').replace(/[^0-9]/g, '');
+          el.value = formatNumberStringWithDots(raw);
+        });
+        el.addEventListener('blur', () => {
+          const raw = (el.value || '').replace(/[^0-9]/g, '');
+          el.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
+        });
       });
-      el.addEventListener('blur', ()=>{
-        const raw = (el.value || '').replace(/[^0-9]/g, '');
-        el.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
-      });
-    });
 
-    // Vẽ biểu đồ tổng quan (bar chart) so sánh: Chỉ tiêu vs Đã đạt cho MC và DL.
-    // - `mcTarget`, `dlTarget`: chỉ tiêu tiền tệ (VND)
-    // Sử dụng biến toàn cục `mcAch` và `dlAch` làm giá trị đã đạt.
-    let chartInstance = null;
-    function renderChart(mcTarget, dlTarget){
-      const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
-      const data = {
-        labels: ['Chỉ Tiêu','Số tiền đã đạt'],
-        datasets: [
-          { label: 'MC', backgroundColor: PALETTE[0], data: [mcTarget, mcAch], stack: 'stack1', borderRadius: 6, maxBarThickness: isSmall ? 40 : 72 },
-          { label: 'DL', backgroundColor: PALETTE[1], data: [dlTarget, dlAch], stack: 'stack1', borderRadius: 6, maxBarThickness: isSmall ? 40 : 72 }
-        ]
-      };
+      // Vẽ biểu đồ tổng quan (bar chart) so sánh: Chỉ tiêu vs Đã đạt cho MC và DL.
+      // - `mcTarget`, `dlTarget`: chỉ tiêu tiền tệ (VND)
+      // Sử dụng biến toàn cục `mcAch` và `dlAch` làm giá trị đã đạt.
+      let chartInstance = null;
+      function renderChart(mcTarget, dlTarget) {
+        const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
+        const data = {
+          labels: ['Chỉ Tiêu', 'Số tiền đã đạt'],
+          datasets: [
+            { label: 'MC', backgroundColor: PALETTE[0], data: [mcTarget, mcAch], stack: 'stack1', borderRadius: 6, maxBarThickness: isSmall ? 40 : 72 },
+            { label: 'DL', backgroundColor: PALETTE[1], data: [dlTarget, dlAch], stack: 'stack1', borderRadius: 6, maxBarThickness: isSmall ? 40 : 72 }
+          ]
+        };
 
-      const cfg = {
-        type: 'bar',
-        data: data,
-        plugins: [],
-        options: {
-          plugins: {
-            legend: { position: isSmall ? 'bottom' : 'top' },
-            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
-          },
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: { padding: { top: 6, bottom: 6, left: 6, right: 6 } },
-          scales: { x: { stacked: true, ticks: { font: { size: isSmall ? 11 : 13 } } }, y: { beginAtZero: true, stacked: true, ticks: { callback: v=> v.toLocaleString('vi-VN') + ' ₫', font: { size: isSmall ? 10 : 12 } } } }
-        }
-      };
+        const cfg = {
+          type: 'bar',
+          data: data,
+          plugins: [],
+          options: {
+            plugins: {
+              legend: { position: isSmall ? 'bottom' : 'top' },
+              tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 6, bottom: 6, left: 6, right: 6 } },
+            scales: { x: { stacked: true, ticks: { font: { size: isSmall ? 11 : 13 } } }, y: { beginAtZero: true, stacked: true, ticks: { callback: v => v.toLocaleString('vi-VN') + ' ₫', font: { size: isSmall ? 10 : 12 } } } }
+          }
+        };
 
-      const ctx = document.getElementById('overviewChart').getContext('2d');
-      if(chartInstance) { chartInstance.destroy(); }
-      chartInstance = new Chart(ctx, cfg);
+        const ctx = document.getElementById('overviewChart').getContext('2d');
+        if (chartInstance) { chartInstance.destroy(); }
+        chartInstance = new Chart(ctx, cfg);
 
-      // (resize re-render handled globally to avoid duplicate listeners)
-    }
+        // (resize re-render handled globally to avoid duplicate listeners)
+      }
 
-    // Tạo phần tóm tắt (summary) hiển thị: chỉ tiêu, đã đạt, còn thiếu và tỷ lệ (%) cho MC, DL và tổng.
-    function renderSummary(mcTarget, dlTarget){
-      const mcTotal = mcTarget;
-      const mcAchieved = mcAch;
-      const mcRemain = mcTotal - mcAchieved;
-      const mcRate = mcTotal ? (mcAchieved / mcTotal * 100) : 0;
+      // Tạo phần tóm tắt (summary) hiển thị: chỉ tiêu, đã đạt, còn thiếu và tỷ lệ (%) cho MC, DL và tổng.
+      function renderSummary(mcTarget, dlTarget) {
+        const mcTotal = mcTarget;
+        const mcAchieved = mcAch;
+        const mcRemain = mcTotal - mcAchieved;
+        const mcRate = mcTotal ? (mcAchieved / mcTotal * 100) : 0;
 
-      const dlTotal = dlTarget;
-      const dlAchieved = dlAch;
-      const dlRemain = dlTotal - dlAchieved;
-      const dlRate = dlTotal ? (dlAchieved / dlTotal * 100) : 0;
+        const dlTotal = dlTarget;
+        const dlAchieved = dlAch;
+        const dlRemain = dlTotal - dlAchieved;
+        const dlRate = dlTotal ? (dlAchieved / dlTotal * 100) : 0;
 
-      const totalTarget = mcTotal + dlTotal;
-      const totalAch = mcAchieved + dlAchieved;
-      const totalRemain = totalTarget - totalAch;
-      const totalRate = totalTarget ? (totalAch / totalTarget * 100) : 0;
+        const totalTarget = mcTotal + dlTotal;
+        const totalAch = mcAchieved + dlAchieved;
+        const totalRemain = totalTarget - totalAch;
+        const totalRate = totalTarget ? (totalAch / totalTarget * 100) : 0;
 
-      const summaryHtml = `
+        const summaryHtml = `
         <div id="summaryBox" style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">
           <div style="flex:1; min-width:220px;">
             <table style="width:100%; border-collapse:collapse; font-size:15px; background:#eef7ff; border:2px solid #2f3b52;">
@@ -508,135 +906,135 @@
           </div>
         </div>
       `;
-      // replace or insert
-      const existing = document.getElementById('summaryBox');
-      if(existing) existing.outerHTML = summaryHtml; else document.querySelector('.chart-wrap').insertAdjacentHTML('afterend', summaryHtml);
-    }
-
-    // AUTH helpers: lưu/đọc token trong localStorage
-    function getAuthToken(){ return localStorage.getItem('authToken'); }
-    function setAuthToken(t){ localStorage.setItem('authToken', t); }
-    function clearAuthToken(){ localStorage.removeItem('authToken'); }
-
-    // Chuyển định dạng ngày từ input HTML 'YYYY-MM-DD' sang định dạng API 'DD-MM-YYYY'.
-    function formatApiDateFromInput(d){ // 'YYYY-MM-DD' -> 'DD-MM-YYYY'
-      if(!d) return '';
-      const parts = d.split('-'); if(parts.length !== 3) return d;
-      return parts[2] + '-' + parts[1] + '-' + parts[0];
-    }
-
-    // Lấy thông tin user đã lưu (payload) từ localStorage (dạng JSON). Trả về null nếu không parse được.
-    function getStoredAuthUser(){
-      try{ const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; }catch(e){ return null; }
-    }
-    // JWT helpers: giải mã payload của token (không verify signature) và kiểm tra expiry.
-    // `parseJwtPayload` trả về object payload nếu parse thành công, ngược lại null.
-    function parseJwtPayload(token){
-      try{
-        const parts = token.split('.'); if(parts.length < 2) return null;
-        const payload = parts[1].replace(/-/g,'+').replace(/_/g,'/');
-        const json = decodeURIComponent(atob(payload).split('').map(function(c){ return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
-        return JSON.parse(json);
-      }catch(e){ return null; }
-    }
-
-    // Trả về true nếu token có claim `exp` và chưa hết hạn.
-    function isTokenValid(token){
-      if(!token) return false;
-      const p = parseJwtPayload(token); if(!p) return false;
-      if(p.exp && typeof p.exp === 'number'){
-        const now = Math.floor(Date.now()/1000);
-        return p.exp > now;
+        // replace or insert
+        const existing = document.getElementById('summaryBox');
+        if (existing) existing.outerHTML = summaryHtml; else document.querySelector('.chart-wrap').insertAdjacentHTML('afterend', summaryHtml);
       }
-      return true; // nếu không có exp, giả sử còn hợp lệ
-    }
 
-    // Tải danh sách hợp đồng từ API theo user hiện tại và khoảng ngày.
-    // - Kiểm tra token trong localStorage (nếu hết hạn => yêu cầu đăng nhập).
-    // - Gọi API, xử lý nhiều dạng response (paged.content, contracts, or raw array).
-    // - Tính `mcAch` và `dlAch` (tổng giá trị hợp đồng theo loại) và trả về object {mcAch, dlAch}.
-    function fetchAchievedFromData(fromInput, toInput){
-      const token = getAuthToken();
-      const authUser = getStoredAuthUser();
-      // ensure token is present and not expired
-      if(!token || !isTokenValid(token)){
-        clearAuthToken(); try{ localStorage.removeItem('authUser'); }catch(e){}
-        showLogin();
-        return Promise.reject(new Error('Token expired or missing. Please login.'));
+      // AUTH helpers: lưu/đọc token trong localStorage
+      function getAuthToken() { return localStorage.getItem('authToken'); }
+      function setAuthToken(t) { localStorage.setItem('authToken', t); }
+      function clearAuthToken() { localStorage.removeItem('authToken'); }
+
+      // Chuyển định dạng ngày từ input HTML 'YYYY-MM-DD' sang định dạng API 'DD-MM-YYYY'.
+      function formatApiDateFromInput(d) { // 'YYYY-MM-DD' -> 'DD-MM-YYYY'
+        if (!d) return '';
+        const parts = d.split('-'); if (parts.length !== 3) return d;
+        return parts[2] + '-' + parts[1] + '-' + parts[0];
       }
-      // require user id
-      if(!(authUser && authUser.id)){
-        showLogin();
-        return Promise.reject(new Error('No user info available. Please login.'));
+
+      // Lấy thông tin user đã lưu (payload) từ localStorage (dạng JSON). Trả về null nếu không parse được.
+      function getStoredAuthUser() {
+        try { const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; } catch (e) { return null; }
       }
-      const id = authUser.id;
-      const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
-      const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
-      // include pagination params (page & size) - API rejects requests without them
-      const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
-      return fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
-        .then(async r=>{
-          if(!r.ok){
-            // try to read response body (json or text) to show better error
-            let bodyText = '';
-            try{ bodyText = await r.text(); }catch(e){}
-            const trace = r.headers.get('tracelogid') || r.headers.get('TraceLogId') || '';
-            const msg = `HTTP ${r.status}` + (bodyText ? (': ' + bodyText) : '') + (trace ? (' (trace:' + trace + ')') : '');
-            throw new Error(msg);
-          }
-          return r.json();
-        })
-        .then(data=>{
-          // expect API returns either a paged object (`content`), an object with `contracts`, or a raw array
-          const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
-          mcAch = 0; dlAch = 0;
-          arr.forEach(c=>{
-            const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
-            if(!ty) return;
-            const val = Number(c.financedAmount || c.totalPurchase || 0);
-            if(ty === 'MC') mcAch += val; else if(ty === 'DL') dlAch += val;
+      // JWT helpers: giải mã payload của token (không verify signature) và kiểm tra expiry.
+      // `parseJwtPayload` trả về object payload nếu parse thành công, ngược lại null.
+      function parseJwtPayload(token) {
+        try {
+          const parts = token.split('.'); if (parts.length < 2) return null;
+          const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+          const json = decodeURIComponent(atob(payload).split('').map(function (c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
+          return JSON.parse(json);
+        } catch (e) { return null; }
+      }
+
+      // Trả về true nếu token có claim `exp` và chưa hết hạn.
+      function isTokenValid(token) {
+        if (!token) return false;
+        const p = parseJwtPayload(token); if (!p) return false;
+        if (p.exp && typeof p.exp === 'number') {
+          const now = Math.floor(Date.now() / 1000);
+          return p.exp > now;
+        }
+        return true; // nếu không có exp, giả sử còn hợp lệ
+      }
+
+      // Tải danh sách hợp đồng từ API theo user hiện tại và khoảng ngày.
+      // - Kiểm tra token trong localStorage (nếu hết hạn => yêu cầu đăng nhập).
+      // - Gọi API, xử lý nhiều dạng response (paged.content, contracts, or raw array).
+      // - Tính `mcAch` và `dlAch` (tổng giá trị hợp đồng theo loại) và trả về object {mcAch, dlAch}.
+      function fetchAchievedFromData(fromInput, toInput) {
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+        // ensure token is present and not expired
+        if (!token || !isTokenValid(token)) {
+          clearAuthToken(); try { localStorage.removeItem('authUser'); } catch (e) { }
+          showLogin();
+          return Promise.reject(new Error('Token expired or missing. Please login.'));
+        }
+        // require user id
+        if (!(authUser && authUser.id)) {
+          showLogin();
+          return Promise.reject(new Error('No user info available. Please login.'));
+        }
+        const id = authUser.id;
+        const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
+        const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
+        // include pagination params (page & size) - API rejects requests without them
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+        return fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
+          .then(async r => {
+            if (!r.ok) {
+              // try to read response body (json or text) to show better error
+              let bodyText = '';
+              try { bodyText = await r.text(); } catch (e) { }
+              const trace = r.headers.get('tracelogid') || r.headers.get('TraceLogId') || '';
+              const msg = `HTTP ${r.status}` + (bodyText ? (': ' + bodyText) : '') + (trace ? (' (trace:' + trace + ')') : '');
+              throw new Error(msg);
+            }
+            return r.json();
+          })
+          .then(data => {
+            // expect API returns either a paged object (`content`), an object with `contracts`, or a raw array
+            const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
+            mcAch = 0; dlAch = 0;
+            arr.forEach(c => {
+              const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+              if (!ty) return;
+              const val = Number(c.financedAmount || c.totalPurchase || 0);
+              if (ty === 'MC') mcAch += val; else if (ty === 'DL') dlAch += val;
+            });
+            return { mcAch, dlAch };
           });
-          return { mcAch, dlAch };
-        });
-    }
+      }
 
-    // date helpers: default to current month
-    // `pad` thêm số 0 phía trước nếu cần (ví dụ 7 -> '07')
-    function pad(n){ return n<10 ? '0'+n : String(n); }
-    // `defaultFromDate` trả về ngày đầu tháng hiện tại (YYYY-MM-DD)
-    function defaultFromDate(){ const d = new Date(); d.setDate(1); return d.toISOString().slice(0,10); }
-    // `defaultToDate` trả về ngày hiện tại (YYYY-MM-DD)
-    function defaultToDate(){ const d = new Date(); return d.toISOString().slice(0,10); }
+      // date helpers: default to current month
+      // `pad` thêm số 0 phía trước nếu cần (ví dụ 7 -> '07')
+      function pad(n) { return n < 10 ? '0' + n : String(n); }
+      // `defaultFromDate` trả về ngày đầu tháng hiện tại (YYYY-MM-DD)
+      function defaultFromDate() { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); }
+      // `defaultToDate` trả về ngày hiện tại (YYYY-MM-DD)
+      function defaultToDate() { const d = new Date(); return d.toISOString().slice(0, 10); }
 
-    // Date range helpers: limit range to at most maxMonths (3)
-    // Tính hiệu số tháng giữa hai ngày (kết quả có thể âm nếu to < from).
-    function monthDiffInMonths(fromStr, toStr){
-      try{
-        if(!fromStr || !toStr) return 0;
-        const f = new Date(fromStr);
-        const t = new Date(toStr);
-        if(isNaN(f) || isNaN(t)) return 0;
-        let months = (t.getFullYear() - f.getFullYear()) * 12 + (t.getMonth() - f.getMonth());
-        if(t.getDate() < f.getDate()) months -= 1;
-        return months;
-      }catch(e){ return 0; }
-    }
+      // Date range helpers: limit range to at most maxMonths (3)
+      // Tính hiệu số tháng giữa hai ngày (kết quả có thể âm nếu to < from).
+      function monthDiffInMonths(fromStr, toStr) {
+        try {
+          if (!fromStr || !toStr) return 0;
+          const f = new Date(fromStr);
+          const t = new Date(toStr);
+          if (isNaN(f) || isNaN(t)) return 0;
+          let months = (t.getFullYear() - f.getFullYear()) * 12 + (t.getMonth() - f.getMonth());
+          if (t.getDate() < f.getDate()) months -= 1;
+          return months;
+        } catch (e) { return 0; }
+      }
 
-    // Hiển thị popup modal cảnh báo/thông báo.
-    // - `msg`: nội dung, `type`: bootstrap alert type (danger, success, info...),
-    // - `timeout`: thời gian tự đóng (ms), `title`: tiêu đề modal.
-    function showAlert(msg, type='danger', timeout=5000, title='Thông báo'){
-      try{
-        // create modal markup
-        const id = 'globalAlertModal';
-        // remove existing if present
-        const existing = document.getElementById(id);
-        if(existing) existing.remove();
-        const wrapper = document.createElement('div');
-        wrapper.id = id;
-        wrapper.className = 'modal fade';
-        wrapper.tabIndex = -1;
-        wrapper.innerHTML = `
+      // Hiển thị popup modal cảnh báo/thông báo.
+      // - `msg`: nội dung, `type`: bootstrap alert type (danger, success, info...),
+      // - `timeout`: thời gian tự đóng (ms), `title`: tiêu đề modal.
+      function showAlert(msg, type = 'danger', timeout = 5000, title = 'Thông báo') {
+        try {
+          // create modal markup
+          const id = 'globalAlertModal';
+          // remove existing if present
+          const existing = document.getElementById(id);
+          if (existing) existing.remove();
+          const wrapper = document.createElement('div');
+          wrapper.id = id;
+          wrapper.className = 'modal fade';
+          wrapper.tabIndex = -1;
+          wrapper.innerHTML = `
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
               <div class="modal-header">
@@ -648,888 +1046,946 @@
               </div>
             </div>
           </div>`;
-        document.body.appendChild(wrapper);
-        const modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
-        modal.show();
-        if(timeout && timeout > 0){ setTimeout(()=>{ try{ modal.hide(); }catch(e){} }, timeout); }
-        wrapper.addEventListener('hidden.bs.modal', ()=>{ try{ wrapper.remove(); }catch(e){} });
-      }catch(e){ console.warn('showAlert failed', e); }
-    }
+          document.body.appendChild(wrapper);
+          const modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+          modal.show();
+          if (timeout && timeout > 0) { setTimeout(() => { try { modal.hide(); } catch (e) { } }, timeout); }
+          wrapper.addEventListener('hidden.bs.modal', () => { try { wrapper.remove(); } catch (e) { } });
+        } catch (e) { console.warn('showAlert failed', e); }
+      }
 
-    // Kiểm tra và ép giới hạn khoảng thời gian tối đa (theo tháng). Nếu vượt, hiển thị lỗi và trả về false.
-    function enforceMaxDateRange(maxMonths = 1){
-      try{
-        const f = inputFromDate.value; const t = inputToDate.value;
-        if(!f || !t){ errEl.textContent = ''; return true; }
-        const months = monthDiffInMonths(f,t);
-        if(months === maxMonths){
-          // do NOT auto-adjust — reject range and show error + alert
-          const msg = `Phạm vi tối đa là ${maxMonths} tháng — Vui lòng chọn lại.`;
-          showAlert(msg, 'danger', 6000);
-          return false;
-        }
-        errEl.textContent = '';
-        return true;
-      }catch(e){ return true; }
-    }
+      // Kiểm tra và ép giới hạn khoảng thời gian tối đa (theo tháng). Nếu vượt, hiển thị lỗi và trả về false.
+      function enforceMaxDateRange(maxMonths = 1) {
+        try {
+          const f = inputFromDate.value; const t = inputToDate.value;
+          if (!f || !t) { errEl.textContent = ''; return true; }
+          const months = monthDiffInMonths(f, t);
+          if (months === maxMonths) {
+            // do NOT auto-adjust — reject range and show error + alert
+            const msg = `Phạm vi tối đa là ${maxMonths} tháng — Vui lòng chọn lại.`;
+            showAlert(msg, 'danger', 6000);
+            return false;
+          }
+          errEl.textContent = '';
+          return true;
+        } catch (e) { return true; }
+      }
 
-    // Login modal handling
-    const loginModalEl = document.getElementById('loginModal');
-    const loginModal = new bootstrap.Modal(loginModalEl, { backdrop: 'static', keyboard: false });
-    const loginBtnEl = document.getElementById('loginBtn');
-    const loginErrorEl = document.getElementById('loginError');
-    const loginUserEl = document.getElementById('loginUsername');
-    const loginPassEl = document.getElementById('loginPassword');
-    const togglePassBtn = document.getElementById('togglePassBtn');
-    const inputFromDate = document.getElementById('inputFromDate');
-    const inputToDate = document.getElementById('inputToDate');
+      // Login modal handling
+      const loginModalEl = document.getElementById('loginModal');
+      const loginModal = new bootstrap.Modal(loginModalEl, { backdrop: 'static', keyboard: false });
+      const loginBtnEl = document.getElementById('loginBtn');
+      const loginErrorEl = document.getElementById('loginError');
+      const loginUserEl = document.getElementById('loginUsername');
+      const loginPassEl = document.getElementById('loginPassword');
+      const togglePassBtn = document.getElementById('togglePassBtn');
+      const inputFromDate = document.getElementById('inputFromDate');
+      const inputToDate = document.getElementById('inputToDate');
       // Tự động debounce và tải lại dữ liệu khi người dùng thay đổi ngày hoặc các filter.
       let _loadTimer = null;
-      function scheduleReload(){
+      function scheduleReload() {
         clearTimeout(_loadTimer);
-        _loadTimer = setTimeout(()=>{
+        _loadTimer = setTimeout(() => {
           const f = inputFromDate.value || defaultFromDate();
           const t = inputToDate.value || defaultToDate();
-          fetchAchievedFromData(f,t).then(()=>{
+          fetchAchievedFromData(f, t).then(() => {
             const stored = getStoredTargets();
             renderChart(stored.mcTarget, stored.dlTarget);
             renderSummary(stored.mcTarget, stored.dlTarget);
             // reload customers list for the new date range
-            if(typeof loadCustomersTable === 'function') loadCustomersTable();
-          }).catch(err=>{
+            if (typeof loadCustomersTable === 'function') loadCustomersTable();
+          }).catch(err => {
             console.warn('Tải dữ liệu lỗi', err);
-            const msg = document.createElement('div'); msg.style.color='red'; msg.style.marginTop='8px';
+            const msg = document.createElement('div'); msg.style.color = 'red'; msg.style.marginTop = '8px';
             msg.textContent = 'Tải dữ liệu lỗi: ' + (err && err.message ? err.message : 'Kiểm tra kết nối và đăng nhập');
             document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
           });
         }, 350);
       }
-      if(inputFromDate) inputFromDate.addEventListener('change', ()=>{ if(enforceMaxDateRange(1)) scheduleReload(); });
-      if(inputToDate) inputToDate.addEventListener('change', ()=>{ if(enforceMaxDateRange(1)) scheduleReload(); });
+      if (inputFromDate) inputFromDate.addEventListener('change', () => { if (enforceMaxDateRange(1)) scheduleReload(); });
+      if (inputToDate) inputToDate.addEventListener('change', () => { if (enforceMaxDateRange(1)) scheduleReload(); });
 
-    // Toggle password visibility
-    if(togglePassBtn){
-      togglePassBtn.addEventListener('click', ()=>{
-        if(loginPassEl.type === 'password'){
-          loginPassEl.type = 'text';
-          togglePassBtn.textContent = '🙈';
-          togglePassBtn.setAttribute('aria-label','Ẩn mật khẩu');
-        } else {
-          loginPassEl.type = 'password';
-          togglePassBtn.textContent = '👁️';
-          togglePassBtn.setAttribute('aria-label','Hiển thị mật khẩu');
-        }
-      });
-    }
-
-    // Hiện modal đăng nhập và làm sạch lỗi/field trước khi hiển thị.
-    function showLogin(){ loginErrorEl.style.display = 'none'; loginErrorEl.textContent = '';
-      loginUserEl.value = ''; loginPassEl.value = ''; loginModal.show();
-    }
-
-    // Khởi động app: tải dữ liệu đã đạt từ API và render chart + summary.
-    function startApp(){
-      // read dates from inputs (if set) or use defaults
-      const from = inputFromDate.value || null;
-      const to = inputToDate.value || null;
-      fetchAchievedFromData(from, to).then(()=>{
-        const stored = getStoredTargets();
-        inputMC.value = stored.mcTarget.toLocaleString('vi-VN');
-        inputDL.value = stored.dlTarget.toLocaleString('vi-VN');
-        renderChart(stored.mcTarget, stored.dlTarget);
-        renderSummary(stored.mcTarget, stored.dlTarget);
-        // load customers after initial data load
-        if(typeof loadCustomersTable === 'function') loadCustomersTable();
-      }).catch(err=>{
-        console.warn('Không thể tải dữ liệu từ API:', err);
-        const msg = document.createElement('div');
-        msg.style.color = 'red'; msg.style.marginTop = '8px';
-        msg.textContent = 'Cảnh báo: không thể tải dữ liệu từ API. ' + (err && err.message ? err.message : 'Vui lòng đăng nhập hoặc kiểm tra kết nối.');
-        document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
-      });
-    }
-
-    // Xử lý sự kiện đăng nhập: gửi POST tới API auth, lưu `accessToken` và payload user vào localStorage,
-    // sau đó đóng modal và khởi động lại ứng dụng (startApp).
-    loginBtnEl.addEventListener('click', async ()=>{
-      const u = (loginUserEl.value || '').trim();
-      const p = (loginPassEl.value || '');
-      if(!u || !p){ loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Nhập tài khoản và mật khẩu'; return; }
-      loginBtnEl.disabled = true;
-      loginErrorEl.style.display = 'none';
-      try{
-        const res = await fetch('https://hpo.hdsaison.com.vn/hpo/api/v1/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: u, password: p })
+      // Toggle password visibility
+      if (togglePassBtn) {
+        togglePassBtn.addEventListener('click', () => {
+          if (loginPassEl.type === 'password') {
+            loginPassEl.type = 'text';
+            togglePassBtn.textContent = '🙈';
+            togglePassBtn.setAttribute('aria-label', 'Ẩn mật khẩu');
+          } else {
+            loginPassEl.type = 'password';
+            togglePassBtn.textContent = '👁️';
+            togglePassBtn.setAttribute('aria-label', 'Hiển thị mật khẩu');
+          }
         });
-        const body = await res.json().catch(()=>null);
-        if(!res.ok){
-          const msg = body && (body.message || body.error) ? (body.message || body.error) : ('HTTP ' + res.status);
-          loginErrorEl.style.display = 'block'; loginErrorEl.textContent = msg;
-          loginBtnEl.disabled = false; return;
-        }
-        // Extract accessToken from common response shapes
-        const accessToken = body && (body.accessToken || body.token || (body.data && (body.data.accessToken || body.data.token)));
-        if(!accessToken){
-          loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Không nhận được accessToken từ server';
-          loginBtnEl.disabled = false; return;
-        }
-        setAuthToken(accessToken);
-        // Normalize and store user payload. API responses vary; try common locations and ensure `id` exists.
-        let userPayload = null;
-        if(body){
-          if(body.user) userPayload = body.user;
-          else if(body.data && body.data.user) userPayload = body.data.user;
-          else if(body.data && (body.data.id || body.data.userId)) userPayload = body.data;
-          else if(body.id || body.userId) userPayload = body;
-        }
-        // Fallback: if we couldn't find a user object, store an empty object (prevents missing id errors)
-        if(!userPayload) userPayload = {};
-        // Ensure `id` exists on the stored payload by searching common locations
-        try{
-          const maybeId = userPayload.id || userPayload.userId || (body && body.data && (body.data.id || body.data.userId)) || (body && (body.id || body.userId));
-          if(maybeId) userPayload.id = maybeId;
-        }catch(e){}
-        try{ localStorage.setItem('authUser', JSON.stringify(userPayload)); }catch(e){}
-        loginModal.hide();
-        loginBtnEl.disabled = false;
-        startApp();
-      }catch(err){
-        loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Lỗi kết nối: ' + (err.message || err);
-        loginBtnEl.disabled = false;
       }
-    });
 
-    // submit on Enter
-    loginPassEl.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') loginBtnEl.click(); });
+      // Hiện modal đăng nhập và làm sạch lỗi/field trước khi hiển thị.
+      function showLogin() {
+        loginErrorEl.style.display = 'none'; loginErrorEl.textContent = '';
+        loginUserEl.value = ''; loginPassEl.value = ''; loginModal.show();
+      }
 
-    // Kickoff: set default date inputs and then auth check
-    if(inputFromDate) inputFromDate.value = defaultFromDate();
-    if(inputToDate) inputToDate.value = defaultToDate();
-    
+      // Khởi động app: tải dữ liệu đã đạt từ API và render chart + summary.
+      function startApp() {
+        // read dates from inputs (if set) or use defaults
+        const from = inputFromDate.value || null;
+        const to = inputToDate.value || null;
+        fetchAchievedFromData(from, to).then(() => {
+          const stored = getStoredTargets();
+          inputMC.value = stored.mcTarget.toLocaleString('vi-VN');
+          inputDL.value = stored.dlTarget.toLocaleString('vi-VN');
+          renderChart(stored.mcTarget, stored.dlTarget);
+          renderSummary(stored.mcTarget, stored.dlTarget);
+          // load customers after initial data load
+          if (typeof loadCustomersTable === 'function') loadCustomersTable();
+        }).catch(err => {
+          console.warn('Không thể tải dữ liệu từ API:', err);
+          const msg = document.createElement('div');
+          msg.style.color = 'red'; msg.style.marginTop = '8px';
+          msg.textContent = 'Cảnh báo: không thể tải dữ liệu từ API. ' + (err && err.message ? err.message : 'Vui lòng đăng nhập hoặc kiểm tra kết nối.');
+          document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
+        });
+      }
 
-    // On startup check token validity and require login if missing/expired
-    // Ensure default status mappings exist (so user sees initial rows in manager)
-    function ensureDefaultStatusMappings(){
-      try{
-        const cur = localStorage.getItem('statusMappings');
-        if(cur && cur.trim()) return;
-        const defaults = [
-          { code: 'REJECT', label: 'Từ chối', color: '#e64b4b' },
-          { code: 'LIVE', label: 'Hoạt động', color: '#10b981' },
-          { code: 'FINISH_ADDITIONAL_INFO', label: 'Hoàn tất thêm thông tin', color: '#111111' },
-          { code: 'ADDITIONAL_INFO', label: 'Thêm thông tin', color: '#9ca3af' },
-          { code: 'REJECT_STATUS', label: 'Từ chối b1', color: '#f59e0b' }
-        ];
-        localStorage.setItem('statusMappings', JSON.stringify(defaults));
-      }catch(e){ console.warn('ensureDefaultStatusMappings failed', e); }
-    }
-    ensureDefaultStatusMappings();
-    const initialToken = getAuthToken();
-    if(initialToken && isTokenValid(initialToken)) startApp(); else { clearAuthToken(); try{ localStorage.removeItem('authUser'); }catch(e){}; showLogin(); }
+      // Xử lý sự kiện đăng nhập: gửi POST tới API auth, lưu `accessToken` và payload user vào localStorage,
+      // sau đó đóng modal và khởi động lại ứng dụng (startApp).
+      loginBtnEl.addEventListener('click', async () => {
+        const u = (loginUserEl.value || '').trim();
+        const p = (loginPassEl.value || '');
+        if (!u || !p) { loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Nhập tài khoản và mật khẩu'; return; }
+        loginBtnEl.disabled = true;
+        loginErrorEl.style.display = 'none';
+        try {
+          const res = await fetch('https://hpo.hdsaison.com.vn/hpo/api/v1/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+          });
+          const body = await res.json().catch(() => null);
+          if (!res.ok) {
+            const msg = body && (body.message || body.error) ? (body.message || body.error) : ('HTTP ' + res.status);
+            loginErrorEl.style.display = 'block'; loginErrorEl.textContent = msg;
+            loginBtnEl.disabled = false; return;
+          }
+          // Extract accessToken from common response shapes
+          const accessToken = body && (body.accessToken || body.token || (body.data && (body.data.accessToken || body.data.token)));
+          if (!accessToken) {
+            loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Không nhận được accessToken từ server';
+            loginBtnEl.disabled = false; return;
+          }
+          setAuthToken(accessToken);
+          // Normalize and store user payload. API responses vary; try common locations and ensure `id` exists.
+          let userPayload = null;
+          if (body) {
+            if (body.user) userPayload = body.user;
+            else if (body.data && body.data.user) userPayload = body.data.user;
+            else if (body.data && (body.data.id || body.data.userId)) userPayload = body.data;
+            else if (body.id || body.userId) userPayload = body;
+          }
+          // Fallback: if we couldn't find a user object, store an empty object (prevents missing id errors)
+          if (!userPayload) userPayload = {};
+          // Ensure `id` exists on the stored payload by searching common locations
+          try {
+            const maybeId = userPayload.id || userPayload.userId || (body && body.data && (body.data.id || body.data.userId)) || (body && (body.id || body.userId));
+            if (maybeId) userPayload.id = maybeId;
+          } catch (e) { }
+          try { localStorage.setItem('authUser', JSON.stringify(userPayload)); } catch (e) { }
+          loginModal.hide();
+          loginBtnEl.disabled = false;
+          startApp();
+        } catch (err) {
+          loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Lỗi kết nối: ' + (err.message || err);
+          loginBtnEl.disabled = false;
+        }
+      });
 
-    // Save handler
-    saveBtn.addEventListener('click', ()=>{
-      const mc = parseNumberInput(inputMC.value) || DEFAULT_MC;
-      const dl = parseNumberInput(inputDL.value) || DEFAULT_DL;
-      localStorage.setItem('targetMC', String(mc));
-      localStorage.setItem('targetDL', String(dl));
-      renderChart(mc, dl);
-      renderSummary(mc, dl);
-      saveStatus.textContent = 'Đã lưu';
-      setTimeout(()=> saveStatus.textContent = '', 2500);
-    });
+      // submit on Enter
+      loginPassEl.addEventListener('keyup', (e) => { if (e.key === 'Enter') loginBtnEl.click(); });
 
-    // Logout (clear auth token and session)
-    function logout(){ sessionStorage.clear(); localStorage.removeItem('authToken'); location.reload(); }
-  </script>
-  <!-- Product modal -->
-  <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Chi tiết sản phẩm</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="productList"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Tenor suggestion modal -->
-  <div class="modal fade" id="tenorSuggestionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Gợi ý tăng kỳ hạn</h5></div>
-        <div class="modal-body" id="tenorSuggestionBody"></div>
-        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button></div>
-      </div>
-    </div>
-  </div>
+      // Kickoff: set default date inputs and then auth check
+      if (inputFromDate) inputFromDate.value = defaultFromDate();
+      if (inputToDate) inputToDate.value = defaultToDate();
 
-  <!-- Status mapping manager modal -->
-  <div class="modal fade" id="statusManagerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Quản lý mapping trạng thái</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p class="small text-muted">Định nghĩa các mã trạng thái (ví dụ: <code>FINISH_ADDITIONAL_INFO</code>) kèm nhãn hiển thị và màu để biểu đồ dùng.</p>
-          <table class="table table-sm" id="statusMappingsTable">
-            <thead><tr><th>Mã</th><th>Nhãn</th><th>Màu</th><th></th></tr></thead>
-            <tbody></tbody>
-          </table>
-          <div class="d-flex gap-2">
-            <input id="newStatusCode" class="form-control form-control-sm" placeholder="Mã trạng thái (ví dụ FINISH_ADDITIONAL_INFO)" />
-            <input id="newStatusLabel" class="form-control form-control-sm" placeholder="Nhãn hiển thị" />
-            <input id="newStatusColor" type="color" class="form-control form-control-sm" value="#2b8be6" style="width:56px;padding:2px;" />
-            <button id="addStatusBtn" class="btn btn-sm btn-primary">Thêm</button>
+
+      // On startup check token validity and require login if missing/expired
+      // Ensure default status mappings exist (so user sees initial rows in manager)
+      function ensureDefaultStatusMappings() {
+        try {
+          const cur = localStorage.getItem('statusMappings');
+          if (cur && cur.trim()) return;
+          const defaults = [
+            { code: 'REJECT', label: 'Từ chối', color: '#e64b4b' },
+            { code: 'LIVE', label: 'Hoạt động', color: '#10b981' },
+            { code: 'FINISH_ADDITIONAL_INFO', label: 'Hoàn tất thêm thông tin', color: '#111111' },
+            { code: 'ADDITIONAL_INFO', label: 'Thêm thông tin', color: '#9ca3af' },
+            { code: 'REJECT_STATUS', label: 'Từ chối b1', color: '#f59e0b' }
+          ];
+          localStorage.setItem('statusMappings', JSON.stringify(defaults));
+        } catch (e) { console.warn('ensureDefaultStatusMappings failed', e); }
+      }
+      ensureDefaultStatusMappings();
+      const initialToken = getAuthToken();
+      if (initialToken && isTokenValid(initialToken)) startApp(); else { clearAuthToken(); try { localStorage.removeItem('authUser'); } catch (e) { }; showLogin(); }
+
+      // Save handler
+      saveBtn.addEventListener('click', () => {
+        const mc = parseNumberInput(inputMC.value) || DEFAULT_MC;
+        const dl = parseNumberInput(inputDL.value) || DEFAULT_DL;
+        localStorage.setItem('targetMC', String(mc));
+        localStorage.setItem('targetDL', String(dl));
+        renderChart(mc, dl);
+        renderSummary(mc, dl);
+        saveStatus.textContent = 'Đã lưu';
+        setTimeout(() => saveStatus.textContent = '', 2500);
+      });
+
+      // Logout (clear auth token and session)
+      function logout() { sessionStorage.clear(); localStorage.removeItem('authToken'); location.reload(); }
+    </script>
+    <!-- Product modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Chi tiết sản phẩm</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="productList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button id="saveStatusMappingsBtn" class="btn btn-primary">Lưu</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+
+    <!-- Tenor suggestion modal -->
+    <div class="modal fade" id="tenorSuggestionModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Gợi ý tăng kỳ hạn</h5>
+          </div>
+          <div class="modal-body" id="tenorSuggestionBody"></div>
+          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    // Try loading contracts from API (when logged in) else fall back to data.json
-    async function fetchContractsFromApi(fromInput, toInput){
-      const token = getAuthToken();
-      const authUser = getStoredAuthUser();
-      if(!token || !isTokenValid(token) || !(authUser && authUser.id)){
-        return null; // signal to caller to fallback
-      }
-      const id = authUser.id;
-      const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
-      const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
-      const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
-      try{
-        const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } });
-        if(!r.ok) throw new Error('HTTP '+r.status);
-        const data = await r.json();
-        // contract list might be in content or contracts or array
-        const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
-        return arr;
-      }catch(err){ console.warn('API load contracts failed:', err); return null; }
-    }
+    <!-- Status mapping manager modal -->
+    <div class="modal fade" id="statusManagerModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Quản lý mapping trạng thái</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted">Định nghĩa các mã trạng thái (ví dụ: <code>FINISH_ADDITIONAL_INFO</code>) kèm
+              nhãn hiển thị và màu để biểu đồ dùng.</p>
+            <table class="table table-sm" id="statusMappingsTable">
+              <thead>
+                <tr>
+                  <th>Mã</th>
+                  <th>Nhãn</th>
+                  <th>Màu</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="d-flex gap-2">
+              <input id="newStatusCode" class="form-control form-control-sm"
+                placeholder="Mã trạng thái (ví dụ FINISH_ADDITIONAL_INFO)" />
+              <input id="newStatusLabel" class="form-control form-control-sm" placeholder="Nhãn hiển thị" />
+              <input id="newStatusColor" type="color" class="form-control form-control-sm" value="#2b8be6"
+                style="width:56px;padding:2px;" />
+              <button id="addStatusBtn" class="btn btn-sm btn-primary">Thêm</button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="saveStatusMappingsBtn" class="btn btn-primary">Lưu</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    async function loadCustomersTable(){
-      try{
-        // try API first (using date filters currently set)
-        const from = inputFromDate.value || defaultFromDate();
-        const to = inputToDate.value || defaultToDate();
-        let arr = await fetchContractsFromApi(from, to);
-        if(!arr){
-          // API failed or user not authenticated — do not fallback to local files
-          console.warn('API load contracts failed or not authenticated');
-          const tbody = document.getElementById('customersTbody');
-          if(tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Không thể tải dữ liệu từ API. Vui lòng đăng nhập hoặc kiểm tra kết nối.</td></tr>';
-          // ensure analytics see empty dataset
-          window._allContracts = [];
-          if(typeof renderAnalytics === 'function') renderAnalytics([]);
-          return; // stop further processing
+    <div class="modal fade" id="cancelRequestModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Tạo yêu cầu huỷ hồ sơ
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="mb-3">
+              <label class="form-label">
+                Lý do huỷ hồ sơ
+              </label>
+
+              <textarea id="cancelReason" class="form-control" rows="4" placeholder="Ví dụ: SI nhập lộn POS">
+                    </textarea>
+            </div>
+
+            <div id="cancelPreview" class="border rounded p-3 bg-light small"
+              style="white-space: pre-line; display:none;">
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Đóng
+            </button>
+
+            <button type="button" class="btn btn-primary" id="btnCopyCancelRequest">
+              Copy nội dung
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Try loading contracts from API (when logged in) else fall back to data.json
+      async function fetchContractsFromApi(fromInput, toInput) {
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+        if (!token || !isTokenValid(token) || !(authUser && authUser.id)) {
+          return null; // signal to caller to fallback
         }
-        // store master list and populate status filter
-        window._allContracts = arr.slice();
-        if(typeof populateStatusFilter === 'function') populateStatusFilter(arr);
-        // render customers (summary, rows) inside the customers card
-        if(typeof renderCustomers === 'function') renderCustomers(arr);
-        // render analytics based on the same array
-        if(typeof renderAnalytics === 'function') renderAnalytics(arr);
-      }catch(err){ console.warn('Không thể load customers:', err); }
-    }
-
-    // --- Analytics rendering (status pie, revenue time-series, tenor distribution, top contracts) ---
-    let statusChartAll = null, statusChartMC = null, statusChartDL = null, revenueChart = null, tenorChart = null, topChart = null;
-
-    function monthKey(d){ const dt = new Date(d); return dt.getFullYear() + '-' + pad(dt.getMonth()+1); }
-
-    function fmtShort(v){ return v.toLocaleString('vi-VN') + ' ₫'; }
-
-    // Compact formatter for tight spaces (mobile) e.g. '1,2 triệu'
-    function fmtCompact(v){
-      try{
-        const n = Number(v) || 0;
-        const nf = new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 });
-        // append currency symbol for clarity
-        return nf.format(n) + ' ₫';
-      }catch(e){ return fmtShort(v); }
-    }
-
-    function buildStatusCounts(arr){ const m = {}; arr.forEach(c=>{ const s = (c.indusStatus || c.status || c.statusName || 'UNKNOWN') .toString(); m[s] = (m[s]||0) + 1; }); return m; }
-    // Map status for a contract using user-defined mappings (stored in localStorage)
-    function getStatusMappings(){
-      try{
-        const raw = localStorage.getItem('statusMappings');
-        if(!raw) return [];
-        const j = JSON.parse(raw);
-        if(!Array.isArray(j)) return [];
-        return j.map(o=>({ code: String(o.code||'').trim(), label: String(o.label||'').trim(), color: String(o.color||'').trim() }));
-      }catch(e){ return []; }
-    }
-
-    function saveStatusMappings(mappings){ try{ localStorage.setItem('statusMappings', JSON.stringify(mappings || [])); }catch(e){ console.warn('saveStatusMappings failed', e); } }
-
-    function mapStatusForContract(c){
-      const mappings = getStatusMappings();
-      // check statusCodes field first
-      const scRaw = (c.statusCodes || c.statusCode || '');
-      let codes = [];
-      if(Array.isArray(scRaw)) codes = scRaw.map(x=>String(x||'').trim()).filter(Boolean);
-      else if(typeof scRaw === 'string' && scRaw.trim()) codes = scRaw.split(/[,;|\s]+/).map(x=>x.trim()).filter(Boolean);
-      else if(scRaw) codes = [String(scRaw).trim()];
-      for(const code of codes){
-        const found = mappings.find(m=> m.code && String(m.code).toLowerCase() === String(code).toLowerCase());
-        if(found) return { label: found.label || code, color: found.color || null };
+        const id = authUser.id;
+        const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
+        const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+        try {
+          const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const data = await r.json();
+          // contract list might be in content or contracts or array
+          const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
+          return arr;
+        } catch (err) { console.warn('API load contracts failed:', err); return null; }
       }
-      // fallback: try indusStatus/status/statusName normalized
-      const raw = (c.indusStatus || c.status || c.statusName || '').toString();
-      const mapped = mappings.find(m=> m.code && String(m.code).toLowerCase() === String(raw).toLowerCase());
-      if(mapped) return { label: mapped.label || raw, color: mapped.color || null };
-      // no mapping found -> use existing display
-      const display = getStatusText(c) || raw || 'UNKNOWN';
-      return { label: display, color: null };
-    }
 
-    // Rebuild status counts using mapped labels
-    function buildStatusCounts(arr){ const m = {}; (arr||[]).forEach(c=>{ const mapped = mapStatusForContract(c); const s = (mapped && mapped.label) ? mapped.label : ( (c.indusStatus || c.status || c.statusName || 'UNKNOWN').toString()); m[s] = (m[s]||0) + 1; }); return m; }
+      async function loadCustomersTable() {
+        try {
+          // try API first (using date filters currently set)
+          const from = inputFromDate.value || defaultFromDate();
+          const to = inputToDate.value || defaultToDate();
+          let arr = await fetchContractsFromApi(from, to);
+          if (!arr) {
+            // API failed or user not authenticated — do not fallback to local files
+            console.warn('API load contracts failed or not authenticated');
+            const tbody = document.getElementById('customersTbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Không thể tải dữ liệu từ API. Vui lòng đăng nhập hoặc kiểm tra kết nối.</td></tr>';
+            // ensure analytics see empty dataset
+            window._allContracts = [];
+            if (typeof renderAnalytics === 'function') renderAnalytics([]);
+            return; // stop further processing
+          }
+          // store master list and populate status filter
+          window._allContracts = arr.slice();
+          if (typeof populateStatusFilter === 'function') populateStatusFilter(arr);
+          // render customers (summary, rows) inside the customers card
+          if (typeof renderCustomers === 'function') renderCustomers(arr);
+          // render analytics based on the same array
+          if (typeof renderAnalytics === 'function') renderAnalytics(arr);
+        } catch (err) { console.warn('Không thể load customers:', err); }
+      }
 
-    function buildMonthlyRevenue(arr){ const m = {}; arr.forEach(c=>{ const d = c.disbursementDate || c.createdDate || c.approvedDate; if(!d) return; const k = monthKey(d); m[k] = (m[k]||0) + Number(c.financedAmount || c.totalPurchase || 0); }); return m; }
+      // --- Analytics rendering (status pie, revenue time-series, tenor distribution, top contracts) ---
+      let statusChartAll = null, statusChartMC = null, statusChartDL = null, revenueChart = null, tenorChart = null, topChart = null;
 
-    function buildTenorDist(arr){ const m = {}; arr.forEach(c=>{ const t = Number(c.tenorInMonths || c.tenor || 0); if(!t) return; m[t] = (m[t]||0) + 1; }); return m; }
+      function monthKey(d) { const dt = new Date(d); return dt.getFullYear() + '-' + pad(dt.getMonth() + 1); }
 
-    function buildTopContracts(arr, n=5){ const copy = arr.slice().filter(c=>Number(c.financedAmount||0)>0); copy.sort((a,b)=>Number(b.financedAmount||0)-Number(a.financedAmount||0)); return copy.slice(0,n); }
+      function fmtShort(v) { return v.toLocaleString('vi-VN') + ' ₫'; }
 
-    function renderAnalytics(arr){
-      try{
-        // KPIs
-        const totalContracts = arr.length;
-        const liveContracts = arr.filter(c=> (c.indusStatus||'').toString().toLowerCase() === 'live').length;
-        const totalFinanced = arr.reduce((s,c)=> s + (c.result === "APPROVE_STATUS" ? Number(c.financedAmount||c.totalPurchase||0) : 0), 0);
-        const totalDisbursed = arr.reduce((s,c)=> s + (c.disbursementDate && c.indusStatus == "LIVE" ? Number(c.financedAmount||0) : 0), 0);
-        const kpiRow = document.getElementById('kpiRow');
-        kpiRow.innerHTML = `
+      // Compact formatter for tight spaces (mobile) e.g. '1,2 triệu'
+      function fmtCompact(v) {
+        try {
+          const n = Number(v) || 0;
+          const nf = new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 });
+          // append currency symbol for clarity
+          return nf.format(n) + ' ₫';
+        } catch (e) { return fmtShort(v); }
+      }
+
+      function buildStatusCounts(arr) { const m = {}; arr.forEach(c => { const s = (c.indusStatus || c.status || c.statusName || 'UNKNOWN').toString(); m[s] = (m[s] || 0) + 1; }); return m; }
+      // Map status for a contract using user-defined mappings (stored in localStorage)
+      function getStatusMappings() {
+        try {
+          const raw = localStorage.getItem('statusMappings');
+          if (!raw) return [];
+          const j = JSON.parse(raw);
+          if (!Array.isArray(j)) return [];
+          return j.map(o => ({ code: String(o.code || '').trim(), label: String(o.label || '').trim(), color: String(o.color || '').trim() }));
+        } catch (e) { return []; }
+      }
+
+      function saveStatusMappings(mappings) { try { localStorage.setItem('statusMappings', JSON.stringify(mappings || [])); } catch (e) { console.warn('saveStatusMappings failed', e); } }
+
+      function mapStatusForContract(c) {
+        const mappings = getStatusMappings();
+        // check statusCodes field first
+        const scRaw = (c.statusCodes || c.statusCode || '');
+        let codes = [];
+        if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
+        else if (typeof scRaw === 'string' && scRaw.trim()) codes = scRaw.split(/[,;|\s]+/).map(x => x.trim()).filter(Boolean);
+        else if (scRaw) codes = [String(scRaw).trim()];
+        for (const code of codes) {
+          const found = mappings.find(m => m.code && String(m.code).toLowerCase() === String(code).toLowerCase());
+          if (found) return { label: found.label || code, color: found.color || null };
+        }
+        // fallback: try indusStatus/status/statusName normalized
+        const raw = (c.indusStatus || c.status || c.statusName || '').toString();
+        const mapped = mappings.find(m => m.code && String(m.code).toLowerCase() === String(raw).toLowerCase());
+        if (mapped) return { label: mapped.label || raw, color: mapped.color || null };
+        // no mapping found -> use existing display
+        const display = getStatusText(c) || raw || 'UNKNOWN';
+        return { label: display, color: null };
+      }
+
+      // Rebuild status counts using mapped labels
+      function buildStatusCounts(arr) { const m = {}; (arr || []).forEach(c => { const mapped = mapStatusForContract(c); const s = (mapped && mapped.label) ? mapped.label : ((c.indusStatus || c.status || c.statusName || 'UNKNOWN').toString()); m[s] = (m[s] || 0) + 1; }); return m; }
+
+      function buildMonthlyRevenue(arr) { const m = {}; arr.forEach(c => { const d = c.disbursementDate || c.createdDate || c.approvedDate; if (!d) return; const k = monthKey(d); m[k] = (m[k] || 0) + Number(c.financedAmount || c.totalPurchase || 0); }); return m; }
+
+      function buildTenorDist(arr) { const m = {}; arr.forEach(c => { const t = Number(c.tenorInMonths || c.tenor || 0); if (!t) return; m[t] = (m[t] || 0) + 1; }); return m; }
+
+      function buildTopContracts(arr, n = 5) { const copy = arr.slice().filter(c => Number(c.financedAmount || 0) > 0); copy.sort((a, b) => Number(b.financedAmount || 0) - Number(a.financedAmount || 0)); return copy.slice(0, n); }
+
+      function renderAnalytics(arr) {
+        try {
+          // KPIs
+          const totalContracts = arr.length;
+          const liveContracts = arr.filter(c => (c.indusStatus || '').toString().toLowerCase() === 'live').length;
+          const totalFinanced = arr.reduce((s, c) => s + (c.result === "APPROVE_STATUS" ? Number(c.financedAmount || c.totalPurchase || 0) : 0), 0);
+          const totalDisbursed = arr.reduce((s, c) => s + (c.disbursementDate && c.indusStatus == "LIVE" ? Number(c.financedAmount || 0) : 0), 0);
+          const kpiRow = document.getElementById('kpiRow');
+          kpiRow.innerHTML = `
           <div class="kpi-card"><div class="label">Tổng HĐ</div><div class="value">${totalContracts}</div></div>
           <div class="kpi-card"><div class="label">HĐ LIVE</div><div class="value">${liveContracts}</div></div>
           <div class="kpi-card"><div class="label">Tổng giải ngân</div><div class="value">${fmtShort(totalDisbursed)}</div></div>
           <div class="kpi-card"><div class="label">Tổng vay</div><div class="value">${fmtShort(totalFinanced)}</div></div>
         `;
 
-        const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
-        // Status pies: All, MC, DL
-        const statusCountsAll = buildStatusCounts(arr);
-        const labelsAll = Object.keys(statusCountsAll);
-        const dataAll = labelsAll.map(l=>statusCountsAll[l]);
-        // build a consistent label list (use labelsAll order) and render legend
-        const uniqueLabels = labelsAll.slice();
-        const legendEl = document.getElementById('statusLegend');
-        if(legendEl){
-          legendEl.innerHTML = '';
+          const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
+          // Status pies: All, MC, DL
+          const statusCountsAll = buildStatusCounts(arr);
+          const labelsAll = Object.keys(statusCountsAll);
+          const dataAll = labelsAll.map(l => statusCountsAll[l]);
+          // build a consistent label list (use labelsAll order) and render legend
+          const uniqueLabels = labelsAll.slice();
+          const legendEl = document.getElementById('statusLegend');
+          if (legendEl) {
+            legendEl.innerHTML = '';
+            const mappings = getStatusMappings();
+            uniqueLabels.forEach((lab, idx) => {
+              const chip = document.createElement('div');
+              chip.style.display = 'inline-flex'; chip.style.alignItems = 'center'; chip.style.gap = '8px';
+              chip.className = 'small';
+              const sw = document.createElement('span');
+              sw.style.width = '12px'; sw.style.height = '12px'; sw.style.display = 'inline-block'; sw.style.borderRadius = '3px';
+              // prefer mapping color if available
+              const mapByLabel = mappings.find(m => String(m.label || '').toLowerCase() === String(lab || '').toLowerCase());
+              sw.style.background = (mapByLabel && mapByLabel.color) ? mapByLabel.color : PALETTE[idx % PALETTE.length];
+              chip.innerHTML = '';
+              chip.appendChild(sw);
+              const labelText = document.createElement('span'); labelText.textContent = ' ' + lab;
+              chip.appendChild(labelText);
+              legendEl.appendChild(chip);
+            });
+          }
+          const mcArr = (arr || []).filter(c => ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'MC');
+          const dlArr = (arr || []).filter(c => ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'DL');
+          const statusCountsMC = buildStatusCounts(mcArr);
+          const statusCountsDL = buildStatusCounts(dlArr);
+          const labelsMC = uniqueLabels; // use same order
+          const labelsDL = uniqueLabels; // use same order
+          // All
+          if (statusChartAll) statusChartAll.destroy();
+          const ctxAll = document.getElementById('statusChartAll').getContext('2d');
+          // determine colors for each label using mappings when available
           const mappings = getStatusMappings();
-          uniqueLabels.forEach((lab, idx)=>{
-            const chip = document.createElement('div');
-            chip.style.display = 'inline-flex'; chip.style.alignItems = 'center'; chip.style.gap = '8px';
-            chip.className = 'small';
-            const sw = document.createElement('span');
-            sw.style.width = '12px'; sw.style.height = '12px'; sw.style.display='inline-block'; sw.style.borderRadius='3px';
-            // prefer mapping color if available
-            const mapByLabel = mappings.find(m=> String(m.label||'').toLowerCase() === String(lab||'').toLowerCase());
-            sw.style.background = (mapByLabel && mapByLabel.color) ? mapByLabel.color : PALETTE[idx % PALETTE.length];
-            chip.innerHTML = '';
-            chip.appendChild(sw);
-            const labelText = document.createElement('span'); labelText.textContent = ' ' + lab;
-            chip.appendChild(labelText);
-            legendEl.appendChild(chip);
+          const colorsAll = labelsAll.map((lab, i) => {
+            const m = mappings.find(mm => String(mm.label || '').toLowerCase() === String(lab || '').toLowerCase());
+            return (m && m.color) ? m.color : PALETTE[i % PALETTE.length];
           });
-        }
-        const mcArr = (arr||[]).filter(c=> ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'MC');
-        const dlArr = (arr||[]).filter(c=> ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'DL');
-        const statusCountsMC = buildStatusCounts(mcArr);
-        const statusCountsDL = buildStatusCounts(dlArr);
-        const labelsMC = uniqueLabels; // use same order
-        const labelsDL = uniqueLabels; // use same order
-        // All
-        if(statusChartAll) statusChartAll.destroy();
-        const ctxAll = document.getElementById('statusChartAll').getContext('2d');
-        // determine colors for each label using mappings when available
-        const mappings = getStatusMappings();
-        const colorsAll = labelsAll.map((lab, i)=>{
-          const m = mappings.find(mm=> String(mm.label||'').toLowerCase() === String(lab||'').toLowerCase());
-          return (m && m.color) ? m.color : PALETTE[i % PALETTE.length];
-        });
-        statusChartAll = new Chart(ctxAll, {
-          type: 'pie',
-          data: { labels: labelsAll, datasets: [{ data: dataAll, backgroundColor: colorsAll }] },
-          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
-        });
-        // MC
-        if(statusChartMC) statusChartMC.destroy();
-        const ctxMC = document.getElementById('statusChartMC').getContext('2d');
-        const colorsMC = labelsMC.map((lab, i)=>{ const m = mappings.find(mm=> String(mm.label||'').toLowerCase() === String(lab||'').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
-        statusChartMC = new Chart(ctxMC, {
-          type: 'pie',
-          data: { labels: labelsMC, datasets: [{ data: labelsMC.map(l=> statusCountsMC[l] || 0), backgroundColor: colorsMC }] },
-          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
-        });
-        // DL
-        if(statusChartDL) statusChartDL.destroy();
-        const ctxDL = document.getElementById('statusChartDL').getContext('2d');
-        const colorsDL = labelsDL.map((lab, i)=>{ const m = mappings.find(mm=> String(mm.label||'').toLowerCase() === String(lab||'').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
-        statusChartDL = new Chart(ctxDL, {
-          type: 'pie',
-          data: { labels: labelsDL, datasets: [{ data: labelsDL.map(l=> statusCountsDL[l] || 0), backgroundColor: colorsDL }] },
-          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, layout:{ padding:6 } }
-        });
+          statusChartAll = new Chart(ctxAll, {
+            type: 'pie',
+            data: { labels: labelsAll, datasets: [{ data: dataAll, backgroundColor: colorsAll }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 6 } }
+          });
+          // MC
+          if (statusChartMC) statusChartMC.destroy();
+          const ctxMC = document.getElementById('statusChartMC').getContext('2d');
+          const colorsMC = labelsMC.map((lab, i) => { const m = mappings.find(mm => String(mm.label || '').toLowerCase() === String(lab || '').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
+          statusChartMC = new Chart(ctxMC, {
+            type: 'pie',
+            data: { labels: labelsMC, datasets: [{ data: labelsMC.map(l => statusCountsMC[l] || 0), backgroundColor: colorsMC }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 6 } }
+          });
+          // DL
+          if (statusChartDL) statusChartDL.destroy();
+          const ctxDL = document.getElementById('statusChartDL').getContext('2d');
+          const colorsDL = labelsDL.map((lab, i) => { const m = mappings.find(mm => String(mm.label || '').toLowerCase() === String(lab || '').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
+          statusChartDL = new Chart(ctxDL, {
+            type: 'pie',
+            data: { labels: labelsDL, datasets: [{ data: labelsDL.map(l => statusCountsDL[l] || 0), backgroundColor: colorsDL }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 6 } }
+          });
 
-        // Prepare filtered set: only contracts that are LIVE or have APPROVED_HARD_COPY_STATUS
-        const filteredForCharts = arr.filter(c=>{
-          const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
-          const isLive = ind.includes('live') || ind === 'l';
-          const scRaw = (c.statusCodes || c.statusCode || '');
-          let codes = [];
-          if(Array.isArray(scRaw)) codes = scRaw.map(x=>String(x||'').trim()).filter(Boolean);
-          else if(typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x=>x.trim()).filter(Boolean);
-          else if(scRaw) codes = [String(scRaw).trim()];
-          const hasApproved = codes.some(code=> String(code).toUpperCase() === 'APPROVED_HARD_COPY_STATUS');
-          return isLive || hasApproved;
-        });
-
-        // Revenue time series (monthly) - use filtered data
-        const rev = buildMonthlyRevenue(filteredForCharts);
-        const revKeys = Object.keys(rev).sort();
-        const revValues = revKeys.map(k=>rev[k]);
-        if(revenueChart) revenueChart.destroy();
-        const ctxR = document.getElementById('revenueChart').getContext('2d');
-        revenueChart = new Chart(ctxR, {
-          type: 'bar',
-          data: { labels: revKeys, datasets: [{ label: 'Doanh số (financed)', data: revValues, backgroundColor: PALETTE[0], borderRadius: 8, barThickness: 'flex' }] },
-          plugins: [],
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: { padding: 8 },
-            plugins: {
-              legend: { display: false },
-              tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.y) } },
-              
-            },
-            scales: { y: { ticks: { callback: v=> v.toLocaleString('vi-VN') } } }
-          }
-        });
-
-        // Tenor distribution
-        const tenor = buildTenorDist(filteredForCharts);
-        const tenorKeys = Object.keys(tenor).map(Number).sort((a,b)=>a-b).map(String);
-        const tenorVals = tenorKeys.map(k=>tenor[k]);
-        if(tenorChart) tenorChart.destroy();
-        const ctxT = document.getElementById('tenorChart').getContext('2d');
-        tenorChart = new Chart(ctxT, {
-          type: 'bar',
-          data: { labels: tenorKeys, datasets: [{ label: 'Số HĐ', data: tenorVals, backgroundColor: PALETTE[3], borderRadius: 6 }] },
-          plugins: [],
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } },
-            layout: { padding: 6 }
-          }
-        });
-
-        // Top contracts by financedAmount
-        const top = buildTopContracts(filteredForCharts,5);
-        const topLabels = top.map(c=> (c.number || c.code || ('HĐ#'+c.id)) );
-        const topVals = top.map(c=> Number(c.financedAmount||c.totalPurchase||0));
-        if(topChart) topChart.destroy();
-        const ctxP = document.getElementById('topChart').getContext('2d');
-        topChart = new Chart(ctxP, {
-          type: 'bar',
-          data: { labels: topLabels, datasets: [{ label: 'Số tiền', data: topVals, backgroundColor: PALETTE[2], borderRadius: 6 }] },
-          plugins: [],
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.x) } } },
-            indexAxis: 'y',
-            scales: { x: { ticks: { callback: v => v.toLocaleString('vi-VN') } } },
-            layout: { padding: 6 }
-          }
-        });
-        // when clicking a bar, show the corresponding customer name
-        try{
-          const topCanvasEl = document.getElementById('topChart');
-          if(topCanvasEl){
-            topCanvasEl.onclick = function(evt){
-              try{
-                const points = topChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-                if(points && points.length){
-                  const idx = points[0].index;
-                  const contract = top[idx];
-                  // open the existing product modal with this contract (it will show details)
-                  if(typeof showProductsForContract === 'function'){
-                    showProductsForContract(contract);
-                  } else {
-                    const cust = contract && contract.customer ? contract.customer : {};
-                    const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || '—';
-                    alert('Khách hàng: ' + name);
-                  }
-                }
-              }catch(e){ console.warn('Top chart click handler error', e); }
-            };
-          }
-        }catch(e){ console.warn('Attach click handler failed', e); }
-
-      }catch(e){ console.warn('Analytics render error', e); }
-    }
-
-    // -------- Filtering & CSV export support --------
-    window._allContracts = [];
-    window._displayedContracts = [];
-
-    function getStatusText(c){
-      const statusRaw = (c.indusStatus || c.status || c.statusName || '').toString();
-      const s = statusRaw.toLowerCase();
-      if(s === 'live' || s === 'l') return 'LIVE';
-      if(s.includes('active') || s.includes('hoạt') || s.includes('approved')) return 'APPROVED';
-      if(s.includes('wait') || s.includes('pending') || s.includes('chờ')) return 'PENDING';
-      if(s.includes('reject') || s.includes('cancel') || s.includes('hủy')) return 'REJECT';
-      return statusRaw || '';
-    }
-
-    // Populate the status filter dropdown from the contracts list
-    function populateStatusFilter(arr){
-      try{
-        const sel = document.getElementById('filterStatus');
-        if(!sel) return;
-        const set = new Set();
-        (arr||[]).forEach(c=>{
-          // collect both normalized display and raw codes when present
-          const disp = getStatusText(c) || '';
-          if(disp) set.add(disp);
-          const scRaw = (c.statusCodes || c.statusCode || '');
-          if(Array.isArray(scRaw)) scRaw.forEach(s=> s && set.add(String(s)));
-          else if(typeof scRaw === 'string' && scRaw.trim()) scRaw.split(/[,;|\s]+/).forEach(s=> s && set.add(String(s.trim())));
-        });
-        const opts = Array.from(set).filter(Boolean).sort((a,b)=> String(a).localeCompare(String(b)));
-        sel.innerHTML = '<option value="">Tất cả</option>' + opts.map(o=> {
-          const v = String(o).toLowerCase();
-          return `<option value="${v}">${o}</option>`;
-        }).join('');
-      }catch(e){ console.warn('populateStatusFilter error', e); }
-    }
-
-    // Compute tenor suggestions to reach a threshold average (only MC, LIVE/approved considered)
-    function computeTenorSuggestion(arr, threshold){
-      const list = (arr||[]).filter(c=>{ const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null); return ty === 'MC' && isLiveOrApproved(c); }).map(c=>({ id: c.id || c.number || c.code || '', number: c.number || c.code || (c.id?('HĐ#'+c.id):''), tenor: Number(c.tenorInMonths || c.tenor || 0) || 0 }));
-      const n = list.length;
-      let sum = list.reduce((s,x)=>s + Number(x.tenor||0), 0);
-      const missingTotal = Math.max(0, Math.round((threshold * (n+ 1)) - sum));
-      const perContractAvg = n ? Math.round((missingTotal / n) * 100) / 100 : 0;
-      // prepare assignments: distribute evenly (base + remainder to shortest contracts)
-      const assignments = [];
-      if(missingTotal > 0 && n > 0){
-        const base = Math.floor(missingTotal / n);
-        let rem = missingTotal % n;
-        // sort by current tenor asc so shortest get remainder
-        const sorted = list.slice().sort((a,b)=> a.tenor - b.tenor);
-        sorted.forEach((c, idx)=>{
-          const add = base + (rem > 0 ? 1 : 0);
-          if(rem > 0) rem--; 
-          assignments.push({ id: c.id, number: c.number, currentTenor: c.tenor, addMonths: add, newTenor: c.tenor + add });
-        });
-      } else {
-        // no changes needed
-        list.forEach(c=> assignments.push({ id: c.id, number: c.number, currentTenor: c.tenor, addMonths: 0, newTenor: c.tenor }));
-      }
-      return { missingTotal, perContractAvg, assignments };
-    }
-
-    function openTenorSuggestionModal(){
-      try{
-        const dlg = document.getElementById('tenorSuggestionModal');
-        const body = document.getElementById('tenorSuggestionBody');
-        if(!window._tenorSuggestion || !dlg || !body) return;
-        const s = window._tenorSuggestion;
-        body.innerHTML = '';
-        const info = document.createElement('div');
-        info.className = 'mb-2';
-        info.innerHTML = `<div>Thiếu tổng: <strong>${s.missingTotal}</strong> tháng tối thiểu.</div>`;
-        body.appendChild(info);
-        const table = document.createElement('table'); table.className = 'table table-sm';
-        const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>HĐ</th><th>Hiện tại (tháng)</th></tr>'; table.appendChild(thead);
-        const tb = document.createElement('tbody');
-        (s.assignments||[]).forEach(a=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${a.number}</td><td>${a.currentTenor}</td>`; tb.appendChild(tr); });
-        table.appendChild(tb); body.appendChild(table);
-        const modal = new bootstrap.Modal(dlg); modal.show();
-      }catch(e){ console.warn('openTenorSuggestionModal error', e); }
-    }
-
-    // helper: returns true if contract is LIVE (indusStatus) or has APPROVED_HARD_COPY_STATUS in statusCodes
-    function isLiveOrApproved(c){
-      const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
-      if(ind.includes('live') || ind.includes('request for disbursement') || ind === 'l') return true;
-      const scRaw = (c.statusCodes || c.statusCode || '');
-      let codes = [];
-      if(Array.isArray(scRaw)) codes = scRaw.map(x=>String(x||'').trim()).filter(Boolean);
-      else if(typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x=>x.trim()).filter(Boolean);
-      else if(scRaw) codes = [String(scRaw).trim()];
-      return codes.some(code=> String(code).toUpperCase() === 'APPROVED_HARD_COPY_STATUS');
-    }
-
-    function applyFilters(arr){
-      const statusFilter = (document.getElementById('filterStatus').value || '').toLowerCase();
-      return arr.filter(c=>{
-        const st = getStatusText(c).toLowerCase();
-        if(statusFilter){
-          if(st.includes(statusFilter)){
-            // ok
-          } else {
+          // Prepare filtered set: only contracts that are LIVE or have APPROVED_HARD_COPY_STATUS
+          const filteredForCharts = arr.filter(c => {
+            const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
+            const isLive = ind.includes('live') || ind === 'l';
             const scRaw = (c.statusCodes || c.statusCode || '');
             let codes = [];
-            if(Array.isArray(scRaw)) codes = scRaw.map(x=>String(x||'').toLowerCase()).filter(Boolean);
-            else if(typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x=>x.trim().toLowerCase()).filter(Boolean);
-            else if(scRaw) codes = [String(scRaw).toLowerCase()];
-            if(!codes.some(code=> code.includes(statusFilter))) return false;
+            if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
+            else if (typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x => x.trim()).filter(Boolean);
+            else if (scRaw) codes = [String(scRaw).trim()];
+            const hasApproved = codes.some(code => String(code).toUpperCase() === 'APPROVED_HARD_COPY_STATUS');
+            return isLive || hasApproved;
+          });
+
+          // Revenue time series (monthly) - use filtered data
+          const rev = buildMonthlyRevenue(filteredForCharts);
+          const revKeys = Object.keys(rev).sort();
+          const revValues = revKeys.map(k => rev[k]);
+          if (revenueChart) revenueChart.destroy();
+          const ctxR = document.getElementById('revenueChart').getContext('2d');
+          revenueChart = new Chart(ctxR, {
+            type: 'bar',
+            data: { labels: revKeys, datasets: [{ label: 'Doanh số (financed)', data: revValues, backgroundColor: PALETTE[0], borderRadius: 8, barThickness: 'flex' }] },
+            plugins: [],
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: { padding: 8 },
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.y) } },
+
+              },
+              scales: { y: { ticks: { callback: v => v.toLocaleString('vi-VN') } } }
+            }
+          });
+
+          // Tenor distribution
+          const tenor = buildTenorDist(filteredForCharts);
+          const tenorKeys = Object.keys(tenor).map(Number).sort((a, b) => a - b).map(String);
+          const tenorVals = tenorKeys.map(k => tenor[k]);
+          if (tenorChart) tenorChart.destroy();
+          const ctxT = document.getElementById('tenorChart').getContext('2d');
+          tenorChart = new Chart(ctxT, {
+            type: 'bar',
+            data: { labels: tenorKeys, datasets: [{ label: 'Số HĐ', data: tenorVals, backgroundColor: PALETTE[3], borderRadius: 6 }] },
+            plugins: [],
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } },
+              layout: { padding: 6 }
+            }
+          });
+
+          // Top contracts by financedAmount
+          const top = buildTopContracts(filteredForCharts, 5);
+          const topLabels = top.map(c => (c.number || c.code || ('HĐ#' + c.id)));
+          const topVals = top.map(c => Number(c.financedAmount || c.totalPurchase || 0));
+          if (topChart) topChart.destroy();
+          const ctxP = document.getElementById('topChart').getContext('2d');
+          topChart = new Chart(ctxP, {
+            type: 'bar',
+            data: { labels: topLabels, datasets: [{ label: 'Số tiền', data: topVals, backgroundColor: PALETTE[2], borderRadius: 6 }] },
+            plugins: [],
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.x) } } },
+              indexAxis: 'y',
+              scales: { x: { ticks: { callback: v => v.toLocaleString('vi-VN') } } },
+              layout: { padding: 6 }
+            }
+          });
+          // when clicking a bar, show the corresponding customer name
+          try {
+            const topCanvasEl = document.getElementById('topChart');
+            if (topCanvasEl) {
+              topCanvasEl.onclick = function (evt) {
+                try {
+                  const points = topChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                  if (points && points.length) {
+                    const idx = points[0].index;
+                    const contract = top[idx];
+                    // open the existing product modal with this contract (it will show details)
+                    if (typeof showProductsForContract === 'function') {
+                      showProductsForContract(contract);
+                    } else {
+                      const cust = contract && contract.customer ? contract.customer : {};
+                      const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || '—';
+                      alert('Khách hàng: ' + name);
+                    }
+                  }
+                } catch (e) { console.warn('Top chart click handler error', e); }
+              };
+            }
+          } catch (e) { console.warn('Attach click handler failed', e); }
+
+        } catch (e) { console.warn('Analytics render error', e); }
+      }
+
+      // -------- Filtering & CSV export support --------
+      window._allContracts = [];
+      window._displayedContracts = [];
+
+      function getStatusText(c) {
+        const statusRaw = (c.indusStatus || c.status || c.statusName || '').toString();
+        const s = statusRaw.toLowerCase();
+        if (s === 'live' || s === 'l') return 'LIVE';
+        if (s.includes('active') || s.includes('hoạt') || s.includes('approved')) return 'APPROVED';
+        if (s.includes('wait') || s.includes('pending') || s.includes('chờ')) return 'PENDING';
+        if (s.includes('reject') || s.includes('cancel') || s.includes('hủy')) return 'REJECT';
+        return statusRaw || '';
+      }
+
+      // Populate the status filter dropdown from the contracts list
+      function populateStatusFilter(arr) {
+        try {
+          const sel = document.getElementById('filterStatus');
+          if (!sel) return;
+          const set = new Set();
+          (arr || []).forEach(c => {
+            // collect both normalized display and raw codes when present
+            const disp = getStatusText(c) || '';
+            if (disp) set.add(disp);
+            const scRaw = (c.statusCodes || c.statusCode || '');
+            if (Array.isArray(scRaw)) scRaw.forEach(s => s && set.add(String(s)));
+            else if (typeof scRaw === 'string' && scRaw.trim()) scRaw.split(/[,;|\s]+/).forEach(s => s && set.add(String(s.trim())));
+          });
+          const opts = Array.from(set).filter(Boolean).sort((a, b) => String(a).localeCompare(String(b)));
+          sel.innerHTML = '<option value="">Tất cả</option>' + opts.map(o => {
+            const v = String(o).toLowerCase();
+            return `<option value="${v}">${o}</option>`;
+          }).join('');
+        } catch (e) { console.warn('populateStatusFilter error', e); }
+      }
+
+      // Compute tenor suggestions to reach a threshold average (only MC, LIVE/approved considered)
+      function computeTenorSuggestion(arr, threshold) {
+        const list = (arr || []).filter(c => { const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null); return ty === 'MC' && isLiveOrApproved(c); }).map(c => ({ id: c.id || c.number || c.code || '', number: c.number || c.code || (c.id ? ('HĐ#' + c.id) : ''), tenor: Number(c.tenorInMonths || c.tenor || 0) || 0 }));
+        const n = list.length;
+        let sum = list.reduce((s, x) => s + Number(x.tenor || 0), 0);
+        const missingTotal = Math.max(0, Math.round((threshold * (n + 1)) - sum));
+        const perContractAvg = n ? Math.round((missingTotal / n) * 100) / 100 : 0;
+        // prepare assignments: distribute evenly (base + remainder to shortest contracts)
+        const assignments = [];
+        if (missingTotal > 0 && n > 0) {
+          const base = Math.floor(missingTotal / n);
+          let rem = missingTotal % n;
+          // sort by current tenor asc so shortest get remainder
+          const sorted = list.slice().sort((a, b) => a.tenor - b.tenor);
+          sorted.forEach((c, idx) => {
+            const add = base + (rem > 0 ? 1 : 0);
+            if (rem > 0) rem--;
+            assignments.push({ id: c.id, number: c.number, currentTenor: c.tenor, addMonths: add, newTenor: c.tenor + add });
+          });
+        } else {
+          // no changes needed
+          list.forEach(c => assignments.push({ id: c.id, number: c.number, currentTenor: c.tenor, addMonths: 0, newTenor: c.tenor }));
+        }
+        return { missingTotal, perContractAvg, assignments };
+      }
+
+      function openTenorSuggestionModal() {
+        try {
+          const dlg = document.getElementById('tenorSuggestionModal');
+          const body = document.getElementById('tenorSuggestionBody');
+          if (!window._tenorSuggestion || !dlg || !body) return;
+          const s = window._tenorSuggestion;
+          body.innerHTML = '';
+          const info = document.createElement('div');
+          info.className = 'mb-2';
+          info.innerHTML = `<div>Thiếu tổng: <strong>${s.missingTotal}</strong> tháng tối thiểu.</div>`;
+          body.appendChild(info);
+          const table = document.createElement('table'); table.className = 'table table-sm';
+          const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>HĐ</th><th>Hiện tại (tháng)</th></tr>'; table.appendChild(thead);
+          const tb = document.createElement('tbody');
+          (s.assignments || []).forEach(a => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${a.number}</td><td>${a.currentTenor}</td>`; tb.appendChild(tr); });
+          table.appendChild(tb); body.appendChild(table);
+          const modal = new bootstrap.Modal(dlg); modal.show();
+        } catch (e) { console.warn('openTenorSuggestionModal error', e); }
+      }
+
+      // helper: returns true if contract is LIVE (indusStatus) or has APPROVED_HARD_COPY_STATUS in statusCodes
+      function isLiveOrApproved(c) {
+        const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
+        if (ind.includes('live') || ind.includes('request for disbursement') || ind === 'l') return true;
+        const scRaw = (c.statusCodes || c.statusCode || '');
+        let codes = [];
+        if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
+        else if (typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x => x.trim()).filter(Boolean);
+        else if (scRaw) codes = [String(scRaw).trim()];
+        return codes.some(code => String(code).toUpperCase() === 'APPROVED_HARD_COPY_STATUS');
+      }
+
+      function applyFilters(arr) {
+        const statusFilter = (document.getElementById('filterStatus').value || '').toLowerCase();
+        return arr.filter(c => {
+          const st = getStatusText(c).toLowerCase();
+          if (statusFilter) {
+            if (st.includes(statusFilter)) {
+              // ok
+            } else {
+              const scRaw = (c.statusCodes || c.statusCode || '');
+              let codes = [];
+              if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').toLowerCase()).filter(Boolean);
+              else if (typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x => x.trim().toLowerCase()).filter(Boolean);
+              else if (scRaw) codes = [String(scRaw).toLowerCase()];
+              if (!codes.some(code => code.includes(statusFilter))) return false;
+            }
           }
-        }
-        return true;
-      });
-    }
-
-    function renderCustomers(arr){
-      const tbody = document.getElementById('customersTbody'); tbody.innerHTML = '';
-      let sumTenor=0, countTenor=0;
-      arr.forEach((c, idx)=>{
-        const cust = c.customer || {};
-        const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
-        const phone = cust.phoneNumber || '';
-        const nid = cust.nationalId || '';
-        const contractNo = c.number || c.code || '';
-        const type = c.type || '';
-        const amount = c.financedAmount || c.totalPurchase || 0;
-        const tr = document.createElement('tr'); tr.style.cursor='pointer';
-        const statusDisplay = getStatusText(c);
-        const sd = statusDisplay.toLowerCase();
-        const badgeClass = sd === 'live' ? 'badge bg-success' : (sd.includes('pend') ? 'badge bg-warning text-dark' : ((sd.includes('reject') || sd.includes('reject') || sd.includes('cancel')) ? 'badge bg-danger' : 'badge bg-secondary'));
-        const amountText = Number(amount).toLocaleString('vi-VN') + ' ₫';
-        const cols = [String(idx+1), name, phone, nid, contractNo, type, amountText, `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`];
-        const colLabels = ['#','Tên khách','SĐT','CMND','Hợp đồng','Loại','Số tiền','Trạng thái'];
-        cols.forEach((val,i)=>{ const td=document.createElement('td'); td.setAttribute('data-label', colLabels[i]); if(i===6) td.style.textAlign='right'; if(i===7) td.innerHTML=val; else td.textContent=val; tr.appendChild(td); });
-        tr.addEventListener('click', ()=> showProductsForContract(c));
-        tbody.appendChild(tr);
-        // tenor stats (only count MC contracts that are LIVE or APPROVED_HARD_COPY_STATUS)
-        const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
-        if(ty === 'MC' && isLiveOrApproved(c)){
-          const t = Number(c.tenorInMonths || c.tenor || 0); if(t>0){ sumTenor += t; countTenor++; }
-        }
-      });
-      const avgTenor = countTenor ? Math.round((sumTenor/countTenor)*100)/100 : 0;
-      const summaryEl = document.getElementById('customersSummary');
-      let summaryHtml = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
-      if(countTenor && avgTenor < 15){ summaryHtml += ' <div class="text-danger mt-1">Cảnh báo: kỳ hạn trung bình nhỏ hơn 15 tháng.</div>'; }
-      try{
-        const suggestion = computeTenorSuggestion(arr, 15);
-        if(suggestion.missingTotal > 0){
-          window._tenorSuggestion = suggestion;
-          summaryHtml += ` <span class="small text-muted">Gợi ý: cần thêm <strong>${suggestion.missingTotal}</strong> tháng cho hợp đồng tiếp theo</span> <button class="btn btn-sm btn-outline-primary ms-2" onclick="openTenorSuggestionModal()">Chi tiết</button>`;
-        } else { window._tenorSuggestion = null; }
-      }catch(e){ console.warn('tenor suggestion failed', e); }
-      summaryEl.innerHTML = summaryHtml;
-      window._displayedContracts = arr.slice();
-    }
-
-    function debounce(fn, ms=250){ let t=null; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
-
-    function initFilters(){
-      const sel = document.getElementById('filterStatus');
-      const reload = debounce(()=>{ if(!window._allContracts) return; const filtered = applyFilters(window._allContracts); renderCustomers(filtered); });
-      if(sel) sel.addEventListener('change', reload);
-      const exportBtn = document.getElementById('exportCsvBtn'); if(exportBtn) exportBtn.addEventListener('click', exportCsv);
-      // wire up status manager button
-      const manageBtn = document.getElementById('manageStatusBtn');
-      if(manageBtn){
-        manageBtn.addEventListener('click', ()=>{
-          const modalEl = document.getElementById('statusManagerModal');
-          const modal = new bootstrap.Modal(modalEl);
-          renderStatusMappingsTable();
-          modal.show();
+          return true;
         });
       }
-      const addBtn = document.getElementById('addStatusBtn');
-      if(addBtn) addBtn.addEventListener('click', ()=>{
-        const code = (document.getElementById('newStatusCode').value || '').trim();
-        const label = (document.getElementById('newStatusLabel').value || '').trim();
-        const color = (document.getElementById('newStatusColor').value || '').trim() || '#2b8be6';
-        if(!code) return alert('Nhập mã trạng thái');
-        const list = getStatusMappings();
-        list.push({ code, label: label || code, color });
-        saveStatusMappings(list);
-        renderStatusMappingsTable();
-        document.getElementById('newStatusCode').value = ''; document.getElementById('newStatusLabel').value = '';
-      });
-      const saveBtnMap = document.getElementById('saveStatusMappingsBtn');
-      if(saveBtnMap) saveBtnMap.addEventListener('click', ()=>{ const mappings = collectStatusMappingsFromTable(); saveStatusMappings(mappings); if(typeof renderAnalytics === 'function') renderAnalytics(window._allContracts || []); const modalEl = document.getElementById('statusManagerModal'); const m = bootstrap.Modal.getInstance(modalEl); if(m) m.hide(); });
-    }
 
-    // Render mappings table inside modal
-    function renderStatusMappingsTable(){
-      const tbody = document.querySelector('#statusMappingsTable tbody'); if(!tbody) return;
-      const mappings = getStatusMappings(); tbody.innerHTML = '';
-      mappings.forEach((m, idx)=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input class="form-control form-control-sm status-code" value="${escapeHtml(m.code)}" /></td>
-                        <td><input class="form-control form-control-sm status-label" value="${escapeHtml(m.label)}" /></td>
-                        <td><input type="color" class="form-control form-control-sm status-color" value="${escapeHtml(m.color||'#2b8be6')}" style="width:56px;" /></td>
-                        <td><button class="btn btn-sm btn-danger remove-mapping">Xóa</button></td>`;
-        tbody.appendChild(tr);
-      });
-      // attach remove handlers
-      tbody.querySelectorAll('.remove-mapping').forEach(btn=> btn.addEventListener('click', (e)=>{ const row = e.target.closest('tr'); if(row) row.remove(); }));
-    }
-
-    function collectStatusMappingsFromTable(){
-      const rows = Array.from(document.querySelectorAll('#statusMappingsTable tbody tr'));
-      const out = rows.map(r=>{
-        const code = (r.querySelector('.status-code').value || '').trim();
-        const label = (r.querySelector('.status-label').value || '').trim() || code;
-        const color = (r.querySelector('.status-color').value || '').trim() || '#2b8be6';
-        return { code, label, color };
-      }).filter(x=> x.code );
-      return out;
-    }
-
-    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-    function exportCsv(){
-      const rows = window._displayedContracts || [];
-      if(!rows.length) return alert('Không có dữ liệu để xuất');
-      const cols = ['Mã HĐ','Tên khách','SĐT','CCCD/CMND','Loại','Số tiền','Trạng thái'];
-      const lines = [cols.join(',')];
-      rows.forEach(c=>{
-        const cust=c.customer||{}; const name=[cust.lastName,cust.middleName,cust.firstName].filter(Boolean).join(' ');
-        const vals=[ (c.number||c.code||''), name, (cust.phoneNumber||''), (cust.nationalId||''), (c.type||''), Number(c.financedAmount||c.totalPurchase||0), getStatusText(c) ];
-        lines.push(vals.map(v=> '"'+String(v).replace(/"/g,'""')+'"').join(','));
-      });
-      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'contracts.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    }
-
-    // initialize after DOM elements exist
-    document.addEventListener('DOMContentLoaded', ()=>{ initFilters(); });
-
-    // Global resize handler: re-render overview chart (debounced)
-    (function(){
-      let _globalResizeTimer = null;
-      window.addEventListener('resize', ()=>{
-        clearTimeout(_globalResizeTimer);
-        _globalResizeTimer = setTimeout(()=>{
-          try{ const stored = getStoredTargets(); renderChart(stored.mcTarget, stored.dlTarget); }catch(e){}
-        }, 250);
-      });
-    })();
-
-    function showProductsForContract(contract){
-      const modalEl = document.getElementById('productModal');
-      const modal = new bootstrap.Modal(modalEl);
-      const container = document.getElementById('productList');
-      // set modal title to include customer name and phone
-      try{
-        const cust = contract && contract.customer ? contract.customer : {};
-        const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || '—';
-        const phone = cust.phoneNumber || contract.customerPhone || '';
-        const titleEl = modalEl.querySelector('.modal-title');
-        if(titleEl) titleEl.textContent = `Chi tiết sản phẩm — ${name}` + (phone ? (' ('+phone+')') : '');
-      }catch(e){ }
-      container.innerHTML = '';
-      // try to fetch and show customer image (if available)
-      (function(){
-        const imgWrap = document.createElement('div'); imgWrap.style.marginBottom='12px';
-        const img = document.createElement('img');
-        img.style.maxWidth = '160px'; img.style.borderRadius='8px'; img.style.display='none'; img.style.cursor='pointer';
-        imgWrap.appendChild(img);
-        container.appendChild(imgWrap);
-
-        async function tryLoadImage(){
-          try{
-            const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
-            const token = getAuthToken();
-            // prefer explicit download paths returned by API fields
-            const candidates = [];
-            const pick = v=>{ if(!v) return; if(Array.isArray(v)) v.forEach(x=> pick(x)); else if(typeof v === 'string') candidates.push(v); };
-            pick(contract.billImageUrls || contract.billImageUrl);
-            pick(contract.contractImageUrls || contract.contractImageUrl);
-            pick(contract.mortgageContractImageUrls || contract.mortgageContractImageUrl);
-            pick(contract.billImagePath || contract.personalImagePath);
-            // normalize candidates to full URLs
-            let url = null;
-            for(const p of candidates){
-              const s = String(p||'').trim();
-              if(!s) continue;
-              // if it's already a full URL
-              if(s.startsWith('http')){ url = s; break; }
-              // if path starts with /downloadfile -> prefix baseApi
-              if(s.indexOf('/downloadfile/') !== -1){ url = baseApi + s.replace(/^\/+/, '/'); break; }
-              // if path starts with 'downloadfile/'
-              if(s.indexOf('downloadfile/') === 0){ url = baseApi + '/' + s; break; }
-            }
-            // if no explicit path, try constructing personal image path from contract code/number
-            if(!url){
-              const code = contract.code || contract.number || contract.id || '';
-              if(code) url = `${baseApi}/downloadfile/${code}/0/personal/0.jpeg`;
-            }
-            if(!url) return;
-            const resp = await fetch(url, { headers: token ? { 'Authorization': 'Bearer ' + token } : {} });
-            if(!resp.ok) return;
-            const blob = await resp.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            // show image
-            img.src = blobUrl; img.style.display = 'block';
-            // open large in new tab on click
-            img.addEventListener('click', ()=> window.open(blobUrl, '_blank'));
-            // remember to revoke when modal hidden
-            modalEl._customerImageUrl = blobUrl;
-          }catch(e){ console.warn('load customer image failed', e); }
-        }
-        tryLoadImage();
-      })();
-
-      // Financial/detail fields to show
-      const totalPurchase = Number(contract.totalPurchase || 0);
-      const downPaymentAmount = Number(contract.downPaymentAmount || 0);
-      const downPaymentRate = contract.downPaymentRate || 0;
-      const financedAmount = Number(contract.financedAmount || 0);
-      const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
-      const monthlyInstallment = Number(contract.monthlyInstallment || 0);
-      const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
-      const disbursementDate = contract.disbursementDate || contract.disbursedDate || '';
-
-      function fmtDate(d){ try{ if(!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('vi-VN'); }catch(e){ return d; } }
-
-      // compute end date by adding tenor months to startingInstallmentDate and subtracting one day
-      function computeEndDate(start, months){
-        try{
-          if(!start || !months) return null;
-          const dt = new Date(start);
-          const end = new Date(dt);
-          end.setMonth(end.getMonth() + Number(months));
-          // subtract one day to make the end date the day before the next-month equivalent
-          end.setDate(end.getDate());
-          return end;
-        }catch(e){ return null; }
+      function renderCustomers(arr) {
+        const tbody = document.getElementById('customersTbody'); tbody.innerHTML = '';
+        let sumTenor = 0, countTenor = 0;
+        arr.forEach((c, idx) => {
+          const cust = c.customer || {};
+          const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
+          const phone = cust.phoneNumber || '';
+          const nid = cust.nationalId || '';
+          const contractNo = c.number || c.code || '';
+          const type = c.type || '';
+          const amount = c.financedAmount || c.totalPurchase || 0;
+          const tr = document.createElement('tr'); tr.style.cursor = 'pointer';
+          const statusDisplay = getStatusText(c);
+          const sd = statusDisplay.toLowerCase();
+          const badgeClass = sd === 'live' ? 'badge bg-success' : (sd.includes('pend') ? 'badge bg-warning text-dark' : ((sd.includes('reject') || sd.includes('reject') || sd.includes('cancel')) ? 'badge bg-danger' : 'badge bg-secondary'));
+          const amountText = Number(amount).toLocaleString('vi-VN') + ' ₫';
+          const cols = [String(idx + 1), name, phone, nid, contractNo, type, amountText, `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`];
+          const colLabels = ['#', 'Tên khách', 'SĐT', 'CMND', 'Hợp đồng', 'Loại', 'Số tiền', 'Trạng thái'];
+          cols.forEach((val, i) => { const td = document.createElement('td'); td.setAttribute('data-label', colLabels[i]); if (i === 6) td.style.textAlign = 'right'; if (i === 7) td.innerHTML = val; else td.textContent = val; tr.appendChild(td); });
+          tr.addEventListener('click', () => showProductsForContract(c));
+          tbody.appendChild(tr);
+          // tenor stats (only count MC contracts that are LIVE or APPROVED_HARD_COPY_STATUS)
+          const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+          if (ty === 'MC' && isLiveOrApproved(c)) {
+            const t = Number(c.tenorInMonths || c.tenor || 0); if (t > 0) { sumTenor += t; countTenor++; }
+          }
+        });
+        const avgTenor = countTenor ? Math.round((sumTenor / countTenor) * 100) / 100 : 0;
+        const summaryEl = document.getElementById('customersSummary');
+        let summaryHtml = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
+        if (countTenor && avgTenor < 15) { summaryHtml += ' <div class="text-danger mt-1">Cảnh báo: kỳ hạn trung bình nhỏ hơn 15 tháng.</div>'; }
+        try {
+          const suggestion = computeTenorSuggestion(arr, 15);
+          if (suggestion.missingTotal > 0) {
+            window._tenorSuggestion = suggestion;
+            summaryHtml += ` <span class="small text-muted">Gợi ý: cần thêm <strong>${suggestion.missingTotal}</strong> tháng cho hợp đồng tiếp theo</span> <button class="btn btn-sm btn-outline-primary ms-2" onclick="openTenorSuggestionModal()">Chi tiết</button>`;
+          } else { window._tenorSuggestion = null; }
+        } catch (e) { console.warn('tenor suggestion failed', e); }
+        summaryEl.innerHTML = summaryHtml;
+        window._displayedContracts = arr.slice();
       }
 
-      // Build details HTML
-      const detailsHtml = `
+      function debounce(fn, ms = 250) { let t = null; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+      function initFilters() {
+        const sel = document.getElementById('filterStatus');
+        const reload = debounce(() => { if (!window._allContracts) return; const filtered = applyFilters(window._allContracts); renderCustomers(filtered); });
+        if (sel) sel.addEventListener('change', reload);
+        const exportBtn = document.getElementById('exportCsvBtn'); if (exportBtn) exportBtn.addEventListener('click', exportCsv);
+        // wire up status manager button
+        const manageBtn = document.getElementById('manageStatusBtn');
+        if (manageBtn) {
+          manageBtn.addEventListener('click', () => {
+            const modalEl = document.getElementById('statusManagerModal');
+            const modal = new bootstrap.Modal(modalEl);
+            renderStatusMappingsTable();
+            modal.show();
+          });
+        }
+        const addBtn = document.getElementById('addStatusBtn');
+        if (addBtn) addBtn.addEventListener('click', () => {
+          const code = (document.getElementById('newStatusCode').value || '').trim();
+          const label = (document.getElementById('newStatusLabel').value || '').trim();
+          const color = (document.getElementById('newStatusColor').value || '').trim() || '#2b8be6';
+          if (!code) return alert('Nhập mã trạng thái');
+          const list = getStatusMappings();
+          list.push({ code, label: label || code, color });
+          saveStatusMappings(list);
+          renderStatusMappingsTable();
+          document.getElementById('newStatusCode').value = ''; document.getElementById('newStatusLabel').value = '';
+        });
+        const saveBtnMap = document.getElementById('saveStatusMappingsBtn');
+        if (saveBtnMap) saveBtnMap.addEventListener('click', () => { const mappings = collectStatusMappingsFromTable(); saveStatusMappings(mappings); if (typeof renderAnalytics === 'function') renderAnalytics(window._allContracts || []); const modalEl = document.getElementById('statusManagerModal'); const m = bootstrap.Modal.getInstance(modalEl); if (m) m.hide(); });
+      }
+
+      // Render mappings table inside modal
+      function renderStatusMappingsTable() {
+        const tbody = document.querySelector('#statusMappingsTable tbody'); if (!tbody) return;
+        const mappings = getStatusMappings(); tbody.innerHTML = '';
+        mappings.forEach((m, idx) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><input class="form-control form-control-sm status-code" value="${escapeHtml(m.code)}" /></td>
+                        <td><input class="form-control form-control-sm status-label" value="${escapeHtml(m.label)}" /></td>
+                        <td><input type="color" class="form-control form-control-sm status-color" value="${escapeHtml(m.color || '#2b8be6')}" style="width:56px;" /></td>
+                        <td><button class="btn btn-sm btn-danger remove-mapping">Xóa</button></td>`;
+          tbody.appendChild(tr);
+        });
+        // attach remove handlers
+        tbody.querySelectorAll('.remove-mapping').forEach(btn => btn.addEventListener('click', (e) => { const row = e.target.closest('tr'); if (row) row.remove(); }));
+      }
+
+      function collectStatusMappingsFromTable() {
+        const rows = Array.from(document.querySelectorAll('#statusMappingsTable tbody tr'));
+        const out = rows.map(r => {
+          const code = (r.querySelector('.status-code').value || '').trim();
+          const label = (r.querySelector('.status-label').value || '').trim() || code;
+          const color = (r.querySelector('.status-color').value || '').trim() || '#2b8be6';
+          return { code, label, color };
+        }).filter(x => x.code);
+        return out;
+      }
+
+      function escapeHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+      function exportCsv() {
+        const rows = window._displayedContracts || [];
+        if (!rows.length) return alert('Không có dữ liệu để xuất');
+        const cols = ['Mã HĐ', 'Tên khách', 'SĐT', 'CCCD/CMND', 'Loại', 'Số tiền', 'Trạng thái'];
+        const lines = [cols.join(',')];
+        rows.forEach(c => {
+          const cust = c.customer || {}; const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
+          const vals = [(c.number || c.code || ''), name, (cust.phoneNumber || ''), (cust.nationalId || ''), (c.type || ''), Number(c.financedAmount || c.totalPurchase || 0), getStatusText(c)];
+          lines.push(vals.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(','));
+        });
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'contracts.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      }
+
+      // initialize after DOM elements exist
+      document.addEventListener('DOMContentLoaded', () => { initFilters(); });
+
+      // Global resize handler: re-render overview chart (debounced)
+      (function () {
+        let _globalResizeTimer = null;
+        window.addEventListener('resize', () => {
+          clearTimeout(_globalResizeTimer);
+          _globalResizeTimer = setTimeout(() => {
+            try { const stored = getStoredTargets(); renderChart(stored.mcTarget, stored.dlTarget); } catch (e) { }
+          }, 250);
+        });
+      })();
+
+      function showProductsForContract(contract) {
+        const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
+        const token = getAuthToken();
+        const modalEl = document.getElementById('productModal');
+        const modal = new bootstrap.Modal(modalEl);
+        const container = document.getElementById('productList');
+        // set modal title to include customer name and phone
+        try {
+          const cust = contract && contract.customer ? contract.customer : {};
+          const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || '—';
+          const phone = cust.phoneNumber || contract.customerPhone || '';
+          const titleEl = modalEl.querySelector('.modal-title');
+          if (titleEl) titleEl.textContent = `Chi tiết sản phẩm — ${name}` + (phone ? (' (' + phone + ')') : '');
+        } catch (e) { }
+        container.innerHTML = '';
+        // try to fetch and show customer image (if available)
+        (function () {
+          const imgWrap = document.createElement('div'); imgWrap.style.marginBottom = '12px';
+          const img = document.createElement('img');
+          img.style.maxWidth = '160px'; img.style.borderRadius = '8px'; img.style.display = 'none'; img.style.cursor = 'pointer';
+          imgWrap.appendChild(img);
+          container.appendChild(imgWrap);
+
+          async function tryLoadImage() {
+            try {
+              // const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
+              // const token = getAuthToken();
+              // prefer explicit download paths returned by API fields
+              const candidates = [];
+              const pick = v => { if (!v) return; if (Array.isArray(v)) v.forEach(x => pick(x)); else if (typeof v === 'string') candidates.push(v); };
+              pick(contract.billImageUrls || contract.billImageUrl);
+              pick(contract.contractImageUrls || contract.contractImageUrl);
+              pick(contract.mortgageContractImageUrls || contract.mortgageContractImageUrl);
+              pick(contract.billImagePath || contract.personalImagePath);
+              // normalize candidates to full URLs
+              let url = null;
+              for (const p of candidates) {
+                const s = String(p || '').trim();
+                if (!s) continue;
+                // if it's already a full URL
+                if (s.startsWith('http')) { url = s; break; }
+                // if path starts with /downloadfile -> prefix baseApi
+                if (s.indexOf('/downloadfile/') !== -1) { url = baseApi + s.replace(/^\/+/, '/'); break; }
+                // if path starts with 'downloadfile/'
+                if (s.indexOf('downloadfile/') === 0) { url = baseApi + '/' + s; break; }
+              }
+              // if no explicit path, try constructing personal image path from contract code/number
+              if (!url) {
+                const code = contract.code || contract.number || contract.id || '';
+                if (code) url = `${baseApi}/downloadfile/${code}/0/personal/0.jpeg`;
+              }
+              if (!url) return;
+              const resp = await fetch(url, { headers: token ? { 'Authorization': 'Bearer ' + token } : {} });
+              if (!resp.ok) return;
+              const blob = await resp.blob();
+              const blobUrl = URL.createObjectURL(blob);
+              // show image
+              img.src = blobUrl; img.style.display = 'block';
+              // open large in new tab on click
+              img.addEventListener('click', () => window.open(blobUrl, '_blank'));
+              // remember to revoke when modal hidden
+              modalEl._customerImageUrl = blobUrl;
+            } catch (e) { console.warn('load customer image failed', e); }
+          }
+          tryLoadImage();
+        })();
+
+        // Financial/detail fields to show
+        const totalPurchase = Number(contract.totalPurchase || 0);
+        const downPaymentAmount = Number(contract.downPaymentAmount || 0);
+        const downPaymentRate = contract.downPaymentRate || 0;
+        const financedAmount = Number(contract.financedAmount || 0);
+        const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
+        const monthlyInstallment = Number(contract.monthlyInstallment || 0);
+        const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
+        const disbursementDate = contract.disbursementDate || contract.disbursedDate || '';
+
+        function fmtDate(d) { try { if (!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('vi-VN'); } catch (e) { return d; } }
+
+        // compute end date by adding tenor months to startingInstallmentDate and subtracting one day
+        function computeEndDate(start, months) {
+          try {
+            if (!start || !months) return null;
+            const dt = new Date(start);
+            const end = new Date(dt);
+            end.setMonth(end.getMonth() + Number(months));
+            // subtract one day to make the end date the day before the next-month equivalent
+            end.setDate(end.getDate());
+            return end;
+          } catch (e) { return null; }
+        }
+
+        // Build details HTML
+        const detailsHtml = `
         <div class="mb-3 contract-details">
           <div class="row"><div class="label">Tổng mua</div><div class="value amount">${fmt(totalPurchase)}</div></div>
           <div class="row"><div class="label">Tiền trả trước</div><div class="value">${fmt(downPaymentAmount)}<span class="muted"> (${Number(downPaymentRate).toFixed(2)}%)</span></div></div>
@@ -1537,58 +1993,147 @@
           <div class="row"><div class="label">Kỳ hạn (tháng)</div><div class="value">${tenorInMonths}</div></div>
           <div class="row"><div class="label">Tiền trả mỗi tháng</div><div class="value amount">${fmt(monthlyInstallment)}</div></div>
           <div class="row"><div class="label">Ngày giải ngân</div><div class="value">${fmtDate(disbursementDate)}</div></div>
-          <div class="row"><div class="label">Thời gian góp</div><div class="value"><span class="pill">${fmtDate(startingInstallmentDate)}</span><span class="arrow"> -> </span><span class="pill">${(function(){ const e = computeEndDate(startingInstallmentDate, tenorInMonths); return e ? fmtDate(e) : '—'; })()}</span></div></div>
+          <div class="row"><div class="label">Thời gian góp</div><div class="value"><span class="pill">${fmtDate(startingInstallmentDate)}</span><span class="arrow"> -> </span><span class="pill">${(function () { const e = computeEndDate(startingInstallmentDate, tenorInMonths); return e ? fmtDate(e) : '—'; })()}</span></div></div>
         </div>
       `;
-      container.insertAdjacentHTML('beforeend', detailsHtml);
+        container.insertAdjacentHTML('beforeend', detailsHtml);
 
-      // Products list (may be empty)
-      const prods = (contract.submittedProducts && contract.submittedProducts.length) ? contract.submittedProducts : (contract.contractProducts || []);
-      if(!prods || prods.length === 0){
-        const msg = document.createElement('div');
-        msg.className = 'text-muted';
-        msg.textContent = 'Không có sản phẩm.';
-        container.appendChild(msg);
+        // Nút tạo yêu cầu huỷ hồ sơ
+        const btnCancelRequest = document.createElement('button');
+        btnCancelRequest.className = 'btn btn-danger mb-3';
+        btnCancelRequest.innerHTML = '<i class="bi bi-file-earmark-x"></i> Tạo yêu cầu huỷ';
+
+        btnCancelRequest.onclick = () => {
+          generateCancelRequest(contract);
+        };
+
+        container.appendChild(btnCancelRequest);
+
+        // Products list (may be empty)
+        const prods = (contract.submittedProducts && contract.submittedProducts.length) ? contract.submittedProducts : (contract.contractProducts || []);
+        if (!prods || prods.length === 0) {
+          const msg = document.createElement('div');
+          msg.className = 'text-muted';
+          msg.textContent = 'Không có sản phẩm.';
+          container.appendChild(msg);
+          modal.show();
+          // revoke object URL when modal closes
+          modalEl.addEventListener('hidden.bs.modal', function () { try { if (modalEl._customerImageUrl) { URL.revokeObjectURL(modalEl._customerImageUrl); modalEl._customerImageUrl = null; } } catch (e) { } });
+          return;
+        }
+
+        // also compute suggestions for future contracts (if current cannot be changed)
+        try {
+          const arr = window._allContracts || [];
+          const currentList = (arr || []).filter(c => { const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null); return ty === 'MC' && isLiveOrApproved(c); });
+          const S = currentList.reduce((s, x) => s + Number(x.tenorInMonths || x.tenor || 0), 0);
+          const N = currentList.length;
+          const futDiv = document.createElement('div'); futDiv.className = 'mt-3';
+          futDiv.innerHTML = '<strong>Gợi ý cho hợp đồng tương lai</strong><div class="small text-muted">(n = số hợp đồng MC tương lai)</div>';
+          const ftable = document.createElement('table'); ftable.className = 'table table-sm mt-2';
+          const fthead = document.createElement('thead'); fthead.innerHTML = '<tr><th>số HĐ mới (m)</th><th>kỳ hạn cần thiết mỗi HĐ (tháng)</th></tr>'; ftable.appendChild(fthead);
+          const ftb = document.createElement('tbody');
+          for (let m = 1; m <= 5; m++) {
+            const required = Math.ceil(((15 * (N + m)) - S) / m);
+            const reqDisplay = required <= 0 ? 0 : required;
+            const tr = document.createElement('tr'); tr.innerHTML = `<td>${m}</td><td>${reqDisplay} tháng</td>`; ftb.appendChild(tr);
+          }
+          ftable.appendChild(ftb); futDiv.appendChild(ftable); body.appendChild(futDiv);
+        } catch (e) { console.warn('future tenor compute failed', e); }
+        const table = document.createElement('table'); table.className = 'table table-sm';
+        const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>Mã/Model</th></tr>'; table.appendChild(thead);
+        const tb = document.createElement('tbody');
+        prods.forEach((p) => {
+          const tr = document.createElement('tr');
+          const name = p.modelDesc || p.name || p.productName || '';
+          tr.innerHTML = `<td>${name}</td>`;
+          tb.appendChild(tr);
+        });
+        table.appendChild(tb);
+        container.appendChild(table);
         modal.show();
-        // revoke object URL when modal closes
-        modalEl.addEventListener('hidden.bs.modal', function(){ try{ if(modalEl._customerImageUrl){ URL.revokeObjectURL(modalEl._customerImageUrl); modalEl._customerImageUrl = null; } }catch(e){} });
-        return;
       }
 
-          // also compute suggestions for future contracts (if current cannot be changed)
-          try{
-            const arr = window._allContracts || [];
-            const currentList = (arr||[]).filter(c=>{ const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null); return ty === 'MC' && isLiveOrApproved(c); });
-            const S = currentList.reduce((s,x)=> s + Number(x.tenorInMonths || x.tenor || 0), 0);
-            const N = currentList.length;
-            const futDiv = document.createElement('div'); futDiv.className='mt-3';
-            futDiv.innerHTML = '<strong>Gợi ý cho hợp đồng tương lai</strong><div class="small text-muted">(n = số hợp đồng MC tương lai)</div>';
-            const ftable = document.createElement('table'); ftable.className = 'table table-sm mt-2';
-            const fthead = document.createElement('thead'); fthead.innerHTML = '<tr><th>số HĐ mới (m)</th><th>kỳ hạn cần thiết mỗi HĐ (tháng)</th></tr>'; ftable.appendChild(fthead);
-            const ftb = document.createElement('tbody');
-            for(let m=1;m<=5;m++){
-              const required = Math.ceil(((15*(N+m)) - S) / m);
-              const reqDisplay = required <= 0 ? 0 : required;
-              const tr = document.createElement('tr'); tr.innerHTML = `<td>${m}</td><td>${reqDisplay} tháng</td>`; ftb.appendChild(tr);
-            }
-            ftable.appendChild(ftb); futDiv.appendChild(ftable); body.appendChild(futDiv);
-          }catch(e){ console.warn('future tenor compute failed', e); }
-      const table = document.createElement('table'); table.className = 'table table-sm';
-      const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>Mã/Model</th></tr>'; table.appendChild(thead);
-      const tb = document.createElement('tbody');
-      prods.forEach((p)=>{
-        const tr = document.createElement('tr');
-        const name = p.modelDesc || p.name || p.productName || '';
-        tr.innerHTML = `<td>${name}</td>`;
-        tb.appendChild(tr);
-      });
-      table.appendChild(tb);
-      container.appendChild(table);
-      modal.show();
-    }
+      async function generateCancelRequest(contract) {
 
-    // load on script end
-    loadCustomersTable();
-  </script>
+        const token = getAuthToken();
+
+        const res = await fetch(
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/contractnumber/${contract.number}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data = await res.json();
+
+        const modal = new bootstrap.Modal(
+          document.getElementById('cancelRequestModal')
+        );
+
+        modal.show();
+
+        const reasonInput =
+          document.getElementById('cancelReason');
+
+        const preview =
+          document.getElementById('cancelPreview');
+
+        const copyBtn =
+          document.getElementById('btnCopyCancelRequest');
+
+        reasonInput.value = '';
+        preview.style.display = 'none';
+
+        copyBtn.onclick = () => {
+
+          const reason = reasonInput.value.trim();
+
+          if (!reason) {
+            alert('Vui lòng nhập lý do huỷ');
+            return;
+          }
+
+          const customerName = [
+            data.customer?.lastName,
+            data.customer?.middleName,
+            data.customer?.firstName
+          ]
+            .filter(Boolean)
+            .join(' ');
+          const STATUS_MAP = {
+            APPROVE_STATUS: 'Contract Printing',
+            APPROVED_HARD_COPY_STATUS: 'Live',
+            WAIT_FOR_CHECKING_DISBURSEMENT_STATUS: 'Request for Disbursement'
+          };
+
+          const statusText = STATUS_MAP[data.status] || 'Trạng thái khác';
+          const content =
+            `Dear anh/chị, huỷ giúp em hồ sơ
+
+Số hợp đồng: ${data.number}
+Tên khách hàng: ${customerName}
+Code SI: HPO00001
+POScode: ${data.submittedPosScheme?.posCode || ''}
+Ngày tạo: ${new Date(data.createdDate).toLocaleDateString('vi-VN')}
+Trạng thái indus: ${statusText}
+Lý do huỷ: ${reason}`;
+
+          navigator.clipboard.writeText(content);
+
+          preview.innerText = content;
+          preview.style.display = 'block';
+
+          copyBtn.innerHTML =
+            '<i class="bi bi-check-circle"></i> Đã copy rồi nhé!';
+        };
+      }
+
+      // load on script end
+      loadCustomersTable();
+    </script>
 </body>
+
 </html>
