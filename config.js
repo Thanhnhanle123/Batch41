@@ -1,1 +1,3 @@
-const API_KEY = 'AQ.Ab8RN6KjvTSMyuS5vYjLpfE2T6LvuHt_ZMXTFmphAm0tkNd7uQ';
+window.CONFIG = {
+  API: "ZJ.Zy8IM6RCYMfqc2pQOgpCHWc9pP5LgVZD3c7B3YtFwXfqP38sbZ"
+};
