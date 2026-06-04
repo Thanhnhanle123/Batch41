@@ -120,5 +120,12 @@ const LINKS = [
     name: 'Tra cứu GPLX',
     url: 'https://gplx.csgt.bocongan.gov.vn/',
     note: 'Hệ thống tra cứu GPLX'
+  },
+  {
+    stt: 14,
+    keywords: ['Tất toán hợp đồng', 'thanh toán hợp đồng', 'thanh toán', 'tất toán', 'thanh lý hợp đồng', 'thanh lý'],
+    name: 'Thanh lý hợp đồng',
+    url: 'https://forms.office.com/r/LQ43fdV9Lj',
+    note: 'Hệ thống thanh lý hợp đồng'
   }
 ]
