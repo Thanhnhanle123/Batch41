@@ -534,7 +534,7 @@
       </div>
     </div>
   </div>
-  <button class="chat-float-btn" style="display: none;" id="toggleChat" onclick="toggleChat()">
+  <button class="chat-float-btn" style="display: none;" id="toggleChat">
     💬
   </button>
 
@@ -1259,6 +1259,53 @@
     window.addEventListener('load', () => {
       localStorage.removeItem(CHAT_STORAGE_KEY);
       // loadChatHistory();
+      
+      // ===== DRAG CHAT BUTTON =====
+      const chatBtn = $("toggleChat");
+      let isDragging = false;
+      let hasMoved = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      chatBtn.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        hasMoved = false;
+        const rect = chatBtn.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        chatBtn.style.cursor = 'grabbing';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        hasMoved = true;
+        let x = e.clientX - offsetX;
+        let y = e.clientY - offsetY;
+        
+        // Giới hạn trong viewport
+        x = Math.max(0, Math.min(x, window.innerWidth - 60));
+        y = Math.max(0, Math.min(y, window.innerHeight - 60));
+        
+        chatBtn.style.position = 'fixed';
+        chatBtn.style.left = x + 'px';
+        chatBtn.style.top = y + 'px';
+        chatBtn.style.right = 'auto';
+        chatBtn.style.bottom = 'auto';
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        chatBtn.style.cursor = 'grab';
+      });
+
+      chatBtn.addEventListener('click', () => {
+        if (!hasMoved) {
+          toggleChat();
+        }
+      });
+
+      chatBtn.style.cursor = 'grab';
     });
 
 
