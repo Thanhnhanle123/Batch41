@@ -1267,21 +1267,26 @@
       let offsetX = 0;
       let offsetY = 0;
 
-      chatBtn.addEventListener('mousedown', (e) => {
+      function startDrag(e) {
         isDragging = true;
         hasMoved = false;
         const rect = chatBtn.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        offsetX = clientX - rect.left;
+        offsetY = clientY - rect.top;
         chatBtn.style.cursor = 'grabbing';
-      });
+      }
 
-      document.addEventListener('mousemove', (e) => {
+      function moveDrag(e) {
         if (!isDragging) return;
         
         hasMoved = true;
-        let x = e.clientX - offsetX;
-        let y = e.clientY - offsetY;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        let x = clientX - offsetX;
+        let y = clientY - offsetY;
         
         // Giới hạn trong viewport
         x = Math.max(0, Math.min(x, window.innerWidth - 60));
@@ -1292,12 +1297,22 @@
         chatBtn.style.top = y + 'px';
         chatBtn.style.right = 'auto';
         chatBtn.style.bottom = 'auto';
-      });
+      }
 
-      document.addEventListener('mouseup', () => {
+      function endDrag() {
         isDragging = false;
         chatBtn.style.cursor = 'grab';
-      });
+      }
+
+      // Mouse events
+      chatBtn.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', moveDrag);
+      document.addEventListener('mouseup', endDrag);
+
+      // Touch events
+      chatBtn.addEventListener('touchstart', startDrag);
+      document.addEventListener('touchmove', moveDrag);
+      document.addEventListener('touchend', endDrag);
 
       chatBtn.addEventListener('click', () => {
         if (!hasMoved) {
