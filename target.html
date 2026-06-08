@@ -703,6 +703,11 @@
           <option value="">Tất cả</option>
         </select>
       </div>
+      <!-- Tạo nút báo cáo report ngày -->
+      <div class="d-flex justify-content-end mb-2">
+        <button id="reportBtn" onclick="generateDailyReport()" class="btn btn-sm btn-outline-primary">Báo cáo
+          ngày</button>
+      </div>
       <div class="table-responsive">
         <table class="table table-sm table-hover" id="customersTable">
           <thead>
@@ -2129,6 +2134,281 @@ Lý do huỷ: ${reason}`;
           copyBtn.innerHTML =
             '<i class="bi bi-check-circle"></i> Đã copy rồi nhé!';
         };
+      }
+
+      async function generateDailyReport() {
+        try {
+          const contracts = await handleDailyReport();
+
+          if (contracts === null) {
+            console.warn('Không thể lấy báo cáo');
+            return;
+          }
+
+          if (contracts.length === 0) {
+            alert('Không có hồ sơ trong ngày');
+            return;
+          }
+
+          const detailContracts = await Promise.all(
+            contracts.map(async (contract) => {
+              try {
+                const detail = await getDataNumber(contract);
+
+                return { contract, detail };
+              } catch (e) {
+                console.error('Lỗi lấy chi tiết:', contract.number, e);
+                return null;
+              }
+            })
+          );
+
+          const reports = {};
+
+          for (const item of detailContracts) {
+            if (!item) continue;
+
+            const { contract, detail } = item;
+
+            const type = contract.type || '';
+            const status = contract.status || '';
+            const amount = Number(contract.financedAmount || 0);
+            const insurance = detail?.submittedPosScheme?.schemeLiCode ? 1 : 0;
+
+            let groupKey = '';
+            let posName = '';
+
+            // ==========================
+            // GROUP LOGIC
+            // ==========================
+            if (type === 'DL') {
+              groupKey = 'DL_GLOBAL';
+              posName = '';
+            } else {
+              const posCode = detail?.submittedPosScheme?.posCode || '';
+              posName = detail?.submittedPosScheme?.posName || '';
+              groupKey = posCode || 'MC_NO_POS';
+            }
+
+            if (!reports[groupKey]) {
+              reports[groupKey] = {
+                posCode: groupKey,
+                posName,
+
+                tm: 0,
+
+                mc: {
+                  mc: 0,
+                  nhap: 0,
+                  duyet: 0,
+                  rot: 0,
+                  cho: 0,
+                  doanhSo: 0,
+                  bhkv: 0
+                },
+
+                dl: {
+                  dl: 0,
+                  dau: 0,
+                  thucHien: 0,
+                  rot: 0,
+                  cho: 0,
+                  doanhSo: 0,
+                  bhkv: 0
+                },
+
+                doiThu: {
+                  doiThu: 0,
+                  ppf: 0,
+                  fe: 0,
+                  mc: 0,
+                  jaccs: 0
+                },
+
+                the: {
+                  the: 0,
+                  hanMuc: 0
+                }
+              };
+            }
+
+            const report = reports[groupKey];
+
+            // ==========================
+            // MC
+            // ==========================
+            if (type === '2W') {
+              report.mc.mc++;
+              report.mc.nhap++;
+
+              switch (status) {
+                case 'APPROVED_HARD_COPY_STATUS', 'WAIT_FOR_CHECKING_DISBURSEMENT_STATUS':
+                  report.mc.duyet++;
+                  report.mc.doanhSo += amount;
+                  report.mc.bhkv += insurance ? 1 : 0;
+                  break;
+
+                case 'REJECT_STATUS':
+                  report.mc.rot++;
+                  break;
+
+                default:
+                  report.mc.cho++;
+                  break;
+              }
+            }
+
+            // ==========================
+            // DL
+            // ==========================
+            else if (type === 'DL') {
+              report.dl.dl++;
+              report.dl.dau++;
+
+              switch (status) {
+                case 'APPROVED_HARD_COPY_STATUS':
+                  report.dl.thucHien++;
+                  report.dl.doanhSo += amount;
+                  report.dl.bhkv += insurance ? 1 : 0;
+                  break;
+
+                case 'REJECT_STATUS':
+                  report.dl.rot++;
+                  break;
+
+                default:
+                  report.dl.cho++;
+                  break;
+              }
+            }
+          }
+
+          const arrReport = Object.values(reports);
+
+          // ==========================
+          // TEXT REPORT
+          // ==========================
+          const now = new Date();
+
+          const reportDate =
+            String(now.getDate()).padStart(2, '0') +
+            '.' +
+            String(now.getMonth() + 1).padStart(2, '0');
+
+          let reportText = `Em B/C ngày ${reportDate}\n\n`;
+
+          arrReport.forEach(r => {
+            reportText += `${r.posCode}`;
+
+            if (r.posName) {
+              reportText += ` - ${r.posName}`;
+            }
+
+            reportText += '\n\n';
+
+            reportText += `TM : ${r.tm}\n`;
+            reportText += '---------------------------\n';
+
+            reportText += `MC : ${r.mc.mc}\n`;
+            reportText += `Nhập : ${r.mc.nhap}\n`;
+            reportText += `Duyệt : ${r.mc.duyet}\n`;
+            reportText += `Rớt : ${r.mc.rot}\n`;
+            reportText += `Doanh số : ${r.mc.doanhSo.toLocaleString('vi-VN')}\n`;
+            reportText += `BHKV : ${r.mc.bhkv}\n`;
+
+            reportText += '---------------------------\n';
+
+            reportText += `DL : ${r.dl.dl}\n`;
+            reportText += `Đầu : ${r.dl.dau}\n`;
+            reportText += `Thực hiện : ${r.dl.thucHien}\n`;
+            reportText += `Rớt : ${r.dl.rot}\n`;
+            reportText += `Doanh số : ${r.dl.doanhSo.toLocaleString('vi-VN')}\n`;
+            reportText += `BHKV : ${r.dl.bhkv}\n`;
+
+            reportText += '---------------------------\n';
+
+            reportText += `Đối thủ : ${r.doiThu.doiThu}\n`;
+            reportText += `PPF : ${r.doiThu.ppf}\n`;
+            reportText += `FE : ${r.doiThu.fe}\n`;
+            reportText += `MC : ${r.doiThu.mc}\n`;
+            reportText += `JACCS : ${r.doiThu.jaccs}\n`;
+
+            reportText += '---------------------------\n';
+
+            reportText += `Thẻ : ${r.the.the}\n`;
+            reportText += `Hạn mức : ${r.the.hanMuc.toLocaleString('vi-VN')}\n`;
+
+            reportText += '\n=====================================\n\n';
+          });
+
+          try {
+            await navigator.clipboard.writeText(reportText);
+            alert('Đã copy báo cáo');
+          } catch (e) {
+            console.warn('Không copy được clipboard');
+          }
+
+          return { reports: arrReport, reportText };
+
+        } catch (e) {
+          console.error('Lỗi tạo báo cáo:', e);
+        }
+      }
+
+      async function handleDailyReport() {
+
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+
+        if (!token || !isTokenValid(token) || !(authUser && authUser.id)) {
+          return null;
+        }
+
+        const id = authUser.id;
+
+        const today = new Date();
+
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate());
+
+        const toDay = formatApiDateFromInput(
+          today.toISOString().split('T')[0]
+        );
+
+        const fromDay = formatApiDateFromInput(
+          yesterday.toISOString().split('T')[0]
+        );
+
+        const res = await fetch(
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS-REJECT_STATUS-AMEND_STATUS&fromDate=${encodeURIComponent(fromDay)}&toDate=${encodeURIComponent(toDay)}&contractNumber=`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data = await res.json();
+
+        return Array.isArray(data.contracts)
+          ? data.contracts
+          : [];
+      }
+
+      async function getDataNumber(contract) {
+
+        const token = getAuthToken();
+
+        const res = await fetch(
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/contractnumber/${contract.number}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        return await res.json();
       }
 
       // load on script end
