@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chuyển đổi địa chỉ đơn lẻ</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: Roboto;
+      }
+      body {
+        background: #f0f4f8;
+        padding-top: 56px;
+      }
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+      }
+      .logo {
+        font-weight: 700;
+        color: #007bff;
+        font-size: 16px;
+      }
+      .desktop-nav a {
+        margin-left: 15px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #333;
+      }
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none;
+        }
+      }
+      
+      .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #212529;
+        margin-top: 60px;
+        margin-bottom: 30px;
+      }
+      .container-custom {
+        max-width: 900px;
+        margin: 0 auto 30px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+      }
+      .form-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 20px;
+      }
+      .form-label {
+        font-weight: 500;
+        color: #495057;
+        font-size: 14px;
+      }
+      .text-danger-custom {
+        color: #dc3545;
+        margin-left: 2px;
+      }
+      .form-select, .form-control {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      .btn-convert {
+        background-color: #ea3d2f;
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        font-weight: 500;
+        font-size: 16px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.2s;
+      }
+      .btn-convert:hover {
+        background-color: #d32f23;
+        color: #fff;
+      }
+      
+      /* Cấu trúc hiển thị kết quả */
+      .result-box {
+        display: none;
+      }
+      .address-card {
+        border-left: 4px solid #0d6efd;
+        background-color: #f8f9fa;
+      }
+      .address-card.new-address {
+        border-left-color: #198754;
+        background-color: #f4fbf7;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">🚗 Batch 41</div>
+      <nav class="desktop-nav">
+        <a href="./index.html">Tính trả góp</a>
+        <a href="./target.html">Tổng quan chỉ tiêu</a>
+        <a href="./customers.html">Danh sách khách hàng</a>
+        <a href="./customer_search.html">Tìm khách hàng</a>
+        <a href="./employee_schedule.html">Tìm lịch làm việc</a>
+        <a href="./bonus.html">Thưởng SI</a>
+        <a href="./convert_address.html">Chuyển đổi địa chỉ</a>
+        <a href="#" onclick="logout()">Đăng xuất</a>
+      </nav>
+      <button
+        type="button"
+        class="btn btn-outline-primary d-md-none"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileMenu"
+        aria-controls="mobileMenu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+    </header>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel" role="dialog">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileMenuLabel">🚗 Batch 41</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
+        <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
+        <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
+        <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
+        <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Tìm lịch làm việc</a>
+        <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
+        <a class="btn btn-light w-100 mb-2" href="./convert_address.html">🔄Chuyển đổi địa chỉ</a>
+        <hr />
+        <button class="btn btn-danger w-100" onclick="logout()">🔐 Đăng xuất</button>
+      </div>
+    </div>
+
+    <h1 class="text-center page-title">Chuyển đổi địa chỉ đơn lẻ</h1>
+
+    <div class="container-custom">
+      <div class="form-section-title">Nhập thông tin địa chỉ</div>
+
+      <form id="addressForm" onsubmit="handleConvert(event)">
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Tỉnh/Thành phố<span class="text-danger-custom">*</span></label>
+            <select id="provinceSelect" class="form-select" required>
+              <option value="">Chọn Tỉnh/Thành phố</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Quận/Huyện<span class="text-danger-custom">*</span></label>
+            <select id="districtSelect" class="form-select" required disabled>
+              <option value="">Chọn Quận/Huyện</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Phường/Xã<span class="text-danger-custom">*</span></label>
+            <select id="wardSelect" class="form-select" required disabled>
+              <option value="">Chọn Phường/Xã</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Địa chỉ đường phố</label>
+          <input type="text" id="streetInput" class="form-control" placeholder="Ví dụ: 123 Nguyễn Văn A" />
+        </div>
+
+        <div class="text-center">
+          <button type="submit" id="btnSubmit" class="btn-convert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+            </svg>
+            <span id="btnText">Chuyển đổi</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- KHU VỰC HIỂN THỊ KẾT QUẢ CỦA API -->
+    <div id="resultArea" class="container-custom result-box">
+      <div class="form-section-title text-success">Kết quả chuyển đổi thành công</div>
+      
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="p-3 shadow-sm rounded address-card h-100">
+            <h6 class="fw-bold text-primary">Địa chỉ cũ (Trước 01/07/2025)</h6>
+            <p class="mb-1 small text-muted" id="oldDetails"></p>
+            <hr class="my-2">
+            <p class="mb-0 fw-medium" id="oldFullAddress"></p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 shadow-sm rounded address-card new-address h-100">
+            <h6 class="fw-bold text-success">Địa chỉ mới (Sau 01/07/2025)</h6>
+            <p class="mb-1 small text-muted" id="newDetails"></p>
+            <hr class="my-2">
+            <p class="mb-0 fw-medium" id="newFullAddress"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning mt-3 mb-0 d-none" id="mergeNoteArea">
+        <strong>Lưu ý sáp nhập:</strong> <span id="mergeNote"></span>
+      </div>
+    </div>
+
+    <script>
+      if (sessionStorage.getItem("logged") !== "1") {
+        window.location.href = "index.html";
+      }
+      function logout() {
+        sessionStorage.removeItem("logged");
+        location.href = "index.html";
+      }
+    </script>
+
+    <!-- HỆ THỐNG LOGIC API -->
+    <script>
+      const API_BASE = "https://tinhthanhpho.com/api/v1";
+      // THAY THẾ KEY API CỦA BẠN VÀO ĐÂY
+      const API_KEY = "hvn_1QkDWky0O4EdQIcrbpFTLlY3CgYF2oyI"; 
+
+      const headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`
+      };
+
+      const provinceSelect = document.getElementById("provinceSelect");
+      const districtSelect = document.getElementById("districtSelect");
+      const wardSelect = document.getElementById("wardSelect");
+      const resultArea = document.getElementById("resultArea");
+
+      // 1. Tự động tải danh sách Tỉnh/Thành phố khi trang load xong
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const res = await fetch(`${API_BASE}/provinces?limit=100`, { headers });
+          const json = await res.json();
+          if (json.success) {
+            json.data.forEach(p => {
+              const opt = document.createElement("option");
+              opt.value = p.code;
+              opt.textContent = `${p.type} ${p.name}`;
+              provinceSelect.appendChild(opt);
+            });
+          }
+        } catch (err) {
+          console.error("Lỗi lấy danh sách tỉnh:", err);
+        }
+      });
+
+      // 2. Sự kiện thay đổi Tỉnh/Thành phố -> Lấy danh sách Quận/Huyện
+      provinceSelect.addEventListener("change", async () => {
+        const pCode = provinceSelect.value;
+        districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+        wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+        districtSelect.disabled = true;
+        wardSelect.disabled = true;
+
+        if (!pCode) return;
+
+        try {
+          const res = await fetch(`${API_BASE}/provinces/${pCode}/districts?limit=100`, { headers });
+          const json = await res.json();
+          if (json.success && json.data.length > 0) {
+            json.data.forEach(d => {
+              const opt = document.createElement("option");
+              opt.value = d.code;
+              opt.textContent = `${d.type} ${d.name}`;
+              districtSelect.appendChild(opt);
+            });
+            districtSelect.disabled = false;
+          }
+        } catch (err) {
+          console.error("Lỗi lấy danh sách huyện:", err);
+        }
+      });
+
+      // 3. Sự kiện thay đổi Quận/Huyện -> Lấy danh sách Phường/Xã
+      districtSelect.addEventListener("change", async () => {
+        const dCode = districtSelect.value;
+        wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+        wardSelect.disabled = true;
+
+        if (!dCode) return;
+
+        try {
+          const res = await fetch(`${API_BASE}/districts/${dCode}/wards?limit=100`, { headers });
+          const json = await res.json();
+          if (json.success && json.data.length > 0) {
+            json.data.forEach(w => {
+              const opt = document.createElement("option");
+              opt.value = w.code;
+              opt.textContent = `${w.type} ${w.name}`;
+              wardSelect.appendChild(opt);
+            });
+            wardSelect.disabled = false;
+          }
+        } catch (err) {
+          console.error("Lỗi lấy danh sách xã:", err);
+        }
+      });
+
+      // 4. Gọi API chuyển đổi địa chỉ đơn lẻ khi submit form
+      async function handleConvert(event) {
+        event.preventDefault();
+        
+        const btnSubmit = document.getElementById("btnSubmit");
+        const btnText = document.getElementById("btnText");
+        
+        btnSubmit.disabled = true;
+        btnText.textContent = "Đang xử lý...";
+        resultArea.style.display = "none";
+
+        const payload = {
+          provinceCode: provinceSelect.value,
+          districtCode: districtSelect.value,
+          wardCode: wardSelect.value,
+          streetAddress: document.getElementById("streetInput").value.trim()
+        };
+
+        try {
+          const res = await fetch(`${API_BASE}/convert/address`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(payload)
+          });
+
+          const json = await res.json();
+
+          if (json.success && json.data) {
+            const { old, new: newData, mergeInfo } = json.data;
+
+            // Đổ dữ liệu vùng địa chỉ cũ
+            document.getElementById("oldDetails").innerText = `Mã: Tỉnh (${old.province.code}) - Huyện (${old.district.code}) - Xã (${old.ward.code})`;
+            document.getElementById("oldFullAddress").innerText = old.fullAddress;
+
+            // Đổ dữ liệu vùng địa chỉ mới
+            document.getElementById("newDetails").innerText = `Mã: Tỉnh (${newData.province.code}) - Xã (${newData.ward.code})`;
+            document.getElementById("newFullAddress").innerText = newData.fullAddress;
+
+            // Hiển thị ghi chú sáp nhập nếu có
+            const noteArea = document.getElementById("mergeNoteArea");
+            if (mergeInfo && mergeInfo.notes) {
+              document.getElementById("mergeNote").innerText = mergeInfo.notes;
+              noteArea.classList.remove("d-none");
+            } else {
+              noteArea.classList.add("d-none");
+            }
+
+            // Hiện khung kết quả
+            resultArea.style.display = "block";
+          } else {
+            alert("Chuyển đổi thất bại: " + (json.message || "Vui lòng kiểm tra lại thông tin."));
+          }
+        } catch (err) {
+          console.error("Lỗi kết nối API chuyển đổi:", err);
+          alert("Lỗi kết nối hệ thống API!");
+        } finally {
+          btnSubmit.disabled = false;
+          btnText.textContent = "Chuyển đổi";
+        }
+      }
+    </script>
+  </body>
+</html>

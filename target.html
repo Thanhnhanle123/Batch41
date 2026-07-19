@@ -553,12 +553,12 @@
     <div class="logo">🚗 Batch 41</div>
     <nav class="desktop-nav">
       <a href="./index.html">Tính trả góp</a>
-      <a href="./cancel_contract.html">Huỷ HĐ</a>
       <a href="./target.html">Tổng quan chỉ tiêu</a>
       <a href="./customers.html">Danh sách khách hàng</a>
       <a href="./customer_search.html">Tìm khách hàng</a>
       <a href="./employee_schedule.html">Tìm lịch làm việc</a>
       <a href="./bonus.html">Thưởng SI</a>
+      <a href="./convert_address.html">Chuyển đổi địa chỉ</a>
       <a href="#" onclick="logout()">Đăng xuất</a>
     </nav>
     <!-- HAMBURGER -->
@@ -574,12 +574,12 @@
     </div>
     <div class="offcanvas-body">
       <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
-      <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
       <a class="btn btn-light w-100 mb-2" href="./target.html">📈 Tổng quan chỉ tiêu</a>
       <a class="btn btn-light w-100 mb-2" href="./customers.html">👥 Danh sách khách hàng</a>
       <a class="btn btn-light w-100 mb-2" href="./customer_search.html">🔎 Tìm khách hàng</a>
       <a class="btn btn-light w-100 mb-2" href="./employee_schedule.html">📅 Tìm lịch làm việc</a>
       <a class="btn btn-light w-100 mb-2" href="./bonus.html">🎁 Thưởng SI</a>
+      <a class="btn btn-light w-100 mb-2" href="./convert_address.html">🔄Chuyển đổi địa chỉ</a>
       <hr />
       <button class="btn btn-danger w-100" onclick="logout()">
         🔐 Đăng xuất
@@ -2163,7 +2163,8 @@ Lý do huỷ: ${reason}`;
             })
           );
 
-          const reports = {};
+          let reports = {};
+          let hasMC = false;
 
           for (const item of detailContracts) {
             if (!item) continue;
@@ -2174,20 +2175,12 @@ Lý do huỷ: ${reason}`;
             const status = contract.status || '';
             const amount = Number(contract.financedAmount || 0);
             const insurance = detail?.submittedPosScheme?.schemeLiCode ? 1 : 0;
+            const posCode = detail?.submittedPosScheme?.posCode || '';
+            const posName = detail?.submittedPosScheme?.posName || '';
 
-            let groupKey = '';
-            let posName = '';
-
-            // ==========================
-            // GROUP LOGIC
-            // ==========================
-            if (type === 'DL') {
-              groupKey = 'DL_GLOBAL';
-              posName = '';
-            } else {
-              const posCode = detail?.submittedPosScheme?.posCode || '';
-              posName = detail?.submittedPosScheme?.posName || '';
-              groupKey = posCode || 'MC_NO_POS';
+            let groupKey = posCode || 'MC_NO_POS';
+            if (type === '2W') {
+              hasMC = true;
             }
 
             if (!reports[groupKey]) {
@@ -2283,6 +2276,56 @@ Lý do huỷ: ${reason}`;
             }
           }
 
+          if (!hasMC) {
+            const dlGlobal = {
+              posCode: 'DL_GLOBAL',
+              posName: '',
+              tm: 0,
+              mc: {
+                mc: 0,
+                nhap: 0,
+                duyet: 0,
+                rot: 0,
+                cho: 0,
+                doanhSo: 0,
+                bhkv: 0
+              },
+              dl: {
+                dl: 0,
+                dau: 0,
+                thucHien: 0,
+                rot: 0,
+                cho: 0,
+                doanhSo: 0,
+                bhkv: 0
+              },
+              doiThu: {
+                doiThu: 0,
+                ppf: 0,
+                fe: 0,
+                mc: 0,
+                jaccs: 0
+              },
+              the: {
+                the: 0,
+                hanMuc: 0
+              }
+            };
+
+            Object.values(reports).forEach((r) => {
+              dlGlobal.tm += Number(r.tm || 0);
+              dlGlobal.dl.dl += Number(r.dl.dl || 0);
+              dlGlobal.dl.dau += Number(r.dl.dau || 0);
+              dlGlobal.dl.thucHien += Number(r.dl.thucHien || 0);
+              dlGlobal.dl.rot += Number(r.dl.rot || 0);
+              dlGlobal.dl.cho += Number(r.dl.cho || 0);
+              dlGlobal.dl.doanhSo += Number(r.dl.doanhSo || 0);
+              dlGlobal.dl.bhkv += Number(r.dl.bhkv || 0);
+            });
+
+            reports = { DL_GLOBAL: dlGlobal };
+          }
+
           const arrReport = Object.values(reports);
 
           // ==========================
@@ -2338,7 +2381,7 @@ Lý do huỷ: ${reason}`;
             reportText += `Thẻ : ${r.the.the}\n`;
             reportText += `Hạn mức : ${r.the.hanMuc.toLocaleString('vi-VN')}\n`;
 
-            reportText += '\n=====================================\n\n';
+            reportText += '\n================================\n\n';
           });
 
           try {
