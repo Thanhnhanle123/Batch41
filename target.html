@@ -976,7 +976,7 @@
         const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
         const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
         // include pagination params (page & size) - API rejects requests without them
-        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS-APPROVE_DISBURSEMENT_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
         return fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
           .then(async r => {
             if (!r.ok) {
@@ -2423,7 +2423,7 @@ Lý do huỷ: ${reason}`;
         );
 
         const res = await fetch(
-          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS-REJECT_STATUS-AMEND_STATUS&fromDate=${encodeURIComponent(fromDay)}&toDate=${encodeURIComponent(toDay)}&contractNumber=`,
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS-REJECT_STATUS-AMEND_STATUS-APPROVE_DISBURSEMENT_STATUS&fromDate=${encodeURIComponent(fromDay)}&toDate=${encodeURIComponent(toDay)}&contractNumber=`,
           {
             headers: {
               Authorization: `Bearer ${token}`
