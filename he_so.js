@@ -23,6 +23,15 @@ const HE_SO = {
     // 0,12722	0,09924	0,08252	0,07138	0,06348	0,05757
     // 36 can be added similarly when needed
   ],
+  1.19: [
+    { tenor: 12, coef: 0.10025, minPercent: 15 },
+    { tenor: 15, coef: 0.08349, minPercent: 15 },
+    { tenor: 18, coef: 0.07237, minPercent: 15 },
+    { tenor: 21, coef: 0.06446, minPercent: 15 },
+    { tenor: 24, coef: 0.05856, minPercent: 15 },
+    { tenor: 30, coef: 0.05037, minPercent: 15 },
+    { tenor: 36, coef: 0.04496, minPercent: 15 },
+  ],
   // 1.21: [
   //   { tenor: 9, coef: 0.12837, minPercent: 20 },
   //   { tenor: 12, coef: 0.1004, minPercent: 20 },
