@@ -1,21 +1,15 @@
 // HE_SO coefficients moved out from index.html
 // New flexible format:
-// HE_SO[package] = [ { tenor: <months>, coef: <number>, minPercent: <min downpay %>, maxPercent: <max downpay %> }, ... ]
-// minPercent / maxPercent are optional; when absent the entry is considered available for any percent.
+// HE_SO[package] = [ { tenor: <months>, coef: <number>, minPercent: <min downpay %>, maxPercent: <max downpay %>, minLoan: <min loan amount>, maxLoan: <max loan amount> }, ... ]
+// minPercent / maxPercent / minLoan / maxLoan are optional; when absent the entry is considered available for any matching value.
 // Backward compatibility: if HE_SO[package] is an object mapping tenor->coef, code will still handle it.
 const HE_SO = {
-  // 0.99: [
-  //   { tenor: 9, coef: 0.126179, minPercent: 0, maxPercent: 19 },
-  //   { tenor: 12, coef: 0.098233, minPercent: 0, maxPercent: 19 },
-  //   { tenor: 15, coef: 0.081497, minPercent: 0, maxPercent: 19 },
-  //   { tenor: 9, coef: 0.126179, minPercent: 20 },
-  //   { tenor: 12, coef: 0.098233, minPercent: 20 },
-  //   { tenor: 15, coef: 0.081497, minPercent: 20 },
-  //   { tenor: 18, coef: 0.070365, minPercent: 20 },
-  //   { tenor: 21, coef: 0.06244, minPercent: 20 },
-  //   { tenor: 24, coef: 0.05651, minPercent: 20 }
-  //   // 36 can be added similarly when needed
-  // ],
+  0.39: [
+    { tenor: 9, coef: 0.12015, minPercent: 15, maxPercent: 80, minLoan: 500000, maxLoan: 14000000 },
+    { tenor: 12, coef: 0.09230, minPercent: 15, maxPercent: 80, minLoan: 500000, maxLoan: 10500000 },
+    { tenor: 15, coef: 0.07557, minPercent: 15, maxPercent: 80, minLoan: 5000000, maxLoan: 8000000 },
+    // 0,12015	0,09230	0,07557
+  ],
   1.09: [
     { tenor: 9, coef: 0.12720, minPercent: 0, maxPercent: 19 },
     { tenor: 12, coef: 0.09924, minPercent: 0, maxPercent: 19 },

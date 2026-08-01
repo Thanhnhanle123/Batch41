@@ -655,6 +655,8 @@
           coef: parseFloat(e.coef),
           minPercent: typeof e.minPercent === "number" ? e.minPercent : null,
           maxPercent: typeof e.maxPercent === "number" ? e.maxPercent : null,
+          minLoan: typeof e.minLoan === "number" ? e.minLoan : null,
+          maxLoan: typeof e.maxLoan === "number" ? e.maxLoan : null,
         }));
       }
       // legacy format: object mapping tenor->coef
@@ -663,6 +665,8 @@
         coef: parseFloat(hs),
         minPercent: null,
         maxPercent: null,
+        minLoan: null,
+        maxLoan: null,
       }));
     }
 
@@ -673,6 +677,12 @@
       const tol = PERCENT_TOLERANCE;
       if (entry.minPercent !== null && percentVal + tol < entry.minPercent) return false;
       if (entry.maxPercent !== null && percentVal - tol > entry.maxPercent) return false;
+      return true;
+    }
+
+    function loanAllowed(entry, loanAmount) {
+      if (entry.minLoan !== null && loanAmount < entry.minLoan) return false;
+      if (entry.maxLoan !== null && loanAmount > entry.maxLoan) return false;
       return true;
     }
 
@@ -893,6 +903,8 @@
         if (allowed && !allowed.includes(tenor)) return;
         // filter by percent constraints if present
         if (!percentAllowed(entry, percentVal)) return;
+        // filter by loan amount constraints if present
+        if (!loanAllowed(entry, vay)) return;
 
         let thang = ceil(vay * entry.coef + 12000);
         let lai = thang * tenor - vay;
