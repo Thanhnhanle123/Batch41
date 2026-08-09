@@ -1475,7 +1475,7 @@
           const totalContracts = arr.length;
           const liveContracts = arr.filter(c => (c.indusStatus || '').toString().toLowerCase() === 'live').length;
           const totalFinanced = arr.reduce((s, c) => s + (c.result === "APPROVE_STATUS" ? Number(c.financedAmount || c.totalPurchase || 0) : 0), 0);
-          const totalDisbursed = arr.reduce((s, c) => s + (c.disbursementDate && c.indusStatus == "LIVE" ? Number(c.financedAmount || 0) : 0), 0);
+          const totalDisbursed = arr.reduce((s, c) => s + (c.disbursementDate && (c.indusStatus === "LIVE" || c.indusStatus === "DBD") ? Number(c.financedAmount || 0) : 0), 0);
           const kpiRow = document.getElementById('kpiRow');
           kpiRow.innerHTML = `
           <div class="kpi-card"><div class="label">Tổng HĐ</div><div class="value">${totalContracts}</div></div>
@@ -1553,7 +1553,7 @@
           // Prepare filtered set: only contracts that are LIVE or have APPROVED_HARD_COPY_STATUS
           const filteredForCharts = arr.filter(c => {
             const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
-            const isLive = ind.includes('live') || ind === 'l';
+            const isLive = ind.includes('live') || ind === 'l' || ind === 'dbd';
             const scRaw = (c.statusCodes || c.statusCode || '');
             let codes = [];
             if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
