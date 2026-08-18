@@ -1661,7 +1661,7 @@
         if (s === 'live' || s === 'l' || s === 'dbd') return 'LIVE';
         if (s.includes('active') || s.includes('hoạt') || s.includes('approved')) return 'APPROVED';
         if (s.includes('wait') || s.includes('pending') || s.includes('chờ')) return 'PENDING';
-        if (s.includes('reject') || s.includes('cancel') || s.includes('hủy')) return 'REJECT';
+        if (s.includes('reject') || s.includes('cancel') || s.includes('hủy') || s.includes('rej')) return 'REJECT';
         return statusRaw || '';
       }
 
@@ -1779,7 +1779,7 @@
           const tr = document.createElement('tr'); tr.style.cursor = 'pointer';
           const statusDisplay = getStatusText(c);
           const sd = statusDisplay.toLowerCase();
-          const badgeClass = sd === 'live' ? 'badge bg-success' : (sd.includes('pend') ? 'badge bg-warning text-dark' : ((sd.includes('reject') || sd.includes('reject') || sd.includes('cancel')) ? 'badge bg-danger' : 'badge bg-secondary'));
+          const badgeClass = sd === 'live' ? 'badge bg-success' : (sd.includes('pend') ? 'badge bg-warning text-dark' : ((sd.includes('reject') || sd.includes('rej') || sd.includes('cancel')) ? 'badge bg-danger' : 'badge bg-secondary'));
           const amountText = Number(amount).toLocaleString('vi-VN') + ' ₫';
           const cols = [String(idx + 1), name, phone, nid, contractNo, type, amountText, `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`];
           const colLabels = ['#', 'Tên khách', 'SĐT', 'CMND', 'Hợp đồng', 'Loại', 'Số tiền', 'Trạng thái'];
