@@ -116,37 +116,105 @@
       text-align: right
     }
 
-    /* Summary boxes */
+    /* Summary boxes Responsive Optimization */
     #summaryBox {
       margin-top: 18px;
       display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      align-items: flex-start
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
     }
 
-    #summaryBox>div {
+    .summary-tables-wrapper {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .summary-card-item {
       flex: 1;
-      min-width: 220px
+      min-width: 280px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     #summaryBox table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      border-radius: 10px;
+      border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04)
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      border: 1px solid var(--border);
+      height: 100%;
     }
 
     #summaryBox td {
-      padding: 10px;
-      border-bottom: 1px solid rgba(46, 66, 90, 0.06);
-      background-clip: padding-box
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(46, 66, 90, 0.08);
+      vertical-align: middle;
     }
 
     #summaryBox tr:last-child td {
-      border-bottom: 0
+      border-bottom: 0;
+    }
+
+    .summary-analytics-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+    }
+
+    .kpi-daily-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    /* Mobile Breakpoints (< 576px) */
+    @media (max-width: 576px) {
+      #summaryBox {
+        margin-top: 12px;
+        gap: 12px;
+      }
+
+      .summary-card-item {
+        min-width: 100%;
+        /* Switch to full width stacked layout on mobile */
+      }
+
+      #summaryBox table {
+        font-size: 13px;
+      }
+
+      #summaryBox td {
+        padding: 6px 8px;
+      }
+
+      .summary-analytics-card {
+        padding: 12px;
+      }
+
+      .kpi-daily-grid {
+        grid-template-columns: 1fr;
+        /* Stack KPI daily boxes on small phones */
+      }
+
+      .analytics-header-title {
+        font-size: 14px !important;
+      }
+
+      .analytics-header-badge {
+        font-size: 11px !important;
+        padding: 2px 8px !important;
+      }
     }
 
     /* Buttons */
@@ -881,41 +949,183 @@
         const totalRemain = totalTarget - totalAch;
         const totalRate = totalTarget ? (totalAch / totalTarget * 100) : 0;
 
+        // Helper hiển thị con số cần thêm đã làm tròn
+        const getPrettyRemain = (achieved, target) => {
+          if (achieved >= target) return '<span style="color:#10b981;">Đã đạt</span>';
+          const diff = target - achieved;
+          return fmt(roundPretty(diff));
+        };
+
         const summaryHtml = `
-        <div id="summaryBox" style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">
-          <div style="flex:1; min-width:220px;">
-            <table style="width:100%; border-collapse:collapse; font-size:15px; background:#eef7ff; border:2px solid #2f3b52;">
-              <tr><td style="border:1px solid #2f3b52; padding:10px; font-weight:700;">MC - Chỉ tiêu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#1e88e5; font-weight:700;">${fmt(mcTotal)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Đã đạt</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${fmt(mcAchieved)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Còn thiếu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e53935">${fmt(mcRemain)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tỷ lệ</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${mcRate.toFixed(2)}%</td></tr>
-            </table>
+  <div id="summaryBox">
+    
+    <!-- 1. BẢNG BÁO CÁO CÁC MỐC CHỈ TIÊU (MC, DL, TỔNG) -->
+    <div class="summary-tables-wrapper">
+      
+      <!-- BẢNG MC -->
+      <div class="summary-card-item">
+        <table style="background:#eef7ff;">
+          <tr><td colspan="2" style="padding:10px; font-weight:700; color:#1e88e5; background:#d0e6ff; text-align:center;">CHỈ TIÊU MC</td></tr>
+          <tr><td style="font-weight:700;">Chỉ tiêu gốc (100%)</td><td style="text-align:right; color:#1e88e5; font-weight:700;">${fmt(mcTotal)}</td></tr>
+          <tr><td>Đã đạt</td><td style="text-align:right; font-weight:700; color:#10b981;">${fmt(mcAchieved)}</td></tr>
+          <tr><td>Còn thiếu (đến 100%)</td><td style="text-align:right; color:#e53935; font-weight:700;">${fmt(mcRemain > 0 ? roundPretty(mcRemain) : 0)}</td></tr>
+          <tr><td>Tỷ lệ hiện tại</td><td style="text-align:right; font-weight:700;">${mcRate.toFixed(2)}%</td></tr>
+          <tr style="background:#e2f0fe;"><td style="font-size:13px;" colspan="2"><strong>Cần thêm để đạt các mốc (làm tròn):</strong></td></tr>
+          <tr><td style="font-size:13px;">• Mốc 75% (${fmt(roundPretty(mcTotal * 0.75))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal * 0.75)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 80% (${fmt(roundPretty(mcTotal * 0.80))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal * 0.80)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 90% (${fmt(roundPretty(mcTotal * 0.90))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal * 0.90)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 100% (${fmt(mcTotal)})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal)}</td></tr>
+        </table>
+      </div>
+
+      <!-- BẢNG DL -->
+      <div class="summary-card-item">
+        <table style="background:#fff5f5;">
+          <tr><td colspan="2" style="padding:10px; font-weight:700; color:#e64b4b; background:#ffe2e2; text-align:center;">CHỈ TIÊU DL</td></tr>
+          <tr><td style="font-weight:700;">Chỉ tiêu gốc (100%)</td><td style="text-align:right; color:#e64b4b; font-weight:700;">${fmt(dlTotal)}</td></tr>
+          <tr><td>Đã đạt</td><td style="text-align:right; font-weight:700; color:#10b981;">${fmt(dlAchieved)}</td></tr>
+          <tr><td>Còn thiếu (đến 100%)</td><td style="text-align:right; color:#e53935; font-weight:700;">${fmt(dlRemain > 0 ? roundPretty(dlRemain) : 0)}</td></tr>
+          <tr><td>Tỷ lệ hiện tại</td><td style="text-align:right; font-weight:700;">${dlRate.toFixed(2)}%</td></tr>
+          <tr style="background:#fde8e8;"><td style="font-size:13px;" colspan="2"><strong>Cần thêm để đạt các mốc (làm tròn):</strong></td></tr>
+          <tr><td style="font-size:13px;">• Mốc 75% (${fmt(roundPretty(dlTotal * 0.75))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal * 0.75)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 80% (${fmt(roundPretty(dlTotal * 0.80))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal * 0.80)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 90% (${fmt(roundPretty(dlTotal * 0.90))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal * 0.90)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 100% (${fmt(dlTotal)})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal)}</td></tr>
+        </table>
+      </div>
+
+      <!-- BẢNG TỔNG CỘNG -->
+      <div class="summary-card-item">
+        <table style="background:#e9edf3;">
+          <tr><td colspan="2" style="padding:10px; font-weight:700; color:#2f3b52; background:#d5deeb; text-align:center;">TỔNG CỘNG</td></tr>
+          <tr><td style="font-weight:700;">Tổng chỉ tiêu (100%)</td><td style="text-align:right; color:#2f3b52; font-weight:700;">${fmt(totalTarget)}</td></tr>
+          <tr><td>Tổng đã đạt</td><td style="text-align:right; font-weight:700; color:#10b981;">${fmt(totalAch)}</td></tr>
+          <tr><td>Tổng thiếu (đến 100%)</td><td style="text-align:right; color:#e53935; font-weight:700;">${fmt(totalRemain > 0 ? roundPretty(totalRemain) : 0)}</td></tr>
+          <tr><td>Tỷ lệ tổng</td><td style="text-align:right; font-weight:700;">${totalRate.toFixed(2)}%</td></tr>
+          <tr style="background:#dc3e5e1e;"><td style="font-size:13px;" colspan="2"><strong>Cần thêm để đạt các mốc (làm tròn):</strong></td></tr>
+          <tr><td style="font-size:13px;">• Mốc 75% (${fmt(roundPretty(totalTarget * 0.75))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget * 0.75)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 80% (${fmt(roundPretty(totalTarget * 0.80))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget * 0.80)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 90% (${fmt(roundPretty(totalTarget * 0.90))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget * 0.90)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 100% (${fmt(totalTarget)})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget)}</td></tr>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- 2. KHỐI PHÂN TÍCH TIẾN ĐỘ & KHUYẾN NGHỊ CHẠY KPI -->
+    ${(() => {
+            const now = new Date();
+            const currentDay = now.getDate();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daysRemaining = Math.max(1, daysInMonth - currentDay + 1);
+
+            const timePassedRate = (currentDay / daysInMonth) * 100;
+
+            const getDailyNeeded = (targetVal, currentVal) => {
+              const need = targetVal - currentVal;
+              return need > 0 ? roundPretty(Math.ceil(need / daysRemaining)) : 0;
+            };
+
+            const dailyMC_100 = getDailyNeeded(mcTotal, mcAchieved);
+            const dailyDL_100 = getDailyNeeded(dlTotal, dlAchieved);
+            const dailyTotal_100 = getDailyNeeded(totalTarget, totalAch);
+            const dailyTotal_80 = getDailyNeeded(totalTarget * 0.8, totalAch);
+
+            let statusBg = '#e8f5e9';
+            let statusColor = '#2e7d32';
+            let statusText = 'TIẾN ĐỘ TỐT - Đang bám sát kế hoạch tháng.';
+
+            if (totalRate < timePassedRate - 15) {
+              statusBg = '#ffebee';
+              statusColor = '#c62828';
+              statusText = 'CẢNH BÁO CHẬM TIẾN ĐỘ - Cần tăng tốc ngay!';
+            } else if (totalRate < timePassedRate - 5) {
+              statusBg = '#fff8e1';
+              statusColor = '#f57f17';
+              statusText = 'CẦN CHÚ Ý - Tiến độ đang hơi chậm hơn so với thời gian trôi qua.';
+            }
+
+            return `
+        <div class="summary-analytics-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <h3 class="analytics-header-title" style="margin:0; font-size:16px; color:#1e293b; text-transform:uppercase; font-weight:700;">📊 Phân Tích Tiến Độ & Gợi Ý Nhịp Chạy KPI</h3>
+            <span class="analytics-header-badge" style="font-size:13px; background:#e2e8f0; padding:4px 10px; border-radius:20px; font-weight:600; white-space:nowrap;">
+              Hôm nay: Ngày ${currentDay}/${daysInMonth} (Còn ${daysRemaining} ngày)
+            </span>
           </div>
 
-          <div style="flex:1; min-width:220px;">
-            <table style="width:100%; border-collapse:collapse; font-size:15px; background:#fff5f5; border:2px solid #2f3b52;">
-              <tr><td style="border:1px solid #2f3b52; padding:10px; font-weight:700;">DL - Chỉ tiêu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e64b4b; font-weight:700;">${fmt(dlTotal)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Đã đạt</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${fmt(dlAchieved)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Còn thiếu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e53935">${fmt(dlRemain)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tỷ lệ</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${dlRate.toFixed(2)}%</td></tr>
-            </table>
+          <!-- Thanh so sánh Thời gian vs Tiến độ -->
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+              <span>Thời gian đã qua: <strong>${timePassedRate.toFixed(1)}%</strong></span>
+              <span>KPI đã đạt: <strong>${totalRate.toFixed(1)}%</strong></span>
+            </div>
+            <div style="width:100%; height:12px; background:#e2e8f0; border-radius:6px; overflow:hidden; position:relative;">
+              <div style="width:${Math.min(100, timePassedRate)}%; height:100%; background:#94a3b8; position:absolute; top:0; left:0; opacity:0.5;" title="Thời gian"></div>
+              <div style="width:${Math.min(100, totalRate)}%; height:100%; background:${statusColor}; position:absolute; top:0; left:0;" title="Tiến độ đạt"></div>
+            </div>
+            <div style="background:${statusBg}; color:${statusColor}; padding:8px 12px; border-radius:6px; font-weight:600; font-size:13px; margin-top:8px;">
+              ${statusText}
+            </div>
           </div>
 
-          <div style="flex:1; min-width:220px;">
-            <table style="width:100%; border-collapse:collapse; font-size:15px; background:#e9edf3; border:2px solid #2f3b52;">
-              <tr><td style="border:1px solid #2f3b52; padding:10px; font-weight:700;">Tổng</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#2f3b52; font-weight:700;">${fmt(totalTarget)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tổng đã đạt</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${fmt(totalAch)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tổng thiếu</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right; color:#e53935">${fmt(totalRemain)}</td></tr>
-              <tr><td style="border:1px solid #2f3b52; padding:10px;">Tỷ lệ</td><td style="border:1px solid #2f3b52; padding:10px; text-align:right;">${totalRate.toFixed(2)}%</td></tr>
-            </table>
+          <!-- Chỉ tiêu cần chạy trung bình mỗi ngày -->
+          <div class="kpi-daily-grid">
+            
+            <div style="background:#fff; border:1px solid var(--border); padding:10px; border-radius:8px;">
+              <div style="font-size:12px; color:#64748b; font-weight:600;">MỤC TIÊU MC / NGÀY (100%)</div>
+              <div style="font-size:16px; font-weight:700; color:#1e88e5; margin-top:4px;">
+                ${dailyMC_100 > 0 ? '~ ' + fmt(dailyMC_100) + ' / ngày' : '🎉 Đã hoàn thành'}
+              </div>
+            </div>
+
+            <div style="background:#fff; border:1px solid var(--border); padding:10px; border-radius:8px;">
+              <div style="font-size:12px; color:#64748b; font-weight:600;">MỤC TIÊU DL / NGÀY (100%)</div>
+              <div style="font-size:16px; font-weight:700; color:#e64b4b; margin-top:4px;">
+                ${dailyDL_100 > 0 ? '~ ' + fmt(dailyDL_100) + ' / ngày' : '🎉 Đã hoàn thành'}
+              </div>
+            </div>
+
+            <div style="border:1px solid #cbd5e1; padding:10px; border-radius:8px; background:#f1f5f9;">
+              <div style="font-size:12px; color:#334155; font-weight:700;">TỔNG CẦN CHẠY / NGÀY (100%)</div>
+              <div style="font-size:16px; font-weight:700; color:#0f172a; margin-top:4px;">
+                ${dailyTotal_100 > 0 ? '~ ' + fmt(dailyTotal_100) + ' / ngày' : '🎉 Đã đạt 100%'}
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:2px;">
+                (Hoặc tối thiểu ~ ${dailyTotal_80 > 0 ? fmt(dailyTotal_80) : '0'} / ngày để đạt 80%)
+              </div>
+            </div>
+
           </div>
         </div>
       `;
-        // replace or insert
+          })()}
+
+  </div>
+  `;
+
         const existing = document.getElementById('summaryBox');
         if (existing) existing.outerHTML = summaryHtml; else document.querySelector('.chart-wrap').insertAdjacentHTML('afterend', summaryHtml);
       }
+      // Hàm làm tròn lên con số đẹp & tròn trịa
+      function roundPretty(val) {
+        if (val <= 0) return 0;
 
+        // Với số nhỏ (< 10.000): làm tròn lên hàng trăm (ví dụ: 1.230 -> 1.300)
+        if (val < 10000) {
+          return Math.ceil(val / 100) * 100;
+        }
+        // Với số từ 10.000 đến < 100.000: làm tròn lên hàng nghìn (ví dụ: 12.340 -> 13.000)
+        if (val < 100000) {
+          return Math.ceil(val / 1000) * 1000;
+        }
+        // Với số từ 100.000 đến < 10.000.000: làm tròn lên hàng chục nghìn (ví dụ: 1.234.500 -> 1.240.000)
+        if (val < 10000000) {
+          return Math.ceil(val / 10000) * 10000;
+        }
+        // Với số lớn hơn 10 triệu: làm tròn lên hàng trăm nghìn (ví dụ: 15.230.000 -> 15.300.000)
+        return Math.ceil(val / 100000) * 100000;
+      }
       // AUTH helpers: lưu/đọc token trong localStorage
       function getAuthToken() { return localStorage.getItem('authToken'); }
       function setAuthToken(t) { localStorage.setItem('authToken', t); }
