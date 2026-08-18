@@ -1658,7 +1658,7 @@
       function getStatusText(c) {
         const statusRaw = (c.indusStatus || c.status || c.statusName || '').toString();
         const s = statusRaw.toLowerCase();
-        if (s === 'live' || s === 'l') return 'LIVE';
+        if (s === 'live' || s === 'l' || s === 'dbd') return 'LIVE';
         if (s.includes('active') || s.includes('hoạt') || s.includes('approved')) return 'APPROVED';
         if (s.includes('wait') || s.includes('pending') || s.includes('chờ')) return 'PENDING';
         if (s.includes('reject') || s.includes('cancel') || s.includes('hủy')) return 'REJECT';
@@ -1736,7 +1736,7 @@
       // helper: returns true if contract is LIVE (indusStatus) or has APPROVED_HARD_COPY_STATUS in statusCodes
       function isLiveOrApproved(c) {
         const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
-        if (ind.includes('live') || ind.includes('request for disbursement') || ind === 'l') return true;
+        if (ind.includes('live') || ind.includes('request for disbursement') || ind.includes('dbd') || ind === 'l') return true;
         const scRaw = (c.statusCodes || c.statusCode || '');
         let codes = [];
         if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
