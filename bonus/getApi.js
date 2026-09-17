@@ -85,13 +85,6 @@ function handleUnauthorized () {
           }
           return
         }
-        const validUsers = ['nguyen.tuyen-giang', 'le.thanh-nhan3']
-
-        if (!validUsers.includes(usernameInput)) {
-          errorBox.innerText = 'Đăng nhập thất bại!, bạn chưa có quyền truy cập'
-          errorBox.classList.remove('hidden')
-          return
-        }
 
         // Cập nhật Token và ID mới vào Storage
         localStorage.setItem('authToken', res.accessToken)
