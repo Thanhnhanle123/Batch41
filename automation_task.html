@@ -63,20 +63,19 @@
       <div class="card-body">
         <h2 id="salesTitle" class="h5">Báo cáo doanh số hôm nay</h2>
         <p class="text-secondary">
-          Đăng nhập HPO để xem hợp đồng và doanh số của tài khoản này trong ngày hôm nay.
-          Mật khẩu chỉ được gửi trực tiếp đến API đăng nhập và không được lưu lại.
+          Nếu đã có token HPO hợp lệ, hệ thống sẽ dùng lại mà không yêu cầu đăng nhập.
+          Nếu chưa có token, nhập thông tin HPO để lấy báo cáo. Sau đó mở email nháp và bấm Gửi.
         </p>
         <div class="alert alert-info">
-          Muốn tự động gửi báo cáo hằng ngày lúc 18:30 (giờ Việt Nam) đến
-          <strong>lethanhnhancantho65@gmail.com</strong>, chạy tác vụ
-          <strong>Setup Nhân daily sales email</strong> trong VS Code.
-          Windows cần giữ tài khoản người dùng đăng nhập và kết nối Internet.
+          Email sẽ được soạn sẵn gửi đến <strong>lethanhnhancantho65@gmail.com</strong>.
+          Trình duyệt không gửi email tự động; hãy kiểm tra nội dung rồi bấm Gửi trong ứng dụng email.
         </div>
         <div class="mb-3">
           <button id="sendEmailNow" class="btn btn-outline-primary" type="button">
-            Gửi báo cáo qua email ngay
+            Chuẩn bị email báo cáo
           </button>
           <div id="emailStatus" class="status-message mt-2" role="status" aria-live="polite"></div>
+          <div id="emailDraft" class="mt-2"></div>
         </div>
         <form id="salesForm" class="row g-3">
           <div class="col-md-5">
@@ -85,9 +84,9 @@
               value="le.thanh-nhan3" required />
           </div>
           <div class="col-md-5">
-            <label for="password" class="form-label">Mật khẩu</label>
+            <label for="password" class="form-label">Mật khẩu HPO (chỉ cần nếu chưa có token)</label>
             <input id="password" name="password" type="password" class="form-control"
-              autocomplete="current-password" required />
+              autocomplete="current-password" />
           </div>
           <div class="col-md-2 d-flex align-items-end">
             <button id="runReport" class="btn btn-primary w-100" type="submit">Xem doanh số</button>
@@ -109,6 +108,7 @@
       const reportButton = document.getElementById("runReport");
       const emailButton = document.getElementById("sendEmailNow");
       const emailStatus = document.getElementById("emailStatus");
+      const emailDraft = document.getElementById("emailDraft");
       const passwordInput = document.getElementById("password");
 
       function dateKey(date) {
@@ -237,6 +237,37 @@
           body?.userId;
       }
 
+      function getCachedAuthContext() {
+        const token = localStorage.getItem("authToken");
+        const user = JSON.parse(localStorage.getItem("authUser") || "null");
+        const userId = user?.id || user?.userId;
+        if (!token || !userId) return null;
+
+        try {
+          const payloadPart = token.split(".")[1];
+          if (!payloadPart) return null;
+          const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+          const json = decodeURIComponent(
+            atob(base64).split("").map((character) =>
+              `%${character.charCodeAt(0).toString(16).padStart(2, "0")}`
+            ).join("")
+          );
+          const payload = JSON.parse(json);
+          if (typeof payload.exp === "number" && payload.exp <= Date.now() / 1000) {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("authUser");
+            return null;
+          }
+        } catch (error) {
+          console.warn("Không thể kiểm tra token đã lưu; yêu cầu đăng nhập lại.", error);
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("authUser");
+          return null;
+        }
+
+        return { token, userId };
+      }
+
       function getApiDate(date) {
         return [
           String(date.getDate()).padStart(2, "0"),
@@ -260,7 +291,26 @@
         if (!token || !userId) {
           throw new Error("Đăng nhập thành công nhưng API không trả về access token hoặc mã người dùng.");
         }
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authUser", JSON.stringify({ id: userId }));
         return { token, userId };
+      }
+
+      async function getAuthContext() {
+        const cachedAuth = getCachedAuthContext();
+        if (cachedAuth) return cachedAuth;
+
+        const username = document.getElementById("username").value.trim();
+        const password = passwordInput.value;
+        if (!username || !password) {
+          throw new Error("Chưa có token hợp lệ. Vui lòng nhập mật khẩu HPO để đăng nhập.");
+        }
+        return login(username, password);
+      }
+
+      function clearStoredAuth() {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("authUser");
       }
 
       async function loadContracts(token, userId, date) {
@@ -273,6 +323,7 @@
           }
         });
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) clearStoredAuth();
           throw new Error(`Không tải được hợp đồng (HTTP ${response.status}).`);
         }
         const body = await response.json();
@@ -292,6 +343,7 @@
           { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
         );
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) clearStoredAuth();
           throw new Error(`Không tải được chi tiết hợp đồng ${contract.number} (HTTP ${response.status}).`);
         }
         return response.json();
@@ -392,13 +444,11 @@
         salesReport.replaceChildren();
 
         try {
-          const username = document.getElementById("username").value.trim();
-          const { token, userId } = await login(username, passwordInput.value);
-          passwordInput.value = "";
+          const { token, userId } = await getAuthContext();
           const report = await createReport(token, userId);
           renderReport(report);
           salesStatus.className = "status-message mt-3 text-success";
-          salesStatus.textContent = "Đã tải đầy đủ dữ liệu doanh số.";
+          salesStatus.textContent = "Đã tải đầy đủ dữ liệu doanh số và lưu token hợp lệ để dùng lại.";
         } catch (error) {
           salesStatus.className = "status-message mt-3 text-danger";
           salesStatus.textContent = error.message || "Không thể tải báo cáo doanh số.";
@@ -411,20 +461,48 @@
       emailButton.addEventListener("click", async () => {
         emailButton.disabled = true;
         emailStatus.className = "status-message mt-2 text-secondary";
-        emailStatus.textContent = "Đang tạo và gửi báo cáo email...";
+        emailStatus.textContent = "Đang kiểm tra token và tạo báo cáo...";
+        emailDraft.replaceChildren();
 
         try {
-          const response = await fetch("/send-email", { method: "POST" });
-          const result = await response.json();
-          if (!response.ok) {
-            throw new Error(result.message || "Không gửi được email.");
-          }
+          const { token, userId } = await getAuthContext();
+          const report = await createReport(token, userId);
+          renderReport(report);
+          const lines = [
+            `BÁO CÁO DOANH SỐ NHÂN - ${report.today.toLocaleDateString("vi-VN")}`,
+            "",
+            ...["MC", "DL"].flatMap((groupName) => {
+              const values = report.totals[groupName];
+              return [
+                `${groupName}:`,
+                `Hồ sơ: ${values.count}`,
+                `Duyệt: ${values.approved}`,
+                `Rớt: ${values.rejected}`,
+                `Doanh số duyệt: ${formatAmount(values.amount)}`,
+                `BHKV: ${values.insurance}`,
+                ""
+              ];
+            }),
+            `Thẻ được duyệt: ${report.cardCount}`,
+            `Hạn mức thẻ: ${formatAmount(report.cardLimit)}`,
+            `TỔNG DOANH SỐ DUYỆT: ${formatAmount(
+              report.totals.MC.amount + report.totals.DL.amount
+            )}`
+          ];
+          const subject = `Báo cáo doanh số Nhân - ${report.today.toLocaleDateString("vi-VN")}`;
+          const emailLink = document.createElement("a");
+          emailLink.className = "btn btn-success";
+          emailLink.href = `mailto:lethanhnhancantho65@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+          emailLink.textContent = "Mở email nháp để gửi";
+          emailDraft.appendChild(emailLink);
           emailStatus.className = "status-message mt-2 text-success";
-          emailStatus.textContent = result.message;
+          emailStatus.textContent =
+            "Báo cáo đã sẵn sàng. Bấm “Mở email nháp để gửi”, rồi bấm Gửi trong ứng dụng email.";
         } catch (error) {
           emailStatus.className = "status-message mt-2 text-danger";
-          emailStatus.textContent = error.message || "Không gửi được email.";
+          emailStatus.textContent = error.message || "Không thể tạo email báo cáo.";
         } finally {
+          passwordInput.value = "";
           emailButton.disabled = false;
         }
       });
