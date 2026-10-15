@@ -2407,17 +2407,12 @@ Lý do huỷ: ${reason}`;
       async function generateDailyReport() {
         try {
           const contracts = await handleDailyReport();
-
           if (contracts === null) {
             alert('Không thể lấy báo cáo. Vui lòng kiểm tra đăng nhập và thử lại.');
             return;
           }
 
-          if (contracts.length === 0) {
-            alert('Không có hợp đồng nào được tạo trong 15 ngày qua.');
-            return;
-          }
-
+          let reportText = '';
           const reportsByDate = new Map();
           const today = new Date();
           const todayKey = [
@@ -2460,6 +2455,10 @@ Lý do huỷ: ${reason}`;
             }
             return reportsByDate.get(date);
           };
+
+          if (contracts.length === 0) {
+            getDateReport(todayKey);
+          }
 
           for (const contract of contracts) {
             try {
@@ -2528,7 +2527,7 @@ Lý do huỷ: ${reason}`;
           }
 
           const formatAmount = (amount) => amount.toLocaleString('vi-VN');
-          let reportText = '';
+
 
           for (const date of [...reportsByDate.keys()].sort().reverse()) {
             const dateReport = reportsByDate.get(date);

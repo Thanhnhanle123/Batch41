@@ -1,0 +1,45 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Nhan schedule and sales automation",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}\\automation_task_server.ps1"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Setup Nhan daily sales email",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}\\automation_task_setup.ps1"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Send Nhan sales report now",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}\\automation_task_worker.ps1",
+				"-SendNow"
+			],
+			"problemMatcher": []
+		}
+	]
+}
