@@ -243,6 +243,10 @@
       max-width: 420px
     }
 
+    #dailyReportModal .modal-dialog {
+      max-width: 800px
+    }
+
     .modal .modal-content {
       border-radius: 12px;
       padding: 0;
@@ -754,6 +758,7 @@
               <th>Loại</th>
               <th>Số tiền</th>
               <th>Trạng thái</th>
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody id="customersTbody"></tbody>
@@ -787,6 +792,25 @@
           </div>
           <div class="modal-footer">
             <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="dailyReportModal" tabindex="-1" aria-labelledby="dailyReportModalTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="dailyReportModalTitle">Báo cáo ngày</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <label for="dailyReportText" class="form-label">Bạn có thể chỉnh sửa nội dung trước khi sao chép</label>
+            <textarea id="dailyReportText" class="form-control" rows="18" spellcheck="false"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary" id="copyDailyReportBtn">Sao chép báo cáo</button>
           </div>
         </div>
       </div>
@@ -1568,7 +1592,7 @@
             // API failed or user not authenticated — do not fallback to local files
             console.warn('API load contracts failed or not authenticated');
             const tbody = document.getElementById('customersTbody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Không thể tải dữ liệu từ API. Vui lòng đăng nhập hoặc kiểm tra kết nối.</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Không thể tải dữ liệu từ API. Vui lòng đăng nhập hoặc kiểm tra kết nối.</td></tr>';
             // ensure analytics see empty dataset
             window._allContracts = [];
             if (typeof renderAnalytics === 'function') renderAnalytics([]);
@@ -1941,6 +1965,62 @@
         });
       }
 
+      function formatCustomerCopyDate(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('vi-VN');
+      }
+
+      async function copyCustomerInfo(contract, button) {
+        const customer = contract.customer || {};
+        const name = [customer.lastName, customer.middleName, customer.firstName]
+          .filter(Boolean)
+          .join(' ') || contract.customerName || contract.customer_fullname || '';
+        const content = [
+          `Họ tên : ${name}`,
+          `Số cccd : ${customer.nationalId || contract.nationalId || ''}`,
+          `Số điện thoại : ${customer.phoneNumber || contract.customerPhone || ''}`,
+          `Khoản vay : ${Number(contract.financedAmount || contract.totalPurchase || 0).toLocaleString('vi-VN')}`,
+          `Ngày giải ngân : ${formatCustomerCopyDate(contract.disbursementDate || contract.disbursedDate)}`
+        ].join('\n');
+
+        try {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(content);
+            } catch (clipboardError) {
+              console.warn('Không thể dùng clipboard API, thử cách sao chép dự phòng:', clipboardError);
+              const textArea = document.createElement('textarea');
+              textArea.value = content;
+              textArea.style.position = 'fixed';
+              textArea.style.opacity = '0';
+              document.body.appendChild(textArea);
+              textArea.select();
+              const copied = document.execCommand('copy');
+              textArea.remove();
+              if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+            }
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = content;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            const copied = document.execCommand('copy');
+            textArea.remove();
+            if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+          }
+
+          const originalText = button.textContent;
+          button.textContent = 'Đã sao chép';
+          setTimeout(() => { button.textContent = originalText; }, 1500);
+        } catch (error) {
+          console.error('Lỗi sao chép thông tin khách hàng:', error);
+          alert('Không thể sao chép thông tin. Vui lòng thử lại.');
+        }
+      }
+
       function renderCustomers(arr) {
         const tbody = document.getElementById('customersTbody'); tbody.innerHTML = '';
         let sumTenor = 0, countTenor = 0;
@@ -1960,6 +2040,18 @@
           const cols = [String(idx + 1), name, phone, nid, contractNo, type, amountText, `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`];
           const colLabels = ['#', 'Tên khách', 'SĐT', 'CMND', 'Hợp đồng', 'Loại', 'Số tiền', 'Trạng thái'];
           cols.forEach((val, i) => { const td = document.createElement('td'); td.setAttribute('data-label', colLabels[i]); if (i === 6) td.style.textAlign = 'right'; if (i === 7) td.innerHTML = val; else td.textContent = val; tr.appendChild(td); });
+          const actionCell = document.createElement('td');
+          actionCell.setAttribute('data-label', 'Thao tác');
+          const copyButton = document.createElement('button');
+          copyButton.type = 'button';
+          copyButton.className = 'btn btn-sm btn-outline-primary';
+          copyButton.textContent = 'Sao chép';
+          copyButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            copyCustomerInfo(c, copyButton);
+          });
+          actionCell.appendChild(copyButton);
+          tr.appendChild(actionCell);
           tr.addEventListener('click', () => showProductsForContract(c));
           tbody.appendChild(tr);
           // tenor stats (only count MC contracts that are LIVE or APPROVED_HARD_COPY_STATUS)
@@ -2317,262 +2409,202 @@ Lý do huỷ: ${reason}`;
           const contracts = await handleDailyReport();
 
           if (contracts === null) {
-            console.warn('Không thể lấy báo cáo');
+            alert('Không thể lấy báo cáo. Vui lòng kiểm tra đăng nhập và thử lại.');
             return;
           }
 
           if (contracts.length === 0) {
-            alert('Không có hồ sơ trong ngày');
+            alert('Không có hợp đồng nào được tạo trong 15 ngày qua.');
             return;
           }
 
-          const detailContracts = await Promise.all(
-            contracts.map(async (contract) => {
-              try {
-                const detail = await getDataNumber(contract);
+          const reportsByDate = new Map();
+          const today = new Date();
+          const todayKey = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, '0'),
+            String(today.getDate()).padStart(2, '0')
+          ].join('-');
 
-                return { contract, detail };
-              } catch (e) {
-                console.error('Lỗi lấy chi tiết:', contract.number, e);
-                return null;
-              }
-            })
-          );
+          const getReportDate = (contract, details) => {
+            const value = details.createdDate || details.created_date ||
+              contract.createdDate || contract.created_date;
+            if (!value) return todayKey;
 
-          let reports = {};
-          let hasMC = false;
+            const datePrefix = String(value).match(/^(\d{4}-\d{2}-\d{2})/);
+            if (datePrefix) return datePrefix[1];
 
-          for (const item of detailContracts) {
-            if (!item) continue;
+            const parsedDate = new Date(value);
+            if (Number.isNaN(parsedDate.getTime())) return todayKey;
+            return [
+              parsedDate.getFullYear(),
+              String(parsedDate.getMonth() + 1).padStart(2, '0'),
+              String(parsedDate.getDate()).padStart(2, '0')
+            ].join('-');
+          };
 
-            const { contract, detail } = item;
-
-            const type = contract.type || '';
-            const status = contract.status || '';
-            const amount = Number(contract.financedAmount || 0);
-            const insurance = detail?.submittedPosScheme?.schemeLiCode ? 1 : 0;
-            const posCode = detail?.submittedPosScheme?.posCode || '';
-            const posName = detail?.submittedPosScheme?.posName || '';
-
-            let groupKey = posCode || 'MC_NO_POS';
-            if (type === '2W') {
-              hasMC = true;
-            }
-
-            if (!reports[groupKey]) {
-              reports[groupKey] = {
-                posCode: groupKey,
-                posName,
-
-                tm: 0,
-
-                mc: {
-                  mc: 0,
-                  nhap: 0,
-                  duyet: 0,
-                  rot: 0,
-                  cho: 0,
-                  doanhSo: 0,
-                  bhkv: 0
-                },
-
-                dl: {
-                  dl: 0,
-                  dau: 0,
-                  thucHien: 0,
-                  rot: 0,
-                  cho: 0,
-                  doanhSo: 0,
-                  bhkv: 0
-                },
-
-                doiThu: {
-                  doiThu: 0,
-                  ppf: 0,
-                  fe: 0,
-                  mc: 0,
-                  jaccs: 0
-                },
-
-                the: {
-                  the: 0,
-                  hanMuc: 0
-                }
-              };
-            }
-
-            const report = reports[groupKey];
-
-            // ==========================
-            // MC
-            // ==========================
-            if (type === '2W') {
-              report.mc.mc++;
-              report.mc.nhap++;
-
-              switch (status) {
-                case 'APPROVED_HARD_COPY_STATUS', 'WAIT_FOR_CHECKING_DISBURSEMENT_STATUS':
-                  report.mc.duyet++;
-                  report.mc.doanhSo += amount;
-                  report.mc.bhkv += insurance ? 1 : 0;
-                  break;
-
-                case 'REJECT_STATUS':
-                  report.mc.rot++;
-                  break;
-
-                default:
-                  report.mc.cho++;
-                  break;
-              }
-            }
-
-            // ==========================
-            // DL
-            // ==========================
-            else if (type === 'DL') {
-              report.dl.dl++;
-              report.dl.dau++;
-
-              switch (status) {
-                case 'APPROVED_HARD_COPY_STATUS':
-                  report.dl.thucHien++;
-                  report.dl.doanhSo += amount;
-                  report.dl.bhkv += insurance ? 1 : 0;
-                  break;
-
-                case 'REJECT_STATUS':
-                  report.dl.rot++;
-                  break;
-
-                default:
-                  report.dl.cho++;
-                  break;
-              }
-            }
-          }
-
-          if (!hasMC) {
-            const dlGlobal = {
-              posCode: 'DL_GLOBAL',
-              posName: '',
-              tm: 0,
-              mc: {
-                mc: 0,
-                nhap: 0,
-                duyet: 0,
-                rot: 0,
-                cho: 0,
-                doanhSo: 0,
-                bhkv: 0
-              },
-              dl: {
-                dl: 0,
-                dau: 0,
-                thucHien: 0,
-                rot: 0,
-                cho: 0,
-                doanhSo: 0,
-                bhkv: 0
-              },
-              doiThu: {
-                doiThu: 0,
-                ppf: 0,
-                fe: 0,
-                mc: 0,
-                jaccs: 0
-              },
-              the: {
-                the: 0,
-                hanMuc: 0
-              }
-            };
-
-            Object.values(reports).forEach((r) => {
-              dlGlobal.tm += Number(r.tm || 0);
-              dlGlobal.dl.dl += Number(r.dl.dl || 0);
-              dlGlobal.dl.dau += Number(r.dl.dau || 0);
-              dlGlobal.dl.thucHien += Number(r.dl.thucHien || 0);
-              dlGlobal.dl.rot += Number(r.dl.rot || 0);
-              dlGlobal.dl.cho += Number(r.dl.cho || 0);
-              dlGlobal.dl.doanhSo += Number(r.dl.doanhSo || 0);
-              dlGlobal.dl.bhkv += Number(r.dl.bhkv || 0);
-            });
-
-            reports = { DL_GLOBAL: dlGlobal };
-          }
-
-          const arrReport = Object.values(reports);
-
-          // ==========================
-          // TEXT REPORT
-          // ==========================
-          const now = new Date();
-
-          const reportDate =
-            String(now.getDate()).padStart(2, '0') +
-            '.' +
-            String(now.getMonth() + 1).padStart(2, '0');
-
-          let reportText = `Em B/C ngày ${reportDate}\n\n`;
-
-          arrReport.forEach(r => {
-            reportText += `${r.posCode}`;
-
-            if (r.posName) {
-              reportText += ` - ${r.posName}`;
-            }
-
-            reportText += '\n\n';
-
-            reportText += `TM : ${r.tm}\n`;
-            reportText += '---------------------------\n';
-
-            reportText += `MC : ${r.mc.mc}\n`;
-            reportText += `Nhập : ${r.mc.nhap}\n`;
-            reportText += `Duyệt : ${r.mc.duyet}\n`;
-            reportText += `Rớt : ${r.mc.rot}\n`;
-            reportText += `Doanh số : ${r.mc.doanhSo.toLocaleString('vi-VN')}\n`;
-            reportText += `BHKV : ${r.mc.bhkv}\n`;
-
-            reportText += '---------------------------\n';
-
-            reportText += `DL : ${r.dl.dl}\n`;
-            reportText += `Đầu : ${r.dl.dau}\n`;
-            reportText += `Thực hiện : ${r.dl.thucHien}\n`;
-            reportText += `Rớt : ${r.dl.rot}\n`;
-            reportText += `Doanh số : ${r.dl.doanhSo.toLocaleString('vi-VN')}\n`;
-            reportText += `BHKV : ${r.dl.bhkv}\n`;
-
-            reportText += '---------------------------\n';
-
-            reportText += `Đối thủ : ${r.doiThu.doiThu}\n`;
-            reportText += `PPF : ${r.doiThu.ppf}\n`;
-            reportText += `FE : ${r.doiThu.fe}\n`;
-            reportText += `MC : ${r.doiThu.mc}\n`;
-            reportText += `JACCS : ${r.doiThu.jaccs}\n`;
-
-            reportText += '---------------------------\n';
-
-            reportText += `Thẻ : ${r.the.the}\n`;
-            reportText += `Hạn mức : ${r.the.hanMuc.toLocaleString('vi-VN')}\n`;
-
-            reportText += '\n================================\n\n';
+          const createPosReport = (posCode, posName = '') => ({
+            posCode,
+            posName,
+            tm: 0,
+            mc: { total: 0, input: 0, approve: 0, reject: 0, loanTotal: 0, insurance: 0 },
+            dl: { total: 0, input: 0, approve: 0, reject: 0, loanTotal: 0, insurance: 0 },
+            cards: 0,
+            cardLimit: 0,
+            competitors: { total: 0, ppf: 0, fe: 0, mc: 0, jaccs: 0 }
           });
 
-          try {
-            await navigator.clipboard.writeText(reportText);
-            alert('Đã copy báo cáo');
-          } catch (e) {
-            console.warn('Không copy được clipboard');
+          const getDateReport = (date) => {
+            if (!reportsByDate.has(date)) {
+              reportsByDate.set(date, { posReports: new Map(), dl: createPosReport('') });
+            }
+            return reportsByDate.get(date);
+          };
+
+          for (const contract of contracts) {
+            try {
+              const contractDetails = await getDataNumber(contract);
+              if (!contractDetails) continue;
+
+              const type = contractDetails.type || contract.type;
+              if (type !== '2W' && type !== 'DL') continue;
+
+              const dateReport = getDateReport(getReportDate(contract, contractDetails));
+              const status = String(contractDetails.status || contract.status || '');
+              const isRejected = status.includes('REJECT');
+              const isApproved = status.includes('APPROVE');
+              const amountValue = Number(contractDetails.financedAmount ?? contract.financedAmount ?? 0);
+              const amount = Number.isFinite(amountValue) ? amountValue : 0;
+              const posScheme = contractDetails.submittedPosScheme || contract.submittedPosScheme;
+              const hasInsurance = posScheme?.schemeLiCode !== null &&
+                posScheme?.schemeLiCode !== undefined;
+
+              if (type === '2W') {
+                const posCode = contractDetails.submittedPosScheme?.posCode ||
+                  contract.submittedPosScheme?.posCode || 'UNKNOWN_POS';
+                const posName = contractDetails.submittedPosScheme?.posName ||
+                  contract.submittedPosScheme?.posName || '';
+                if (!dateReport.posReports.has(posCode)) {
+                  dateReport.posReports.set(posCode, createPosReport(posCode, posName));
+                }
+
+                const mc = dateReport.posReports.get(posCode).mc;
+                mc.total++;
+                mc.input++;
+                if (isRejected) {
+                  mc.reject++;
+                } else if (isApproved) {
+                  mc.approve++;
+                  mc.loanTotal += amount;
+                  if (hasInsurance) mc.insurance++;
+                }
+              } else {
+                const dl = dateReport.dl.dl;
+                dl.total++;
+                dl.input++;
+                if (isRejected) {
+                  dl.reject++;
+                } else if (isApproved) {
+                  dl.approve++;
+                  dl.loanTotal += amount;
+                  if (hasInsurance) dl.insurance++;
+
+                  const cardLimitValue = Number(contractDetails.cardCreditLimit || 0);
+                  const cardLimit = Number.isFinite(cardLimitValue) ? cardLimitValue : 0;
+                  if (cardLimit > 0) {
+                    dateReport.dl.cards++;
+                    dateReport.dl.cardLimit += cardLimit;
+                  }
+                }
+              }
+            } catch (innerError) {
+              console.error('Lỗi khi xử lý contract cụ thể:', contract, innerError);
+            }
           }
 
-          return { reports: arrReport, reportText };
+          if (reportsByDate.size === 0) {
+            alert('Không có dữ liệu hợp lệ để lập báo cáo.');
+            return;
+          }
 
+          const formatAmount = (amount) => amount.toLocaleString('vi-VN');
+          let reportText = '';
+
+          for (const date of [...reportsByDate.keys()].sort().reverse()) {
+            const dateReport = reportsByDate.get(date);
+            const posReports = [...dateReport.posReports.values()];
+            if (posReports.length === 0) {
+              posReports.push(createPosReport('UNKNOWN_POS'));
+            }
+
+            const firstPos = posReports[0];
+            firstPos.dl = dateReport.dl.dl;
+            firstPos.cards = dateReport.dl.cards;
+            firstPos.cardLimit = dateReport.dl.cardLimit;
+
+            reportText += `Em B/C ngày ${date}\n\n`;
+            for (const report of posReports) {
+              reportText += `${report.posCode}${report.posName ? ` - ${report.posName}` : ''}\n`;
+              reportText += `TM : ${report.tm}\n`;
+              reportText += '---------------------------\n';
+              reportText += `MC : ${report.mc.total}\n`;
+              reportText += `Nhập : ${report.mc.input}\n`;
+              reportText += `Duyệt : ${report.mc.approve}\n`;
+              reportText += `Rớt : ${report.mc.reject}\n`;
+              reportText += `Doanh số : ${formatAmount(report.mc.loanTotal)}\n`;
+              reportText += `BHKV : ${report.mc.insurance}\n`;
+              reportText += '---------------------------\n';
+              reportText += `DL : ${report.dl.total}\n`;
+              reportText += `Thực hiện : ${report.dl.input}\n`;
+              reportText += `Duyệt : ${report.dl.approve}\n`;
+              reportText += `Rớt : ${report.dl.reject}\n`;
+              reportText += `Doanh số : ${formatAmount(report.dl.loanTotal)}\n`;
+              reportText += `BHKV : ${report.dl.insurance}\n`;
+              reportText += '---------------------------\n';
+              reportText += `Thẻ : ${report.cards}\n`;
+              reportText += `Hạn mức : ${formatAmount(report.cardLimit)}\n`;
+              reportText += '---------------------------\n';
+              reportText += `Đối thủ : ${report.competitors.total}\n`;
+              reportText += `PPF : ${report.competitors.ppf}\n`;
+              reportText += `FE : ${report.competitors.fe}\n`;
+              reportText += `MC : ${report.competitors.mc}\n`;
+              reportText += `JACCS : ${report.competitors.jaccs}\n`;
+              reportText += '\n===================\n\n';
+            }
+          }
+
+          document.getElementById('dailyReportText').value = reportText.trimEnd();
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('dailyReportModal')).show();
         } catch (e) {
           console.error('Lỗi tạo báo cáo:', e);
+          alert('Đã xảy ra lỗi khi tạo báo cáo. Vui lòng thử lại.');
         }
       }
+
+      document.getElementById('copyDailyReportBtn').addEventListener('click', async () => {
+        const reportText = document.getElementById('dailyReportText');
+        try {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(reportText.value);
+              alert('Đã sao chép báo cáo.');
+              return;
+            } catch (clipboardError) {
+              console.warn('Không thể dùng clipboard API, thử cách sao chép dự phòng:', clipboardError);
+            }
+          }
+
+          reportText.focus();
+          reportText.select();
+          if (!document.execCommand('copy')) {
+            throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+          }
+          alert('Đã sao chép báo cáo.');
+        } catch (error) {
+          console.error('Lỗi sao chép báo cáo:', error);
+          alert('Không thể sao chép báo cáo. Vui lòng chọn và sao chép nội dung thủ công.');
+        }
+      });
 
       async function handleDailyReport() {
 
@@ -2615,7 +2647,6 @@ Lý do huỷ: ${reason}`;
       }
 
       async function getDataNumber(contract) {
-
         const token = getAuthToken();
 
         const res = await fetch(
@@ -2627,7 +2658,17 @@ Lý do huỷ: ${reason}`;
           }
         );
 
-        return await res.json();
+        // Kiểm tra nếu API trả về lỗi HTTP (ví dụ: 404, 500...)
+        if (!res.ok) {
+          console.warn(`API lỗi cho hợp đồng ${contract.number}: Status ${res.status}`);
+          return null;
+        }
+
+        // Lấy dữ liệu dưới dạng text trước để phòng trường hợp body trống
+        const text = await res.text();
+
+        // Nếu có nội dung thì parse JSON, ngược lại trả về null
+        return text ? JSON.parse(text) : null;
       }
 
       // load on script end
