@@ -2021,6 +2021,80 @@
         }
       }
 
+      async function showCustomerInfo(contract, button) {
+        const customer = contract.customer || {};
+        const product = contract.submittedProducts || {}
+        const name = [customer.lastName, customer.middleName, customer.firstName]
+          .filter(Boolean)
+          .join(' ') || contract.customerName || contract.customer_fullname || '';
+        // 80-CTH-Thành phố Cần Thơ lấy từ địa chỉ sổ hộ khẩu, ví dụ: "80-CTH-Thành phố Cần Thơ" -> "Thành phố Cần Thơ"
+        const city = (customer.familyBookAddressProvince || '').split('-').slice(2).join('-').trim();
+        const phone = customer.phoneNumber;
+        const address = [
+        customer.familyBookNumber, customer.familyBookNumber == null ? '' : ',',
+        customer.familyBookAddressStreet,',',
+        customer.familyBookAddressWard,',',
+        city
+      ]
+          .filter(Boolean)
+          .join(' ')
+        const modelDesc = product[0]?.modelDesc;
+        // Prepare content for display
+        /*
+          HDSAISON
+          Tên: name
+          SDT: phone
+          ĐC: ${customer.address || contract.customerAddress || ''}
+          Xe: ${modelDesc}, Trả trước: ${Number(contract.downPaymentAmount || 0).toLocaleString('vi-VN')} ₫, Giá trị xe: ${Number(contract.totalPurchase || 0).toLocaleString('vi-VN')} ₫
+          BH: ABC
+          Hồ sơ: if contract.status == reject ? Hồ sơ rớt: Hồ sơ duyệt
+        */
+        const content = [
+          'HDSAISON',
+          `Tên: ${name}`,
+          `Sđt: ${phone}`,
+          `Đc: ${address}`,
+          `Xe: ${modelDesc}, Trả trước: ${Number(contract.downPaymentAmount || 0).toLocaleString('vi-VN')}`,
+          `BH: Tên BH`,
+          `Hồ sơ: ${(contract.status || '').toString().toLowerCase().includes('reject') ? 'Hồ sơ rớt' : 'Hồ sơ duyệt'}`
+        ].join('\n');
+        try {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(content);
+            } catch (clipboardError) {
+              console.warn('Không thể dùng clipboard API, thử cách sao chép dự phòng:', clipboardError);
+              const textArea = document.createElement('textarea');
+              textArea.value = content;
+              textArea.style.position = 'fixed';
+              textArea.style.opacity = '0';
+              document.body.appendChild(textArea);
+              textArea.select();
+              const copied = document.execCommand('copy');
+              textArea.remove();
+              if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+            }
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = content;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            const copied = document.execCommand('copy');
+            textArea.remove();
+            if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+          }
+
+          const originalText = button.textContent;
+          button.textContent = 'Đã lấy thông tin';
+          setTimeout(() => { button.textContent = originalText; }, 1500);
+        } catch (error) {
+          console.error('Lỗi lấy thông tin khách hàng:', error);
+          alert('Không thể lấy thông tin. Vui lòng thử lại.');
+        }
+      }
+
       function renderCustomers(arr) {
         const tbody = document.getElementById('customersTbody'); tbody.innerHTML = '';
         let sumTenor = 0, countTenor = 0;
@@ -2050,7 +2124,18 @@
             event.stopPropagation();
             copyCustomerInfo(c, copyButton);
           });
+
+          const infoButton = document.createElement('button');
+          infoButton.type = 'button';
+          infoButton.className = 'btn btn-sm btn-outline-primary';
+          infoButton.textContent = 'Thông tin';
+          infoButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            showCustomerInfo(c, infoButton);
+          });
+
           actionCell.appendChild(copyButton);
+          actionCell.appendChild(infoButton);
           tr.appendChild(actionCell);
           tr.addEventListener('click', () => showProductsForContract(c));
           tbody.appendChild(tr);
