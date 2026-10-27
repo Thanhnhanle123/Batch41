@@ -618,6 +618,42 @@
       display: block;
       margin: auto;
     }
+
+    /* Tùy chỉnh riêng cho modal thẻ thông tin khách hàng rộng hơn */
+    #customerCardModal .modal-dialog {
+      max-width: 950px !important;
+    }
+
+    @media (max-width: 992px) {
+      #customerCardModal .modal-dialog {
+        max-width: 95% !important;
+      }
+    }
+
+    /* Tối ưu hóa thẻ thông tin khi xem trên điện thoại hoặc màn hình nhỏ */
+    @media (max-width: 768px) {
+      #printableCustomerCard .row {
+        flex-direction: column !important;
+      }
+
+      #printableCustomerCard .col-md-7,
+      #printableCustomerCard .col-md-5 {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-right: none !important;
+        padding: 0 !important;
+      }
+
+      #printableCustomerCard .col-md-5 {
+        margin-top: 15px !important;
+        text-align: center !important;
+      }
+
+      #customerCardModal .modal-dialog {
+        max-width: 96% !important;
+        margin: 10px auto !important;
+      }
+    }
   </style>
 </head>
 
@@ -765,6 +801,108 @@
         </table>
       </div>
       <div class="text-muted small">Nhấp vào một dòng để xem thông tin sản phẩm.</div>
+      <div class="modal fade" id="customerCardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title fw-bold">THẺ THÔNG TIN KHÁCH HÀNG</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+              <div class="card mb-4 border-primary bg-light">
+                <div class="card-body py-2 px-3">
+                  <label for="selectBankAcc" class="form-label fw-bold text-primary mb-1">
+                    <i class="bi bi-bank"></i> Chọn Số tài khoản thụ hưởng (HD Bank):
+                  </label>
+                  <select id="selectBankAcc" class="form-select form-select-sm fw-bold text-dark">
+                    <option value="10001">HD BANK - STK: 10001 (Tài khoản Công ty HD SAISON)</option>
+                    <option value="10002">HD BANK - STK: 10002 (Tài khoản Thu hộ HD SAISON)</option>
+                    <option value="custom">-- Nhập số tài khoản HD Bank khác --</option>
+                  </select>
+                  <input type="text" id="customBankAcc" class="form-control form-control-sm mt-2 d-none"
+                    placeholder="Nhập số tài khoản HD Bank mới..." />
+                </div>
+              </div>
+
+              <div id="printableCustomerCard"
+                class="border border-2 border-dashed p-3 rounded position-relative bg-white"
+                style="border-color: #dc3545 !important;">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fs-4 fw-bold text-danger">HD</span><span class="fs-5 fw-bold text-dark">Finance</span>
+                  </div>
+                  <div class="text-end">
+                    <h6 class="fw-bold text-danger mb-0">THẺ THÔNG TIN KHÁCH HÀNG</h6>
+                    <small class="text-muted">HD SAISON Finance</small>
+                  </div>
+                </div>
+
+                <div class="row align-items-center">
+                  <div class="col-md-7 border-end-md">
+                    <table class="table table-borderless table-sm mb-0">
+                      <tbody>
+                        <tr>
+                          <td class="fw-bold text-secondary" style="width: 140px;">Họ và tên:</td>
+                          <td class="fw-bold text-primary fs-6" id="cardCustName">---</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Số hợp đồng:</td>
+                          <td class="fw-bold text-danger fs-6" id="cardContractNo">---</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Số tiền thanh toán:</td>
+                          <td class="fw-bold text-success fs-6" id="cardMonthlyInstallment">--- ₫ / tháng</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Ngân hàng thụ hưởng:</td>
+                          <td class="fw-bold text-dark" id="cardBankName">HD BANK</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Tài khoản thụ hưởng:</td>
+                          <td class="fw-bold text-dark" id="cardBankAccNo">---</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Thời gian đóng tiền:</td>
+                          <td class="fw-bold text-dark">
+                            <span id="cardStartDate" class="badge bg-info text-dark">---</span>
+                            <i class="bi bi-arrow-right"></i>
+                            <span id="cardEndDate" class="badge bg-secondary">---</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Cú pháp chuyển khoản:</td>
+                          <td class="fw-bold text-primary" id="cardTransferSyntax">---</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small" role="alert">
+                      <i class="bi bi-exclamation-triangle-fill"></i> <strong>Lưu ý:</strong> Vui lòng chuyển khoản đúng
+                      Cú pháp & Số hợp đồng để hệ thống gạch nợ tự động chính xác.
+                    </div>
+                  </div>
+
+                  <div class="col-md-5 text-center mt-3 mt-md-0">
+                    <div class="p-2 border rounded bg-light d-inline-block shadow-sm">
+                      <img id="cardQrCodeImg" src="" alt="Mã QR Chuyển khoản VietQR"
+                        style="width: 180px; height: 180px; object-fit: contain;" />
+                      <div class="fw-bold text-danger small mt-1">QUÉT MÃ VIETQR ĐỂ THANH TOÁN</div>
+                      <div class="text-muted style-italic" style="font-size: 11px;">Tự động điền đúng STK, Số tiền & Nội
+                        dung</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+              <button type="button" class="btn btn-danger" onclick="outputCustomerCardPDF()">
+                <i class="bi bi-printer"></i> Xuất file PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Login modal: will appear if no auth token is stored -->
@@ -822,6 +960,8 @@
       src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
 
       // Utility to format currency (VND)
@@ -2031,11 +2171,11 @@
         const city = (customer.familyBookAddressProvince || '').split('-').slice(2).join('-').trim();
         const phone = customer.phoneNumber;
         const address = [
-        customer.familyBookNumber, customer.familyBookNumber == null ? '' : ',',
-        customer.familyBookAddressStreet,',',
-        customer.familyBookAddressWard,',',
-        city
-      ]
+          customer.familyBookNumber, customer.familyBookNumber == null ? '' : ',',
+          customer.familyBookAddressStreet, ',',
+          customer.familyBookAddressWard, ',',
+          city
+        ]
           .filter(Boolean)
           .join(' ')
         const modelDesc = product[0]?.modelDesc;
@@ -2134,8 +2274,18 @@
             showCustomerInfo(c, infoButton);
           });
 
+          const cardButton = document.createElement('button');
+          cardButton.type = 'button';
+          cardButton.className = 'btn btn-sm btn-outline-danger ms-1';
+          cardButton.innerHTML = '<i class="bi bi-card-heading"></i> Thẻ TT';
+          cardButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openCustomerCardModal(c);
+          });
+
           actionCell.appendChild(copyButton);
           actionCell.appendChild(infoButton);
+          actionCell.appendChild(cardButton);
           tr.appendChild(actionCell);
           tr.addEventListener('click', () => showProductsForContract(c));
           tbody.appendChild(tr);
@@ -2249,6 +2399,94 @@
           }, 250);
         });
       })();
+
+      function openCustomerCardModal(contract) {
+        const modalEl = document.getElementById('customerCardModal');
+        if (!modalEl) return;
+
+        const modal = new bootstrap.Modal(modalEl);
+        const customer = contract.customer || {};
+        const name = [customer.lastName, customer.middleName, customer.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || 'KHACH HANG';
+        const contractNo = contract.number || contract.code || '---';
+        const monthlyInstallment = Number(contract.monthlyInstallment || 0);
+        const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
+        const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
+
+        function fmtDate(d) {
+          try {
+            if (!d) return '---';
+            const dt = new Date(d);
+            return isNaN(dt.getTime()) ? d : dt.toLocaleDateString('vi-VN');
+          } catch (e) { return d; }
+        }
+
+        function computeEndDate(start, months) {
+          try {
+            if (!start || !months) return null;
+            const dt = new Date(start);
+            const end = new Date(dt);
+            end.setMonth(end.getMonth() + Number(months));
+            return end;
+          } catch (e) { return null; }
+        }
+
+        const startDateStr = fmtDate(startingInstallmentDate);
+        const endDateObj = computeEndDate(startingInstallmentDate, tenorInMonths);
+        const endDateStr = endDateObj ? fmtDate(endDateObj) : '---';
+
+        document.getElementById('cardCustName').textContent = name;
+        document.getElementById('cardContractNo').textContent = contractNo;
+        document.getElementById('cardMonthlyInstallment').textContent = `${Number(monthlyInstallment).toLocaleString('vi-VN')} ₫ / tháng`;
+        document.getElementById('cardBankName').textContent = 'HD BANK';
+        document.getElementById('cardBankAccNo').textContent = '---';
+        document.getElementById('cardStartDate').textContent = startDateStr;
+        document.getElementById('cardEndDate').textContent = endDateStr;
+        document.getElementById('cardTransferSyntax').textContent = '---';
+        document.getElementById('cardQrCodeImg').src = '';
+
+        const bankSelect = document.getElementById('selectBankAcc');
+        const customBankInput = document.getElementById('customBankAcc');
+        const defaultAccount = '10001';
+        bankSelect.value = defaultAccount;
+        customBankInput.value = '';
+        customBankInput.classList.add('d-none');
+
+        const updateSelectedBank = () => {
+          const selectedValue = bankSelect.value;
+          const accountNo = selectedValue === 'custom' ? (customBankInput.value.trim() || defaultAccount) : selectedValue;
+          const displayAcc = accountNo || defaultAccount;
+          document.getElementById('cardBankAccNo').textContent = displayAcc;
+          const cleanName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toUpperCase();
+          const transferContent = `${contractNo} ${cleanName}`.trim();
+          document.getElementById('cardTransferSyntax').textContent = transferContent;
+          const bankId = 'HDB';
+          const template = 'compact2';
+          const accountName = 'CONG TY TAI CHINH HD SAISON';
+          const amountValue = Number(monthlyInstallment || 0);
+          const qrUrl = `https://img.vietqr.io/image/${bankId}-${displayAcc}-${template}.png?amount=${amountValue}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(accountName)}`;
+          document.getElementById('cardQrCodeImg').src = qrUrl;
+        };
+
+        bankSelect.onchange = () => {
+          const isCustom = bankSelect.value === 'custom';
+          customBankInput.classList.toggle('d-none', !isCustom);
+          if (!isCustom) {
+            customBankInput.value = '';
+            updateSelectedBank();
+          } else {
+            customBankInput.focus();
+          }
+        };
+
+        customBankInput.oninput = () => {
+          if (bankSelect.value === 'custom') {
+            updateSelectedBank();
+          }
+        };
+
+        updateSelectedBank();
+        modal.show();
+      }
 
       function showProductsForContract(contract) {
         const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
@@ -2754,6 +2992,50 @@ Lý do huỷ: ${reason}`;
         // Nếu có nội dung thì parse JSON, ngược lại trả về null
         return text ? JSON.parse(text) : null;
       }
+
+      async function outputCustomerCardPDF() {
+        try {
+          const element = document.getElementById('printableCustomerCard');
+          if (!element) {
+            alert('Không tìm thấy nội dung thẻ thông tin khách hàng!');
+            return;
+          }
+
+          // Hiển thị thông báo đang xử lý nếu cần
+          const { jsPDF } = window.jspdf;
+
+          // Dùng html2canvas để render element thành canvas sau đó đưa vào jsPDF
+          if (typeof html2canvas === 'undefined') {
+            alert('Thư viện html2canvas chưa được tải!');
+            return;
+          }
+
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            logging: false
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          // Canh giữa trang PDF hoặc đặt lề đẹp mắt
+          const margin = 10;
+          const renderWidth = pdfWidth - (margin * 2);
+          const renderHeight = (canvas.height * renderWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', margin, margin, renderWidth, renderHeight);
+
+          const contractNo = document.getElementById('cardContractNo').textContent || 'card';
+          pdf.save(`The_Thong_Tin_${contractNo.trim()}.pdf`);
+        } catch (error) {
+          console.error('Lỗi xuất PDF bằng jsPDF:', error);
+          alert('Có lỗi xảy ra khi xuất file PDF. Vui lòng thử lại.');
+        }
+      }
+
 
       // load on script end
       loadCustomersTable();
