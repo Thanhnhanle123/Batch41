@@ -816,8 +816,8 @@
                     <i class="bi bi-bank"></i> Chọn Số tài khoản thụ hưởng (HD Bank):
                   </label>
                   <select id="selectBankAcc" class="form-select form-select-sm fw-bold text-dark">
-                    <option value="10001">HD BANK - STK: 10001 (Tài khoản Công ty HD SAISON)</option>
-                    <option value="10002">HD BANK - STK: 10002 (Tài khoản Thu hộ HD SAISON)</option>
+                    <option value="002704070014601">HD BANK - STK: 002704070014601 (Tài khoản Công ty HD SAISON)
+                    </option>
                     <option value="custom">-- Nhập số tài khoản HD Bank khác --</option>
                   </select>
                   <input type="text" id="customBankAcc" class="form-control form-control-sm mt-2 d-none"
@@ -830,11 +830,11 @@
                 style="border-color: #dc3545 !important;">
                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
                   <div class="d-flex align-items-center gap-2">
-                    <span class="fs-4 fw-bold text-danger">HD</span><span class="fs-5 fw-bold text-dark">Finance</span>
+                    <span class="fs-4 fw-bold text-danger">HD</span><span class="fs-5 fw-bold text-dark">SAISON</span>
                   </div>
                   <div class="text-end">
                     <h6 class="fw-bold text-danger mb-0">THẺ THÔNG TIN KHÁCH HÀNG</h6>
-                    <small class="text-muted">HD SAISON Finance</small>
+                    <small class="text-muted">HD SAISON</small>
                   </div>
                 </div>
 
@@ -848,7 +848,7 @@
                         </tr>
                         <tr>
                           <td class="fw-bold text-secondary">Số hợp đồng:</td>
-                          <td class="fw-bold text-danger fs-6" id="cardContractNo">---</td>
+                          <td class="fw-bold text-danger fs-6" id="cardContractNumber">---</td>
                         </tr>
                         <tr>
                           <td class="fw-bold text-secondary">Số tiền thanh toán:</td>
@@ -865,7 +865,7 @@
                         <tr>
                           <td class="fw-bold text-secondary">Thời gian đóng tiền:</td>
                           <td class="fw-bold text-dark">
-                            <span id="cardStartDate" class="badge bg-info text-dark">---</span>
+                            <span id="cardStartDate" class="badge bg-secondary">---</span>
                             <i class="bi bi-arrow-right"></i>
                             <span id="cardEndDate" class="badge bg-secondary">---</span>
                           </td>
@@ -2274,18 +2274,21 @@
             showCustomerInfo(c, infoButton);
           });
 
-          const cardButton = document.createElement('button');
-          cardButton.type = 'button';
-          cardButton.className = 'btn btn-sm btn-outline-danger ms-1';
-          cardButton.innerHTML = '<i class="bi bi-card-heading"></i> Thẻ TT';
-          cardButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            openCustomerCardModal(c);
-          });
+
 
           actionCell.appendChild(copyButton);
           actionCell.appendChild(infoButton);
-          actionCell.appendChild(cardButton);
+          if (!(c.status && c.status.toString().toLowerCase().includes('reject') || c.status.toString().toLowerCase().includes('additional_info'))) {
+            const cardButton = document.createElement('button');
+            cardButton.type = 'button';
+            cardButton.className = 'btn btn-sm btn-outline-danger ms-1';
+            cardButton.innerHTML = '<i class="bi bi-card-heading"></i> Thẻ TT';
+            cardButton.addEventListener('click', (event) => {
+              event.stopPropagation();
+              openCustomerCardModal(c);
+            });
+            actionCell.appendChild(cardButton);
+          }
           tr.appendChild(actionCell);
           tr.addEventListener('click', () => showProductsForContract(c));
           tbody.appendChild(tr);
@@ -2407,7 +2410,7 @@
         const modal = new bootstrap.Modal(modalEl);
         const customer = contract.customer || {};
         const name = [customer.lastName, customer.middleName, customer.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || 'KHACH HANG';
-        const contractNo = contract.number || contract.code || '---';
+        const cardContractNumber = contract.number || contract.code || '---';
         const monthlyInstallment = Number(contract.monthlyInstallment || 0);
         const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
         const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
@@ -2431,11 +2434,11 @@
         }
 
         const startDateStr = fmtDate(startingInstallmentDate);
-        const endDateObj = computeEndDate(startingInstallmentDate, tenorInMonths);
+        const endDateObj = computeEndDate(startingInstallmentDate, tenorInMonths - 1);
         const endDateStr = endDateObj ? fmtDate(endDateObj) : '---';
 
         document.getElementById('cardCustName').textContent = name;
-        document.getElementById('cardContractNo').textContent = contractNo;
+        document.getElementById('cardContractNumber').textContent = cardContractNumber;
         document.getElementById('cardMonthlyInstallment').textContent = `${Number(monthlyInstallment).toLocaleString('vi-VN')} ₫ / tháng`;
         document.getElementById('cardBankName').textContent = 'HD BANK';
         document.getElementById('cardBankAccNo').textContent = '---';
@@ -2446,7 +2449,7 @@
 
         const bankSelect = document.getElementById('selectBankAcc');
         const customBankInput = document.getElementById('customBankAcc');
-        const defaultAccount = '10001';
+        const defaultAccount = '002704070014601';
         bankSelect.value = defaultAccount;
         customBankInput.value = '';
         customBankInput.classList.add('d-none');
@@ -2457,7 +2460,7 @@
           const displayAcc = accountNo || defaultAccount;
           document.getElementById('cardBankAccNo').textContent = displayAcc;
           const cleanName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toUpperCase();
-          const transferContent = `${contractNo} ${cleanName}`.trim();
+          const transferContent = `${cardContractNumber} ${cleanName}`.trim();
           document.getElementById('cardTransferSyntax').textContent = transferContent;
           const bankId = 'HDB';
           const template = 'compact2';
@@ -2589,7 +2592,7 @@
           <div class="row"><div class="label">Kỳ hạn (tháng)</div><div class="value">${tenorInMonths}</div></div>
           <div class="row"><div class="label">Tiền trả mỗi tháng</div><div class="value amount">${fmt(monthlyInstallment)}</div></div>
           <div class="row"><div class="label">Ngày giải ngân</div><div class="value">${fmtDate(disbursementDate)}</div></div>
-          <div class="row"><div class="label">Thời gian góp</div><div class="value"><span class="pill">${fmtDate(startingInstallmentDate)}</span><span class="arrow"> -> </span><span class="pill">${(function () { const e = computeEndDate(startingInstallmentDate, tenorInMonths); return e ? fmtDate(e) : '—'; })()}</span></div></div>
+          <div class="row"><div class="label">Thời gian góp</div><div class="value"><span class="pill">${fmtDate(startingInstallmentDate)}</span><span class="arrow"> -> </span><span class="pill">${(function () { const e = computeEndDate(startingInstallmentDate, tenorInMonths - 1); return e ? fmtDate(e) : '—'; })()}</span></div></div>
         </div>
       `;
         container.insertAdjacentHTML('beforeend', detailsHtml);
@@ -3028,8 +3031,8 @@ Lý do huỷ: ${reason}`;
 
           pdf.addImage(imgData, 'PNG', margin, margin, renderWidth, renderHeight);
 
-          const contractNo = document.getElementById('cardContractNo').textContent || 'card';
-          pdf.save(`The_Thong_Tin_${contractNo.trim()}.pdf`);
+          const cardContractNumber = document.getElementById('cardContractNumber').textContent || 'card';
+          pdf.save(`The_Thong_Tin_${cardContractNumber.trim()}.pdf`);
         } catch (error) {
           console.error('Lỗi xuất PDF bằng jsPDF:', error);
           alert('Có lỗi xảy ra khi xuất file PDF. Vui lòng thử lại.');
