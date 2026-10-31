@@ -1,0 +1,440 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Thưởng MC & SI</title>
+    <!-- Google Fonts - Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- ExcelJS cho tính năng xuất Excel nâng cao -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #f1f3f6;
+            --card-bg: #ffffff;
+            --primary-navy: #1d1c68;
+            --primary-navy-hover: #15144d;
+            --dark-banner-bg: #111038;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --gold-accent: #f59e0b;
+            --green-accent: #059669;
+            --purple-accent: #6d28d9;
+            --blue-accent: #2563eb;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        .container-custom {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Main Wrapper Card */
+        .card-container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            padding: 2.5rem 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        /* Input Styles */
+        .form-label {
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 0.92rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.95rem;
+            color: #111827;
+            font-weight: 500;
+            background-color: #f9fafb;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: var(--primary-navy);
+            box-shadow: 0 0 0 3px rgba(29, 28, 104, 0.15);
+        }
+
+        /* Button */
+        .btn-calculate {
+            background-color: var(--primary-navy);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            font-size: 1.05rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-calculate:hover {
+            background-color: var(--primary-navy-hover);
+            color: #ffffff;
+        }
+
+        .btn-calculate:active {
+            transform: scale(0.99);
+        }
+
+        /* Dark Total Banner */
+        .banner-total {
+            background-color: var(--dark-banner-bg);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 12px 20px rgba(17, 16, 56, 0.25);
+        }
+
+        .banner-total .title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #d1d5db;
+            margin-bottom: 0.5rem;
+        }
+
+        .banner-total .amount {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: #eab308;
+            line-height: 1.1;
+            margin-bottom: 0.6rem;
+        }
+
+        .banner-total .formula {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            letter-spacing: 0.3px;
+        }
+
+        /* Breakdown Cards Grid */
+        .breakdown-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem 1.25rem;
+            height: 100%;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breakdown-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        .card-a::before { background-color: var(--blue-accent); }
+        .card-b::before { background-color: var(--green-accent); }
+        .card-c::before { background-color: var(--purple-accent); }
+        .card-d::before { background-color: var(--gold-accent); }
+
+        .breakdown-card .label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 0.8rem;
+            line-height: 1.3;
+        }
+
+        .breakdown-card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        /* Detailed Table Section */
+        .table-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .btn-excel {
+            background-color: #059669;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-excel:hover {
+            background-color: #047857;
+            color: white;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1rem;
+        }
+
+        .custom-table th {
+            background-color: #f3f4f6;
+            color: #374151;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 0.8rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .custom-table td {
+            padding: 1.1rem 0.8rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem;
+        }
+
+        .badge-group {
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: 700;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .text-sub {
+            font-size: 0.85rem;
+            color: #6b7280;
+            display: block;
+            margin-top: 0.15rem;
+        }
+
+        .total-row {
+            background-color: #f8fafc;
+        }
+
+        .total-row td {
+            border-top: 2px solid #e5e7eb;
+            font-weight: 700;
+        }
+
+        .amount-green {
+            color: var(--green-accent);
+            font-weight: 700;
+        }
+
+        .amount-purple {
+            color: var(--purple-accent);
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container container-custom">
+        <!-- 1. Header & Input Card Form -->
+        <div class="card-container">
+            <h1 class="section-title">Tính Thưởng SI & Hợp Đồng</h1>
+
+            <form id="bonusForm" onsubmit="event.preventDefault();">
+                <!-- Date Row -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="fromDate" class="form-label">Từ ngày</label>
+                        <input type="date" class="form-control" id="fromDate" value="2026-09-01">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="toDate" class="form-label">Đến ngày</label>
+                        <input type="date" class="form-control" id="toDate" value="2026-09-30">
+                    </div>
+                </div>
+
+                <!-- Parameters Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4 col-sm-6">
+                        <label for="chitieuMC" class="form-label">Chỉ tiêu MC (VNĐ)</label>
+                        <input type="text" class="form-control" id="chitieuMC" value="100.000.000">
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="pr3" class="form-label">Phần trăm đạt PR3 (%)</label>
+                        <input type="number" class="form-control" id="pr3" value="90" min="0" max="100">
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="pr6" class="form-label">Phần trăm đạt PR6 (%)</label>
+                        <input type="number" class="form-control" id="pr6" value="90" min="0" max="100">
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" id="btnCalculate" class="btn btn-calculate">Tính Thưởng</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 2. Total Bonus Card (Highlight Banner) -->
+        <div class="banner-total">
+            <div class="title">Tổng Thưởng SI</div>
+            <div class="amount" id="totalSIBounty">0 đ</div>
+            <div class="formula">Công thức: A + B + C</div>
+        </div>
+
+        <!-- 3. Breakdown Summary Cards Grid (4 Cards) -->
+        <div class="row g-3 mb-4">
+            <!-- Block A -->
+            <div class="col-md-3 col-sm-6">
+                <div class="breakdown-card card-a">
+                    <div class="label">Block A (Thưởng DS)</div>
+                    <div class="value" id="blockA">0 đ</div>
+                </div>
+            </div>
+            <!-- Block B -->
+            <div class="col-md-3 col-sm-6">
+                <div class="breakdown-card card-b">
+                    <div class="label">Block B (Thưởng CT MC)</div>
+                    <div class="value" id="blockB">0 đ</div>
+                </div>
+            </div>
+            <!-- Block C -->
+            <div class="col-md-3 col-sm-6">
+                <div class="breakdown-card card-c">
+                    <div class="label">Block C (Thưởng bảo hiểm)</div>
+                    <div class="value" id="blockC">0</div>
+                </div>
+            </div>
+            <!-- Block D -->
+            <div class="col-md-3 col-sm-6">
+                <div class="breakdown-card card-d">
+                    <div class="label">Block D (Thưởng BH)</div>
+                    <div class="value" id="blockD">0 đ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Detailed Table Card ("Chi Tiết Từng Hợp Đồng") -->
+        <div class="table-card">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h2 class="h4 mb-0 fw-bold" style="color: #111827;">Chi Tiết Từng Hợp Đồng</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-excel" id="btnExportExcel">
+                        <i class="bi bi-file-earmark-excel-fill"></i> Tải File Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table custom-table align-middle" id="contractTable">
+                    <thead>
+                        <tr>
+                            <th>MÃ HĐ<br><small class="text-muted fw-normal">(CONTRACTNO)</small></th>
+                            <th>KỲ HẠN<br><small class="text-muted fw-normal">(TENURE)</small></th>
+                            <th>DS GIẢI NGÂN<br><small class="text-muted fw-normal">(DSGN)</small></th>
+                            <th class="text-center">GROUP<br><small class="text-muted fw-normal">(SCHEMEGROUP)</small></th>
+                            <th class="text-center">HỆ SỐ (%)<br><small class="text-muted fw-normal">(COEFFICIENT)</small></th>
+                            <th class="text-end">THƯỞNG DOANH SỐ<br><small class="text-muted fw-normal">(SALEBONUS)</small></th>
+                            <th class="text-end">THƯỞNG BH<br><small class="text-muted fw-normal">(INSURANCEBONUS)</small></th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractTableBody">
+                        <!-- Dynamic content filled by index_2.js -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2" class="fw-bold text-dark">Tổng cộng:</td>
+                            <td>
+                                <span class="amount-purple" id="totalDSGN">0 đ</span>
+                            </td>
+                            <td colspan="2"></td>
+                            <td class="text-end fw-bold" id="sumSaleBonus">0 đ</td>
+                            <td class="text-end fw-bold amount-green" id="sumInsuranceBonus">0 đ</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Đăng Nhập (Phục vụ API 401 Unauthorized nếu gọi hệ thống thật) -->
+    <!-- <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-96">
+            <h3 class="text-lg font-bold mb-4">Phiên đăng nhập hết hạn</h3>
+            <form id="reLoginForm">
+                <div class="mb-3">
+                    <label class="form-label">Tài khoản</label>
+                    <input type="text" id="modalUsername" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mật khẩu</label>
+                    <input type="password" id="modalPassword" class="form-control" required>
+                </div>
+                <div id="loginModalError" class="text-danger text-sm mb-3 hidden"></div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" id="closeModalBtn" class="btn btn-secondary">Hủy</button>
+                    <button type="submit" class="btn btn-calculate w-auto px-4">Đăng nhập</button>
+                </div>
+            </form>
+        </div>
+    </div> -->
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Các hàm hỗ trợ lấy giá trị toàn cục cho script module -->
+    <script>
+        window.getDateValue = function(id) {
+            return document.getElementById(id)?.value || '';
+        };
+        window.getNumericValue = function(id) {
+            const val = document.getElementById(id)?.value || '0';
+            return Number(val.replace(/\./g, '').replace(/\D/g, '')) || 0;
+        };
+    </script>
+
+    <!-- Main Logic Script (ES Module) -->
+    <script type="module" src="index.js"></script>
+</body>
+
+</html>

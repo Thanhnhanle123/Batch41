@@ -1,0 +1,3048 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biểu đồ tổng quan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/batch41-ui.css">
+
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --accent: #2b8be6;
+      --accent-2: #1e88e5;
+      --danger: #e53935;
+      --muted: #6b7280;
+      --border: #e6eef9;
+      --shadow: 0 8px 30px rgba(43, 67, 99, 0.08);
+      --radius: 12px;
+      --max-width: 1100px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Roboto, Inter, system-ui, -apple-system, 'Segoe UI', Arial;
+    }
+
+    body {
+      background: var(--bg);
+      color: #24313a;
+      -webkit-font-smoothing: antialiased
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      font-weight: 700
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 16px
+    }
+
+    .desktop-nav a {
+      margin-left: 15px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    @media (max-width:768px) {
+      .desktop-nav {
+        display: none
+      }
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-top: 92px;
+      padding-left: 16px;
+      padding-right: 16px
+    }
+
+    .chart-wrap {
+      max-width: 1000px;
+      height: 460px;
+      margin: 0 auto;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 18px
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block
+    }
+
+    /* Inputs */
+    .mb-3 .form-control {
+      border: 1px solid #e6eef9;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fff, #fbfdff);
+      padding: 10px 12px
+    }
+
+    .mb-3 label {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    input[type='text'] {
+      text-align: right
+    }
+
+    /* Summary boxes Responsive Optimization */
+    #summaryBox {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .summary-tables-wrapper {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .summary-card-item {
+      flex: 1;
+      min-width: 280px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #summaryBox table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      border: 1px solid var(--border);
+      height: 100%;
+    }
+
+    #summaryBox td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(46, 66, 90, 0.08);
+      vertical-align: middle;
+    }
+
+    #summaryBox tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .summary-analytics-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+    }
+
+    .kpi-daily-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    /* Mobile Breakpoints (< 576px) */
+    @media (max-width: 576px) {
+      #summaryBox {
+        margin-top: 12px;
+        gap: 12px;
+      }
+
+      .summary-card-item {
+        min-width: 100%;
+        /* Switch to full width stacked layout on mobile */
+      }
+
+      #summaryBox table {
+        font-size: 13px;
+      }
+
+      #summaryBox td {
+        padding: 6px 8px;
+      }
+
+      .summary-analytics-card {
+        padding: 12px;
+      }
+
+      .kpi-daily-grid {
+        grid-template-columns: 1fr;
+        /* Stack KPI daily boxes on small phones */
+      }
+
+      .analytics-header-title {
+        font-size: 14px !important;
+      }
+
+      .analytics-header-badge {
+        font-size: 11px !important;
+        padding: 2px 8px !important;
+      }
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      border: none;
+      box-shadow: none
+    }
+
+    .btn-outline-secondary {
+      border-radius: 10px
+    }
+
+    /* Save button sizing to match inputs */
+    #saveTargetsBtn {
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 10px
+    }
+
+    /* Modal / login input styling */
+    .modal .modal-dialog {
+      max-width: 420px
+    }
+
+    #dailyReportModal .modal-dialog {
+      max-width: 800px
+    }
+
+    .modal .modal-content {
+      border-radius: 12px;
+      padding: 0;
+      overflow: hidden
+    }
+
+    .modal .modal-header {
+      border-bottom: 0;
+      padding: 16px 20px
+    }
+
+    .modal .modal-title {
+      margin: 0;
+      font-weight: 700;
+      font-size: 18px
+    }
+
+    .modal .modal-body {
+      padding: 18px 20px
+    }
+
+    .modal .form-label {
+      font-weight: 600;
+      font-size: 14px
+    }
+
+    .modal .input-group {
+      border: 1px solid #e6eef9;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center
+    }
+
+    .modal .input-group .form-control {
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 10px 12px
+    }
+
+    .modal .input-group .btn {
+      border: 0;
+      box-shadow: none;
+      min-width: 44px;
+      padding: 6px 8px;
+      background: transparent
+    }
+
+    #loginError {
+      font-size: 14px
+    }
+
+    @media (max-width:420px) {
+      .modal .modal-dialog {
+        max-width: 92%
+      }
+    }
+
+    @media (max-width:768px) {
+      .chart-wrap {
+        height: 340px
+      }
+
+      .page {
+        padding-top: 86px
+      }
+    }
+
+    @media (max-width:480px) {
+      #summaryBox>div {
+        min-width: 160px
+      }
+
+      #summaryBox table {
+        font-size: 13px
+      }
+    }
+
+    /* Mobile-specific tweaks to make charts and cards fit smaller screens */
+    @media (max-width:768px) {
+      .chart-wrap {
+        padding: 12px;
+      }
+
+      .chart-wrap canvas#overviewChart {
+        height: 360px !important;
+      }
+
+      #analytics .card canvas,
+      #statusChart,
+      #revenueChart,
+      #tenorChart,
+      #topChart {
+        min-height: 220px !important;
+        height: 220px !important
+      }
+
+      #kpiRow {
+        flex-direction: row;
+        gap: 8px;
+      }
+
+      #kpiRow .kpi-card {
+        min-width: 140px;
+        padding: 10px;
+        font-size: 14px
+      }
+
+      .modal .modal-dialog {
+        max-width: 92%
+      }
+
+      .chart-wrap {
+        height: auto !important;
+        min-height: 0 !important;
+      }
+    }
+
+    @media (max-width:576px) {
+      .chart-wrap {
+        padding: 10px;
+      }
+
+      .chart-wrap canvas#overviewChart {
+        height: 260px !important;
+      }
+
+      #analytics .card canvas,
+      #statusChart,
+      #revenueChart,
+      #tenorChart,
+      #topChart {
+        min-height: 180px !important;
+        height: 180px !important
+      }
+
+      #kpiRow {
+        flex-direction: column;
+      }
+
+      #kpiRow .kpi-card {
+        width: 100%;
+        min-width: 0;
+        padding: 10px;
+      }
+
+      /* Make product modal full width-ish on phones */
+      #productModal .modal-dialog {
+        max-width: 95%;
+        margin: 0 8px;
+      }
+
+      /* Reduce table padding for small screens */
+      #customersTable tbody td {
+        padding: 6px 6px;
+      }
+
+      .chart-wrap {
+        height: auto !important;
+        min-height: 0 !important;
+      }
+    }
+
+    /* Customers table mobile friendly: stack rows and show labels */
+    #customersTable td,
+    #customersTable th {
+      white-space: nowrap;
+    }
+
+    @media (max-width:576px) {
+      #customersTable thead {
+        display: none;
+      }
+
+      #customersTable {
+        border: 0;
+      }
+
+      #customersTable tbody tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 8px;
+        padding: 8px;
+        background: #fff
+      }
+
+      #customersTable tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 8px;
+        border: 0;
+      }
+
+      #customersTable tbody td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--muted);
+        margin-right: 8px;
+      }
+
+      #customersTable tbody td[data-label='#'] {
+        display: none;
+      }
+    }
+
+    /* Contract details modal styling (card-like rows) */
+    #productModal .contract-details {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      margin-bottom: 14px;
+    }
+
+    #productModal .contract-details .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 6px;
+      border-bottom: 1px solid #f1f5f9
+    }
+
+    #productModal .contract-details .row:last-child {
+      border-bottom: 0
+    }
+
+    #productModal .contract-details .label {
+      color: #374151;
+      font-weight: 700
+    }
+
+    #productModal .contract-details .value {
+      color: #0f172a;
+      font-weight: 700
+    }
+
+    #productModal .contract-details .amount {
+      color: var(--accent-2);
+      font-size: 1.05rem
+    }
+
+    #productModal .contract-details .muted {
+      color: #6b7280;
+      font-weight: 400;
+      margin-left: 8px
+    }
+
+    /* Highlighted date-range row: start and end close together */
+    #productModal .contract-details .date-range {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: linear-gradient(90deg, #eef7ff, #f6fbff);
+      border-radius: 8px;
+      margin: 6px 0 12px 0
+    }
+
+    #productModal .contract-details .date-range .pill {
+      background: var(--accent-2);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      display: inline-block
+    }
+
+    #productModal .contract-details .date-range .arrow {
+      margin: 0 8px;
+      color: #334155;
+      font-weight: 700
+    }
+
+    /* KPI cards */
+    #kpiRow .kpi-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column
+    }
+
+    #kpiRow .kpi-card .label {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px
+    }
+
+    #kpiRow .kpi-card .value {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--accent-2)
+    }
+
+    /* Canvas sizing: keep overview large and analytics canvases readable */
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block
+    }
+
+    .chart-wrap canvas#overviewChart {
+      height: 420px !important;
+      max-height: 520px
+    }
+
+    /* Make analytics charts equal height */
+    #analytics .card canvas {
+      min-height: 220px !important;
+      height: 220px !important;
+    }
+
+    /* Customers summary banner (moved outside card) */
+    #customersSummary {
+      background: linear-gradient(180deg, #fff, #fcfeff);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      margin-bottom: 12px
+    }
+
+    #customersSummary .muted {
+      color: var(--muted)
+    }
+
+    #customersSummary .text-danger {
+      margin-left: 6px;
+      font-weight: 700
+    }
+
+    @media (max-width:576px) {
+      #customersSummary {
+        font-size: 0.88rem;
+        padding: 8px 10px
+      }
+    }
+
+    /* Analytics cards: make each chart taller so MC/DL bars are visible and readable */
+    #analytics .card canvas,
+    #statusChart,
+    #revenueChart,
+    #tenorChart,
+    #topChart {
+      min-height: 320px !important;
+      height: 320px !important
+    }
+
+    /* Revenue chart container should flex to fill its card and stay readable */
+    .card.d-flex .flex-grow-1 canvas {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 260px;
+    }
+
+    /* Centered revenue chart variant */
+    canvas.centered-chart {
+      display: block;
+      margin: auto;
+    }
+
+    /* Tùy chỉnh riêng cho modal thẻ thông tin khách hàng rộng hơn */
+    #customerCardModal .modal-dialog {
+      max-width: 950px !important;
+    }
+
+    @media (max-width: 992px) {
+      #customerCardModal .modal-dialog {
+        max-width: 95% !important;
+      }
+    }
+
+    /* Tối ưu hóa thẻ thông tin khi xem trên điện thoại hoặc màn hình nhỏ */
+    @media (max-width: 768px) {
+      #printableCustomerCard .row {
+        flex-direction: column !important;
+      }
+
+      #printableCustomerCard .col-md-7,
+      #printableCustomerCard .col-md-5 {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-right: none !important;
+        padding: 0 !important;
+      }
+
+      #printableCustomerCard .col-md-5 {
+        margin-top: 15px !important;
+        text-align: center !important;
+      }
+
+      #customerCardModal .modal-dialog {
+        max-width: 96% !important;
+        margin: 10px auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="batch41-header"></div>
+  <script src="./assets/js/batch41-common.js"></script>
+
+  <div class="page">
+    <h5 class="text-center mb-3">TỔNG QUAN CHỈ TIÊU</h5>
+
+    <!-- Inputs for targets -->
+    <div class="mb-3">
+      <div class="d-flex w-100 gap-2 flex-column flex-md-row flex-wrap align-items-center">
+        <div class="d-flex align-items-center gap-2 me-3">
+          <label class="mb-0 me-2 text-muted">Chỉ tiêu MC:</label>
+          <input id="inputTargetMC" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="mb-0 ms-0 me-2 text-muted">Chỉ tiêu DL:</label>
+          <input id="inputTargetDL" type="text" class="form-control w-100 w-md-auto" style="min-width:140px" />
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button id="saveTargetsBtn" class="btn btn-primary">Lưu</button>
+          <span id="saveStatus" class="text-success"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date range for data -->
+    <div class="mb-3">
+      <div class="d-flex gap-2 flex-column flex-sm-row align-items-start">
+        <div class="d-flex flex-column">
+          <label class="mb-1 text-muted">Từ ngày</label>
+          <input id="inputFromDate" type="date" class="form-control" />
+        </div>
+        <div class="d-flex flex-column">
+          <label class="mb-1 text-muted">Đến ngày</label>
+          <input id="inputToDate" type="date" class="form-control" />
+        </div>
+        <div class="d-flex align-items-end">
+          <!-- Tải dữ liệu removed: auto-load on date change -->
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-wrap p-3 bg-white rounded shadow-sm">
+      <canvas id="overviewChart"></canvas>
+    </div>
+    <div class="text-muted small mt-2">Biểu đồ tổng quan: so sánh Chỉ tiêu (MC/DL) với Số tiền đã đạt (chỉ tính các hợp
+      đồng LIVE).</div>
+    <!-- Analytics: KPI cards and charts -->
+    <div id="analytics" class="mt-4">
+      <div id="kpiRow" class="d-flex gap-3 mb-3"></div>
+      <div class="row g-3 align-items-stretch">
+        <div class="col-md-6">
+          <div class="card p-2 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Phân bố trạng thái</strong></div>
+              <div>
+                <span class="small text-muted">Hiển thị tổng &amp; tách theo MC / DL</span>
+                <button id="manageStatusBtn" class="btn btn-sm btn-outline-secondary ms-2">Quản lý trạng thái</button>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-4"><canvas id="statusChartAll"></canvas>
+                <div class="text-center small mt-1">Tất cả</div>
+              </div>
+              <div class="col-4"><canvas id="statusChartMC"></canvas>
+                <div class="text-center small mt-1">MC</div>
+              </div>
+              <div class="col-4"><canvas id="statusChartDL"></canvas>
+                <div class="text-center small mt-1">DL</div>
+              </div>
+            </div>
+            <div id="statusLegend" class="d-flex flex-wrap gap-2 mt-2"></div>
+            <div class="text-muted small mt-1">Phân bố trạng thái hợp đồng: hiển thị số lượng hợp đồng theo từng trạng
+              thái (All / MC / DL).</div>
+            <div class="text-muted small mt-1">Ghi chú: biểu đồ "MC" và "DL" chỉ tính theo loại hợp đồng tương ứng; dùng
+              để so sánh phân bổ trạng thái giữa hai dòng sản phẩm.</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-2 h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Doanh số theo tháng</strong></div>
+              <div class="small text-muted">Doanh số theo tháng (MC/DL)</div>
+            </div>
+            <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+              <canvas id="revenueChart" class="centered-chart"
+                style="flex:0 0 auto; max-width:95%; max-height:100%;"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-2 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Phân bố kỳ hạn</strong></div>
+              <div class="small text-muted">Số hợp đồng theo kỳ hạn (tháng)</div>
+            </div>
+            <canvas id="tenorChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-2 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div><strong>Top hợp đồng</strong></div>
+              <div class="small text-muted">Hợp đồng giá trị lớn nhất</div>
+            </div>
+            <canvas id="topChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers table -->
+    <div id="customersSummary" class="text-muted small mt-4 mb-2">&nbsp;</div>
+    <div class="card mt-4 p-3" id="customersCard">
+      <h5 class="mb-3">Danh sách khách hàng</h5>
+      <div class="d-flex gap-2 mb-2 align-items-center">
+        <select id="filterStatus" class="form-select form-select-sm" style="max-width:200px;">
+          <option value="">Tất cả</option>
+        </select>
+      </div>
+      <!-- Tạo nút báo cáo report ngày -->
+      <div class="d-flex justify-content-end mb-2">
+        <button id="reportBtn" onclick="generateDailyReport()" class="btn btn-sm btn-outline-primary">Báo cáo
+          ngày</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover" id="customersTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tên khách</th>
+              <th>SĐT</th>
+              <th>CCCD/CMND</th>
+              <th>Hợp đồng</th>
+              <th>Loại</th>
+              <th>Số tiền</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="customersTbody"></tbody>
+        </table>
+      </div>
+      <div class="text-muted small">Nhấp vào một dòng để xem thông tin sản phẩm.</div>
+      <div class="modal fade" id="customerCardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title fw-bold">THẺ THÔNG TIN KHÁCH HÀNG</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+              <div class="card mb-4 border-primary bg-light">
+                <div class="card-body py-2 px-3">
+                  <label for="selectBankAcc" class="form-label fw-bold text-primary mb-1">
+                    <i class="bi bi-bank"></i> Chọn Số tài khoản thụ hưởng (HD Bank):
+                  </label>
+                  <select id="selectBankAcc" class="form-select form-select-sm fw-bold text-dark">
+                    <option value="002704070014601">HD BANK - STK: 002704070014601 (Tài khoản Công ty HD SAISON)
+                    </option>
+                    <option value="custom">-- Nhập số tài khoản HD Bank khác --</option>
+                  </select>
+                  <input type="text" id="customBankAcc" class="form-control form-control-sm mt-2 d-none"
+                    placeholder="Nhập số tài khoản HD Bank mới..." />
+                </div>
+              </div>
+
+              <div id="printableCustomerCard"
+                class="border border-2 border-dashed p-3 rounded position-relative bg-white"
+                style="border-color: #dc3545 !important;">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fs-4 fw-bold text-danger">HD</span><span class="fs-5 fw-bold text-dark">SAISON</span>
+                  </div>
+                  <div class="text-end">
+                    <h6 class="fw-bold text-danger mb-0">THẺ THÔNG TIN KHÁCH HÀNG</h6>
+                    <small class="text-muted">HD SAISON</small>
+                  </div>
+                </div>
+
+                <div class="row align-items-center">
+                  <div class="col-md-7 border-end-md">
+                    <table class="table table-borderless table-sm mb-0">
+                      <tbody>
+                        <tr>
+                          <td class="fw-bold text-secondary" style="width: 140px;">Họ và tên:</td>
+                          <td class="fw-bold text-primary fs-6" id="cardCustName">---</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Số hợp đồng:</td>
+                          <td class="fw-bold text-danger fs-6" id="cardContractNumber">---</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Số tiền thanh toán:</td>
+                          <td class="fw-bold text-success fs-6" id="cardMonthlyInstallment">--- ₫ / tháng</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Ngân hàng thụ hưởng:</td>
+                          <td class="fw-bold text-dark" id="cardBankName">HD BANK</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Tài khoản thụ hưởng:</td>
+                          <td class="fw-bold text-dark" id="cardBankAccNo">---</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Thời gian đóng tiền:</td>
+                          <td class="fw-bold text-dark">
+                            <span id="cardStartDate" class="badge bg-secondary">---</span>
+                            <i class="bi bi-arrow-right"></i>
+                            <span id="cardEndDate" class="badge bg-secondary">---</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-secondary">Cú pháp chuyển khoản:</td>
+                          <td class="fw-bold text-primary" id="cardTransferSyntax">---</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small" role="alert">
+                      <i class="bi bi-exclamation-triangle-fill"></i> <strong>Lưu ý:</strong> Vui lòng chuyển khoản đúng
+                      Cú pháp & Số hợp đồng để hệ thống gạch nợ tự động chính xác.
+                    </div>
+                  </div>
+
+                  <div class="col-md-5 text-center mt-3 mt-md-0">
+                    <div class="p-2 border rounded bg-light d-inline-block shadow-sm">
+                      <img id="cardQrCodeImg" src="" alt="Mã QR Chuyển khoản VietQR"
+                        style="width: 180px; height: 180px; object-fit: contain;" />
+                      <div class="fw-bold text-danger small mt-1">QUÉT MÃ VIETQR ĐỂ THANH TOÁN</div>
+                      <div class="text-muted style-italic" style="font-size: 11px;">Tự động điền đúng STK, Số tiền & Nội
+                        dung</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+              <button type="button" class="btn btn-danger" onclick="outputCustomerCardPDF()">
+                <i class="bi bi-printer"></i> Xuất file PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login modal: will appear if no auth token is stored -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Đăng nhập</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="loginError" class="text-danger mb-2" style="display:none;"></div>
+            <div class="mb-3">
+              <label class="form-label">Tài khoản</label>
+              <input id="loginUsername" class="form-control" autocomplete="username" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <div class="input-group">
+                <input id="loginPassword" type="password" class="form-control" autocomplete="current-password" />
+                <button class="btn btn-outline-secondary" type="button" id="togglePassBtn"
+                  aria-label="Hiển thị mật khẩu">👁️</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="loginBtn" class="btn btn-primary">Đăng nhập</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="dailyReportModal" tabindex="-1" aria-labelledby="dailyReportModalTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="dailyReportModalTitle">Báo cáo ngày</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <label for="dailyReportText" class="form-label">Bạn có thể chỉnh sửa nội dung trước khi sao chép</label>
+            <textarea id="dailyReportText" class="form-control" rows="18" spellcheck="false"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary" id="copyDailyReportBtn">Sao chép báo cáo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js and datalabels plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+
+      // Utility to format currency (VND)
+      function fmt(v) {
+        return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' ₫';
+      }
+
+      // Defaults for targets (can be overridden by user/localStorage)
+      const DEFAULT_MC = 100000000; // 100 million VND
+      const DEFAULT_DL = 1000000000; // 1 billion VND
+      // Color palette for charts
+      const PALETTE = ['#2b8be6', '#e64b4b', '#10b981', '#f59e0b', '#9ca3af', '#60a5fa'];
+      // Achieved numbers will be computed from data.json (API) below
+      let mcAch = 0;
+      let dlAch = 0;
+
+      // (removed simple data-only fetchAchievedFromData) - consolidated version below handles API + fallback
+
+      // Chuyển giá trị input (chuỗi có thể chứa '.' hoặc ',' hoặc khoảng trắng) sang Number.
+      // Trả về 0 khi giá trị không hợp lệ hoặc rỗng.
+      function parseNumberInput(s) {
+        if (s === null || s === undefined) return 0;
+        // loại bỏ dấu phân nhóm và khoảng trắng
+        const cleaned = String(s).replace(/[\.\,\s]/g, '');
+        const n = Number(cleaned);
+        return isNaN(n) ? 0 : n;
+      }
+
+      // Lấy chỉ tiêu MC và DL từ localStorage. Nếu chưa có, trả về giá trị mặc định.
+      function getStoredTargets() {
+        const m = parseNumberInput(localStorage.getItem('targetMC')) || DEFAULT_MC;
+        const d = parseNumberInput(localStorage.getItem('targetDL')) || DEFAULT_DL;
+        return { mcTarget: m, dlTarget: d };
+      }
+
+      // Set up initial input values
+      const inputMC = document.getElementById('inputTargetMC');
+      const inputDL = document.getElementById('inputTargetDL');
+      const saveBtn = document.getElementById('saveTargetsBtn');
+      const saveStatus = document.getElementById('saveStatus');
+
+      // Format helpers for target inputs (thousand separator '.' for vi-VN)
+      // Định dạng chuỗi số: thêm dấu chấm nhóm hàng nghìn (dùng cho hiển thị trong input).
+      function formatNumberStringWithDots(s) {
+        const digits = String(s || '').replace(/[^0-9]/g, '');
+        if (!digits) return '';
+        return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      }
+
+      // Apply dynamic formatting: remove separators on focus, format with locale on blur, keep grouping while typing
+      [inputMC, inputDL].forEach(el => {
+        if (!el) return;
+        el.addEventListener('focus', () => { el.value = (el.value || '').toString().replace(/\./g, ''); });
+        el.addEventListener('input', () => {
+          const raw = (el.value || '').replace(/[^0-9]/g, '');
+          el.value = formatNumberStringWithDots(raw);
+        });
+        el.addEventListener('blur', () => {
+          const raw = (el.value || '').replace(/[^0-9]/g, '');
+          el.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
+        });
+      });
+
+      // Vẽ biểu đồ tổng quan (bar chart) so sánh: Chỉ tiêu vs Đã đạt cho MC và DL.
+      // - `mcTarget`, `dlTarget`: chỉ tiêu tiền tệ (VND)
+      // Sử dụng biến toàn cục `mcAch` và `dlAch` làm giá trị đã đạt.
+      let chartInstance = null;
+      function renderChart(mcTarget, dlTarget) {
+        const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
+        const data = {
+          labels: ['Chỉ Tiêu', 'Số tiền đã đạt'],
+          datasets: [
+            { label: 'MC', backgroundColor: PALETTE[0], data: [mcTarget, mcAch], stack: 'stack1', borderRadius: 6, maxBarThickness: isSmall ? 40 : 72 },
+            { label: 'DL', backgroundColor: PALETTE[1], data: [dlTarget, dlAch], stack: 'stack1', borderRadius: 6, maxBarThickness: isSmall ? 40 : 72 }
+          ]
+        };
+
+        const cfg = {
+          type: 'bar',
+          data: data,
+          plugins: [],
+          options: {
+            plugins: {
+              legend: { position: isSmall ? 'bottom' : 'top' },
+              tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 6, bottom: 6, left: 6, right: 6 } },
+            scales: { x: { stacked: true, ticks: { font: { size: isSmall ? 11 : 13 } } }, y: { beginAtZero: true, stacked: true, ticks: { callback: v => v.toLocaleString('vi-VN') + ' ₫', font: { size: isSmall ? 10 : 12 } } } }
+          }
+        };
+
+        const ctx = document.getElementById('overviewChart').getContext('2d');
+        if (chartInstance) { chartInstance.destroy(); }
+        chartInstance = new Chart(ctx, cfg);
+
+        // (resize re-render handled globally to avoid duplicate listeners)
+      }
+
+      // Tạo phần tóm tắt (summary) hiển thị: chỉ tiêu, đã đạt, còn thiếu và tỷ lệ (%) cho MC, DL và tổng.
+      function renderSummary(mcTarget, dlTarget) {
+        const mcTotal = mcTarget;
+        const mcAchieved = mcAch;
+        const mcRemain = mcTotal - mcAchieved;
+        const mcRate = mcTotal ? (mcAchieved / mcTotal * 100) : 0;
+
+        const dlTotal = dlTarget;
+        const dlAchieved = dlAch;
+        const dlRemain = dlTotal - dlAchieved;
+        const dlRate = dlTotal ? (dlAchieved / dlTotal * 100) : 0;
+
+        const totalTarget = mcTotal + dlTotal;
+        const totalAch = mcAchieved + dlAchieved;
+        const totalRemain = totalTarget - totalAch;
+        const totalRate = totalTarget ? (totalAch / totalTarget * 100) : 0;
+
+        // Helper hiển thị con số cần thêm đã làm tròn
+        const getPrettyRemain = (achieved, target) => {
+          if (achieved >= target) return '<span style="color:#10b981;">Đã đạt</span>';
+          const diff = target - achieved;
+          return fmt(roundPretty(diff));
+        };
+
+        const summaryHtml = `
+  <div id="summaryBox">
+    
+    <!-- 1. BẢNG BÁO CÁO CÁC MỐC CHỈ TIÊU (MC, DL, TỔNG) -->
+    <div class="summary-tables-wrapper">
+      
+      <!-- BẢNG MC -->
+      <div class="summary-card-item">
+        <table style="background:#eef7ff;">
+          <tr><td colspan="2" style="padding:10px; font-weight:700; color:#1e88e5; background:#d0e6ff; text-align:center;">CHỈ TIÊU MC</td></tr>
+          <tr><td style="font-weight:700;">Chỉ tiêu gốc (100%)</td><td style="text-align:right; color:#1e88e5; font-weight:700;">${fmt(mcTotal)}</td></tr>
+          <tr><td>Đã đạt</td><td style="text-align:right; font-weight:700; color:#10b981;">${fmt(mcAchieved)}</td></tr>
+          <tr><td>Còn thiếu (đến 100%)</td><td style="text-align:right; color:#e53935; font-weight:700;">${fmt(mcRemain > 0 ? roundPretty(mcRemain) : 0)}</td></tr>
+          <tr><td>Tỷ lệ hiện tại</td><td style="text-align:right; font-weight:700;">${mcRate.toFixed(2)}%</td></tr>
+          <tr style="background:#e2f0fe;"><td style="font-size:13px;" colspan="2"><strong>Cần thêm để đạt các mốc (làm tròn):</strong></td></tr>
+          <tr><td style="font-size:13px;">• Mốc 75% (${fmt(roundPretty(mcTotal * 0.75))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal * 0.75)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 80% (${fmt(roundPretty(mcTotal * 0.80))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal * 0.80)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 90% (${fmt(roundPretty(mcTotal * 0.90))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal * 0.90)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 100% (${fmt(mcTotal)})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(mcAchieved, mcTotal)}</td></tr>
+        </table>
+      </div>
+
+      <!-- BẢNG DL -->
+      <div class="summary-card-item">
+        <table style="background:#fff5f5;">
+          <tr><td colspan="2" style="padding:10px; font-weight:700; color:#e64b4b; background:#ffe2e2; text-align:center;">CHỈ TIÊU DL</td></tr>
+          <tr><td style="font-weight:700;">Chỉ tiêu gốc (100%)</td><td style="text-align:right; color:#e64b4b; font-weight:700;">${fmt(dlTotal)}</td></tr>
+          <tr><td>Đã đạt</td><td style="text-align:right; font-weight:700; color:#10b981;">${fmt(dlAchieved)}</td></tr>
+          <tr><td>Còn thiếu (đến 100%)</td><td style="text-align:right; color:#e53935; font-weight:700;">${fmt(dlRemain > 0 ? roundPretty(dlRemain) : 0)}</td></tr>
+          <tr><td>Tỷ lệ hiện tại</td><td style="text-align:right; font-weight:700;">${dlRate.toFixed(2)}%</td></tr>
+          <tr style="background:#fde8e8;"><td style="font-size:13px;" colspan="2"><strong>Cần thêm để đạt các mốc (làm tròn):</strong></td></tr>
+          <tr><td style="font-size:13px;">• Mốc 75% (${fmt(roundPretty(dlTotal * 0.75))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal * 0.75)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 80% (${fmt(roundPretty(dlTotal * 0.80))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal * 0.80)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 90% (${fmt(roundPretty(dlTotal * 0.90))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal * 0.90)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 100% (${fmt(dlTotal)})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(dlAchieved, dlTotal)}</td></tr>
+        </table>
+      </div>
+
+      <!-- BẢNG TỔNG CỘNG -->
+      <div class="summary-card-item">
+        <table style="background:#e9edf3;">
+          <tr><td colspan="2" style="padding:10px; font-weight:700; color:#2f3b52; background:#d5deeb; text-align:center;">TỔNG CỘNG</td></tr>
+          <tr><td style="font-weight:700;">Tổng chỉ tiêu (100%)</td><td style="text-align:right; color:#2f3b52; font-weight:700;">${fmt(totalTarget)}</td></tr>
+          <tr><td>Tổng đã đạt</td><td style="text-align:right; font-weight:700; color:#10b981;">${fmt(totalAch)}</td></tr>
+          <tr><td>Tổng thiếu (đến 100%)</td><td style="text-align:right; color:#e53935; font-weight:700;">${fmt(totalRemain > 0 ? roundPretty(totalRemain) : 0)}</td></tr>
+          <tr><td>Tỷ lệ tổng</td><td style="text-align:right; font-weight:700;">${totalRate.toFixed(2)}%</td></tr>
+          <tr style="background:#dc3e5e1e;"><td style="font-size:13px;" colspan="2"><strong>Cần thêm để đạt các mốc (làm tròn):</strong></td></tr>
+          <tr><td style="font-size:13px;">• Mốc 75% (${fmt(roundPretty(totalTarget * 0.75))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget * 0.75)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 80% (${fmt(roundPretty(totalTarget * 0.80))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget * 0.80)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 90% (${fmt(roundPretty(totalTarget * 0.90))})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget * 0.90)}</td></tr>
+          <tr><td style="font-size:13px;">• Mốc 100% (${fmt(totalTarget)})</td><td style="text-align:right; font-weight:600; font-size:13px;">${getPrettyRemain(totalAch, totalTarget)}</td></tr>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- 2. KHỐI PHÂN TÍCH TIẾN ĐỘ & KHUYẾN NGHỊ CHẠY KPI -->
+    ${(() => {
+            const now = new Date();
+            const currentDay = now.getDate();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daysRemaining = Math.max(1, daysInMonth - currentDay + 1);
+
+            const timePassedRate = (currentDay / daysInMonth) * 100;
+
+            const getDailyNeeded = (targetVal, currentVal) => {
+              const need = targetVal - currentVal;
+              return need > 0 ? roundPretty(Math.ceil(need / daysRemaining)) : 0;
+            };
+
+            const dailyMC_100 = getDailyNeeded(mcTotal, mcAchieved);
+            const dailyDL_100 = getDailyNeeded(dlTotal, dlAchieved);
+            const dailyTotal_100 = getDailyNeeded(totalTarget, totalAch);
+            const dailyTotal_80 = getDailyNeeded(totalTarget * 0.8, totalAch);
+
+            let statusBg = '#e8f5e9';
+            let statusColor = '#2e7d32';
+            let statusText = 'TIẾN ĐỘ TỐT - Đang bám sát kế hoạch tháng.';
+
+            if (totalRate < timePassedRate - 15) {
+              statusBg = '#ffebee';
+              statusColor = '#c62828';
+              statusText = 'CẢNH BÁO CHẬM TIẾN ĐỘ - Cần tăng tốc ngay!';
+            } else if (totalRate < timePassedRate - 5) {
+              statusBg = '#fff8e1';
+              statusColor = '#f57f17';
+              statusText = 'CẦN CHÚ Ý - Tiến độ đang hơi chậm hơn so với thời gian trôi qua.';
+            }
+
+            return `
+        <div class="summary-analytics-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <h3 class="analytics-header-title" style="margin:0; font-size:16px; color:#1e293b; text-transform:uppercase; font-weight:700;">📊 Phân Tích Tiến Độ & Gợi Ý Nhịp Chạy KPI</h3>
+            <span class="analytics-header-badge" style="font-size:13px; background:#e2e8f0; padding:4px 10px; border-radius:20px; font-weight:600; white-space:nowrap;">
+              Hôm nay: Ngày ${currentDay}/${daysInMonth} (Còn ${daysRemaining} ngày)
+            </span>
+          </div>
+
+          <!-- Thanh so sánh Thời gian vs Tiến độ -->
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+              <span>Thời gian đã qua: <strong>${timePassedRate.toFixed(1)}%</strong></span>
+              <span>KPI đã đạt: <strong>${totalRate.toFixed(1)}%</strong></span>
+            </div>
+            <div style="width:100%; height:12px; background:#e2e8f0; border-radius:6px; overflow:hidden; position:relative;">
+              <div style="width:${Math.min(100, timePassedRate)}%; height:100%; background:#94a3b8; position:absolute; top:0; left:0; opacity:0.5;" title="Thời gian"></div>
+              <div style="width:${Math.min(100, totalRate)}%; height:100%; background:${statusColor}; position:absolute; top:0; left:0;" title="Tiến độ đạt"></div>
+            </div>
+            <div style="background:${statusBg}; color:${statusColor}; padding:8px 12px; border-radius:6px; font-weight:600; font-size:13px; margin-top:8px;">
+              ${statusText}
+            </div>
+          </div>
+
+          <!-- Chỉ tiêu cần chạy trung bình mỗi ngày -->
+          <div class="kpi-daily-grid">
+            
+            <div style="background:#fff; border:1px solid var(--border); padding:10px; border-radius:8px;">
+              <div style="font-size:12px; color:#64748b; font-weight:600;">MỤC TIÊU MC / NGÀY (100%)</div>
+              <div style="font-size:16px; font-weight:700; color:#1e88e5; margin-top:4px;">
+                ${dailyMC_100 > 0 ? '~ ' + fmt(dailyMC_100) + ' / ngày' : '🎉 Đã hoàn thành'}
+              </div>
+            </div>
+
+            <div style="background:#fff; border:1px solid var(--border); padding:10px; border-radius:8px;">
+              <div style="font-size:12px; color:#64748b; font-weight:600;">MỤC TIÊU DL / NGÀY (100%)</div>
+              <div style="font-size:16px; font-weight:700; color:#e64b4b; margin-top:4px;">
+                ${dailyDL_100 > 0 ? '~ ' + fmt(dailyDL_100) + ' / ngày' : '🎉 Đã hoàn thành'}
+              </div>
+            </div>
+
+            <div style="border:1px solid #cbd5e1; padding:10px; border-radius:8px; background:#f1f5f9;">
+              <div style="font-size:12px; color:#334155; font-weight:700;">TỔNG CẦN CHẠY / NGÀY (100%)</div>
+              <div style="font-size:16px; font-weight:700; color:#0f172a; margin-top:4px;">
+                ${dailyTotal_100 > 0 ? '~ ' + fmt(dailyTotal_100) + ' / ngày' : '🎉 Đã đạt 100%'}
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:2px;">
+                (Hoặc tối thiểu ~ ${dailyTotal_80 > 0 ? fmt(dailyTotal_80) : '0'} / ngày để đạt 80%)
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+          })()}
+
+  </div>
+  `;
+
+        const existing = document.getElementById('summaryBox');
+        if (existing) existing.outerHTML = summaryHtml; else document.querySelector('.chart-wrap').insertAdjacentHTML('afterend', summaryHtml);
+      }
+      // Hàm làm tròn lên con số đẹp & tròn trịa
+      function roundPretty(val) {
+        if (val <= 0) return 0;
+
+        // Với số nhỏ (< 10.000): làm tròn lên hàng trăm (ví dụ: 1.230 -> 1.300)
+        if (val < 10000) {
+          return Math.ceil(val / 100) * 100;
+        }
+        // Với số từ 10.000 đến < 100.000: làm tròn lên hàng nghìn (ví dụ: 12.340 -> 13.000)
+        if (val < 100000) {
+          return Math.ceil(val / 1000) * 1000;
+        }
+        // Với số từ 100.000 đến < 10.000.000: làm tròn lên hàng chục nghìn (ví dụ: 1.234.500 -> 1.240.000)
+        if (val < 10000000) {
+          return Math.ceil(val / 10000) * 10000;
+        }
+        // Với số lớn hơn 10 triệu: làm tròn lên hàng trăm nghìn (ví dụ: 15.230.000 -> 15.300.000)
+        return Math.ceil(val / 100000) * 100000;
+      }
+      // AUTH helpers: lưu/đọc token trong localStorage
+      function getAuthToken() { return localStorage.getItem('authToken'); }
+      function setAuthToken(t) { localStorage.setItem('authToken', t); }
+      function clearAuthToken() { localStorage.removeItem('authToken'); }
+
+      // Chuyển định dạng ngày từ input HTML 'YYYY-MM-DD' sang định dạng API 'DD-MM-YYYY'.
+      function formatApiDateFromInput(d) { // 'YYYY-MM-DD' -> 'DD-MM-YYYY'
+        if (!d) return '';
+        const parts = d.split('-'); if (parts.length !== 3) return d;
+        return parts[2] + '-' + parts[1] + '-' + parts[0];
+      }
+
+      // Lấy thông tin user đã lưu (payload) từ localStorage (dạng JSON). Trả về null nếu không parse được.
+      function getStoredAuthUser() {
+        try { const j = localStorage.getItem('authUser'); return j ? JSON.parse(j) : null; } catch (e) { return null; }
+      }
+      // JWT helpers: giải mã payload của token (không verify signature) và kiểm tra expiry.
+      // `parseJwtPayload` trả về object payload nếu parse thành công, ngược lại null.
+      function parseJwtPayload(token) {
+        try {
+          const parts = token.split('.'); if (parts.length < 2) return null;
+          const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+          const json = decodeURIComponent(atob(payload).split('').map(function (c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
+          return JSON.parse(json);
+        } catch (e) { return null; }
+      }
+
+      // Trả về true nếu token có claim `exp` và chưa hết hạn.
+      function isTokenValid(token) {
+        if (!token) return false;
+        const p = parseJwtPayload(token); if (!p) return false;
+        if (p.exp && typeof p.exp === 'number') {
+          const now = Math.floor(Date.now() / 1000);
+          return p.exp > now;
+        }
+        return true; // nếu không có exp, giả sử còn hợp lệ
+      }
+
+      // Tải danh sách hợp đồng từ API theo user hiện tại và khoảng ngày.
+      // - Kiểm tra token trong localStorage (nếu hết hạn => yêu cầu đăng nhập).
+      // - Gọi API, xử lý nhiều dạng response (paged.content, contracts, or raw array).
+      // - Tính `mcAch` và `dlAch` (tổng giá trị hợp đồng theo loại) và trả về object {mcAch, dlAch}.
+      function fetchAchievedFromData(fromInput, toInput) {
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+        // ensure token is present and not expired
+        if (!token || !isTokenValid(token)) {
+          clearAuthToken(); try { localStorage.removeItem('authUser'); } catch (e) { }
+          showLogin();
+          return Promise.reject(new Error('Token expired or missing. Please login.'));
+        }
+        // require user id
+        if (!(authUser && authUser.id)) {
+          showLogin();
+          return Promise.reject(new Error('No user info available. Please login.'));
+        }
+        const id = authUser.id;
+        const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
+        const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
+        // include pagination params (page & size) - API rejects requests without them
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS-APPROVE_DISBURSEMENT_STATUS&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+        return fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
+          .then(async r => {
+            if (!r.ok) {
+              // try to read response body (json or text) to show better error
+              let bodyText = '';
+              try { bodyText = await r.text(); } catch (e) { }
+              const trace = r.headers.get('tracelogid') || r.headers.get('TraceLogId') || '';
+              const msg = `HTTP ${r.status}` + (bodyText ? (': ' + bodyText) : '') + (trace ? (' (trace:' + trace + ')') : '');
+              throw new Error(msg);
+            }
+            return r.json();
+          })
+          .then(data => {
+            // expect API returns either a paged object (`content`), an object with `contracts`, or a raw array
+            const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
+            mcAch = 0; dlAch = 0;
+            arr.forEach(c => {
+              const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+              if (!ty) return;
+              const val = Number(c.financedAmount || c.totalPurchase || 0);
+              if (ty === 'MC') mcAch += val; else if (ty === 'DL') dlAch += val;
+            });
+            return { mcAch, dlAch };
+          });
+      }
+
+      // date helpers: default to current month
+      // `pad` thêm số 0 phía trước nếu cần (ví dụ 7 -> '07')
+      function pad(n) { return n < 10 ? '0' + n : String(n); }
+      // `defaultFromDate` trả về ngày đầu tháng hiện tại (YYYY-MM-DD)
+      function defaultFromDate() { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); }
+      // `defaultToDate` trả về ngày hiện tại (YYYY-MM-DD)
+      function defaultToDate() { const d = new Date(); return d.toISOString().slice(0, 10); }
+
+      // Date range helpers: limit range to at most maxMonths (3)
+      // Tính hiệu số tháng giữa hai ngày (kết quả có thể âm nếu to < from).
+      function monthDiffInMonths(fromStr, toStr) {
+        try {
+          if (!fromStr || !toStr) return 0;
+          const f = new Date(fromStr);
+          const t = new Date(toStr);
+          if (isNaN(f) || isNaN(t)) return 0;
+          let months = (t.getFullYear() - f.getFullYear()) * 12 + (t.getMonth() - f.getMonth());
+          if (t.getDate() < f.getDate()) months -= 1;
+          return months;
+        } catch (e) { return 0; }
+      }
+
+      // Hiển thị popup modal cảnh báo/thông báo.
+      // - `msg`: nội dung, `type`: bootstrap alert type (danger, success, info...),
+      // - `timeout`: thời gian tự đóng (ms), `title`: tiêu đề modal.
+      function showAlert(msg, type = 'danger', timeout = 5000, title = 'Thông báo') {
+        try {
+          // create modal markup
+          const id = 'globalAlertModal';
+          // remove existing if present
+          const existing = document.getElementById(id);
+          if (existing) existing.remove();
+          const wrapper = document.createElement('div');
+          wrapper.id = id;
+          wrapper.className = 'modal fade';
+          wrapper.tabIndex = -1;
+          wrapper.innerHTML = `
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">${escapeHtml(title)}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-${type}">${escapeHtml(msg)}</div>
+              </div>
+            </div>
+          </div>`;
+          document.body.appendChild(wrapper);
+          const modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+          modal.show();
+          if (timeout && timeout > 0) { setTimeout(() => { try { modal.hide(); } catch (e) { } }, timeout); }
+          wrapper.addEventListener('hidden.bs.modal', () => { try { wrapper.remove(); } catch (e) { } });
+        } catch (e) { console.warn('showAlert failed', e); }
+      }
+
+      // Kiểm tra và ép giới hạn khoảng thời gian tối đa (theo tháng). Nếu vượt, hiển thị lỗi và trả về false.
+      function enforceMaxDateRange(maxMonths = 1) {
+        try {
+          const f = inputFromDate.value; const t = inputToDate.value;
+          if (!f || !t) { errEl.textContent = ''; return true; }
+          const months = monthDiffInMonths(f, t);
+          if (months === maxMonths) {
+            // do NOT auto-adjust — reject range and show error + alert
+            const msg = `Phạm vi tối đa là ${maxMonths} tháng — Vui lòng chọn lại.`;
+            showAlert(msg, 'danger', 6000);
+            return false;
+          }
+          errEl.textContent = '';
+          return true;
+        } catch (e) { return true; }
+      }
+
+      // Login modal handling
+      const loginModalEl = document.getElementById('loginModal');
+      const loginModal = new bootstrap.Modal(loginModalEl, { backdrop: 'static', keyboard: false });
+      const loginBtnEl = document.getElementById('loginBtn');
+      const loginErrorEl = document.getElementById('loginError');
+      const loginUserEl = document.getElementById('loginUsername');
+      const loginPassEl = document.getElementById('loginPassword');
+      const togglePassBtn = document.getElementById('togglePassBtn');
+      const inputFromDate = document.getElementById('inputFromDate');
+      const inputToDate = document.getElementById('inputToDate');
+      // Tự động debounce và tải lại dữ liệu khi người dùng thay đổi ngày hoặc các filter.
+      let _loadTimer = null;
+      function scheduleReload() {
+        clearTimeout(_loadTimer);
+        _loadTimer = setTimeout(() => {
+          const f = inputFromDate.value || defaultFromDate();
+          const t = inputToDate.value || defaultToDate();
+          fetchAchievedFromData(f, t).then(() => {
+            const stored = getStoredTargets();
+            renderChart(stored.mcTarget, stored.dlTarget);
+            renderSummary(stored.mcTarget, stored.dlTarget);
+            // reload customers list for the new date range
+            if (typeof loadCustomersTable === 'function') loadCustomersTable();
+          }).catch(err => {
+            console.warn('Tải dữ liệu lỗi', err);
+            const msg = document.createElement('div'); msg.style.color = 'red'; msg.style.marginTop = '8px';
+            msg.textContent = 'Tải dữ liệu lỗi: ' + (err && err.message ? err.message : 'Kiểm tra kết nối và đăng nhập');
+            document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
+          });
+        }, 350);
+      }
+      if (inputFromDate) inputFromDate.addEventListener('change', () => { if (enforceMaxDateRange(1)) scheduleReload(); });
+      if (inputToDate) inputToDate.addEventListener('change', () => { if (enforceMaxDateRange(1)) scheduleReload(); });
+
+      // Toggle password visibility
+      if (togglePassBtn) {
+        togglePassBtn.addEventListener('click', () => {
+          if (loginPassEl.type === 'password') {
+            loginPassEl.type = 'text';
+            togglePassBtn.textContent = '🙈';
+            togglePassBtn.setAttribute('aria-label', 'Ẩn mật khẩu');
+          } else {
+            loginPassEl.type = 'password';
+            togglePassBtn.textContent = '👁️';
+            togglePassBtn.setAttribute('aria-label', 'Hiển thị mật khẩu');
+          }
+        });
+      }
+
+      // Hiện modal đăng nhập và làm sạch lỗi/field trước khi hiển thị.
+      function showLogin() {
+        loginErrorEl.style.display = 'none'; loginErrorEl.textContent = '';
+        loginUserEl.value = ''; loginPassEl.value = ''; loginModal.show();
+      }
+
+      // Khởi động app: tải dữ liệu đã đạt từ API và render chart + summary.
+      function startApp() {
+        // read dates from inputs (if set) or use defaults
+        const from = inputFromDate.value || null;
+        const to = inputToDate.value || null;
+        fetchAchievedFromData(from, to).then(() => {
+          const stored = getStoredTargets();
+          inputMC.value = stored.mcTarget.toLocaleString('vi-VN');
+          inputDL.value = stored.dlTarget.toLocaleString('vi-VN');
+          renderChart(stored.mcTarget, stored.dlTarget);
+          renderSummary(stored.mcTarget, stored.dlTarget);
+          // load customers after initial data load
+          if (typeof loadCustomersTable === 'function') loadCustomersTable();
+        }).catch(err => {
+          console.warn('Không thể tải dữ liệu từ API:', err);
+          const msg = document.createElement('div');
+          msg.style.color = 'red'; msg.style.marginTop = '8px';
+          msg.textContent = 'Cảnh báo: không thể tải dữ liệu từ API. ' + (err && err.message ? err.message : 'Vui lòng đăng nhập hoặc kiểm tra kết nối.');
+          document.querySelector('.chart-wrap').insertAdjacentElement('afterend', msg);
+        });
+      }
+
+      // Xử lý sự kiện đăng nhập: gửi POST tới API auth, lưu `accessToken` và payload user vào localStorage,
+      // sau đó đóng modal và khởi động lại ứng dụng (startApp).
+      loginBtnEl.addEventListener('click', async () => {
+        const u = (loginUserEl.value || '').trim();
+        const p = (loginPassEl.value || '');
+        if (!u || !p) { loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Nhập tài khoản và mật khẩu'; return; }
+        loginBtnEl.disabled = true;
+        loginErrorEl.style.display = 'none';
+        try {
+          const res = await fetch('https://hpo.hdsaison.com.vn/hpo/api/v1/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+          });
+          const body = await res.json().catch(() => null);
+          if (!res.ok) {
+            const msg = body && (body.message || body.error) ? (body.message || body.error) : ('HTTP ' + res.status);
+            loginErrorEl.style.display = 'block'; loginErrorEl.textContent = msg;
+            loginBtnEl.disabled = false; return;
+          }
+          // Extract accessToken from common response shapes
+          const accessToken = body && (body.accessToken || body.token || (body.data && (body.data.accessToken || body.data.token)));
+          if (!accessToken) {
+            loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Không nhận được accessToken từ server';
+            loginBtnEl.disabled = false; return;
+          }
+          setAuthToken(accessToken);
+          // Normalize and store user payload. API responses vary; try common locations and ensure `id` exists.
+          let userPayload = null;
+          if (body) {
+            if (body.user) userPayload = body.user;
+            else if (body.data && body.data.user) userPayload = body.data.user;
+            else if (body.data && (body.data.id || body.data.userId)) userPayload = body.data;
+            else if (body.id || body.userId) userPayload = body;
+          }
+          // Fallback: if we couldn't find a user object, store an empty object (prevents missing id errors)
+          if (!userPayload) userPayload = {};
+          // Ensure `id` exists on the stored payload by searching common locations
+          try {
+            const maybeId = userPayload.id || userPayload.userId || (body && body.data && (body.data.id || body.data.userId)) || (body && (body.id || body.userId));
+            if (maybeId) userPayload.id = maybeId;
+          } catch (e) { }
+          try { localStorage.setItem('authUser', JSON.stringify(userPayload)); } catch (e) { }
+          loginModal.hide();
+          loginBtnEl.disabled = false;
+          startApp();
+        } catch (err) {
+          loginErrorEl.style.display = 'block'; loginErrorEl.textContent = 'Lỗi kết nối: ' + (err.message || err);
+          loginBtnEl.disabled = false;
+        }
+      });
+
+      // submit on Enter
+      loginPassEl.addEventListener('keyup', (e) => { if (e.key === 'Enter') loginBtnEl.click(); });
+
+      // Kickoff: set default date inputs and then auth check
+      if (inputFromDate) inputFromDate.value = defaultFromDate();
+      if (inputToDate) inputToDate.value = defaultToDate();
+
+
+      // On startup check token validity and require login if missing/expired
+      // Ensure default status mappings exist (so user sees initial rows in manager)
+      function ensureDefaultStatusMappings() {
+        try {
+          const cur = localStorage.getItem('statusMappings');
+          if (cur && cur.trim()) return;
+          const defaults = [
+            { code: 'REJECT', label: 'Từ chối', color: '#e64b4b' },
+            { code: 'LIVE', label: 'Hoạt động', color: '#10b981' },
+            { code: 'FINISH_ADDITIONAL_INFO', label: 'Hoàn tất thêm thông tin', color: '#111111' },
+            { code: 'ADDITIONAL_INFO', label: 'Thêm thông tin', color: '#9ca3af' },
+            { code: 'REJECT_STATUS', label: 'Từ chối b1', color: '#f59e0b' }
+          ];
+          localStorage.setItem('statusMappings', JSON.stringify(defaults));
+        } catch (e) { console.warn('ensureDefaultStatusMappings failed', e); }
+      }
+      ensureDefaultStatusMappings();
+      const initialToken = getAuthToken();
+      if (initialToken && isTokenValid(initialToken)) startApp(); else { clearAuthToken(); try { localStorage.removeItem('authUser'); } catch (e) { }; showLogin(); }
+
+      // Save handler
+      saveBtn.addEventListener('click', () => {
+        const mc = parseNumberInput(inputMC.value) || DEFAULT_MC;
+        const dl = parseNumberInput(inputDL.value) || DEFAULT_DL;
+        localStorage.setItem('targetMC', String(mc));
+        localStorage.setItem('targetDL', String(dl));
+        renderChart(mc, dl);
+        renderSummary(mc, dl);
+        saveStatus.textContent = 'Đã lưu';
+        setTimeout(() => saveStatus.textContent = '', 2500);
+      });
+
+      // Logout (clear auth token and session)
+      function logout() { sessionStorage.clear(); localStorage.removeItem('authToken'); location.reload(); }
+    </script>
+    <!-- Product modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Chi tiết sản phẩm</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="productList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tenor suggestion modal -->
+    <div class="modal fade" id="tenorSuggestionModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Gợi ý tăng kỳ hạn</h5>
+          </div>
+          <div class="modal-body" id="tenorSuggestionBody"></div>
+          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status mapping manager modal -->
+    <div class="modal fade" id="statusManagerModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Quản lý mapping trạng thái</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted">Định nghĩa các mã trạng thái (ví dụ: <code>FINISH_ADDITIONAL_INFO</code>) kèm
+              nhãn hiển thị và màu để biểu đồ dùng.</p>
+            <table class="table table-sm" id="statusMappingsTable">
+              <thead>
+                <tr>
+                  <th>Mã</th>
+                  <th>Nhãn</th>
+                  <th>Màu</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="d-flex gap-2">
+              <input id="newStatusCode" class="form-control form-control-sm"
+                placeholder="Mã trạng thái (ví dụ FINISH_ADDITIONAL_INFO)" />
+              <input id="newStatusLabel" class="form-control form-control-sm" placeholder="Nhãn hiển thị" />
+              <input id="newStatusColor" type="color" class="form-control form-control-sm" value="#2b8be6"
+                style="width:56px;padding:2px;" />
+              <button id="addStatusBtn" class="btn btn-sm btn-primary">Thêm</button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="saveStatusMappingsBtn" class="btn btn-primary">Lưu</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="cancelRequestModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Tạo yêu cầu huỷ hồ sơ
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="mb-3">
+              <label class="form-label">
+                Lý do huỷ hồ sơ
+              </label>
+
+              <textarea id="cancelReason" class="form-control" rows="4" placeholder="Ví dụ: SI nhập lộn POS">
+                    </textarea>
+            </div>
+
+            <div id="cancelPreview" class="border rounded p-3 bg-light small"
+              style="white-space: pre-line; display:none;">
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Đóng
+            </button>
+
+            <button type="button" class="btn btn-primary" id="btnCopyCancelRequest">
+              Copy nội dung
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Try loading contracts from API (when logged in) else fall back to data.json
+      async function fetchContractsFromApi(fromInput, toInput) {
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+        if (!token || !isTokenValid(token) || !(authUser && authUser.id)) {
+          return null; // signal to caller to fallback
+        }
+        const id = authUser.id;
+        const fromApi = fromInput ? formatApiDateFromInput(fromInput) : formatApiDateFromInput(defaultFromDate());
+        const toApi = toInput ? formatApiDateFromInput(toInput) : formatApiDateFromInput(defaultToDate());
+        const url = `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=&fromDate=${encodeURIComponent(fromApi)}&toDate=${encodeURIComponent(toApi)}&contractNumber=`;
+        try {
+          const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const data = await r.json();
+          // contract list might be in content or contracts or array
+          const arr = data && (data.content || data.contracts) ? (data.content || data.contracts) : (Array.isArray(data) ? data : []);
+          return arr;
+        } catch (err) { console.warn('API load contracts failed:', err); return null; }
+      }
+
+      async function loadCustomersTable() {
+        try {
+          // try API first (using date filters currently set)
+          const from = inputFromDate.value || defaultFromDate();
+          const to = inputToDate.value || defaultToDate();
+          let arr = await fetchContractsFromApi(from, to);
+          if (!arr) {
+            // API failed or user not authenticated — do not fallback to local files
+            console.warn('API load contracts failed or not authenticated');
+            const tbody = document.getElementById('customersTbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Không thể tải dữ liệu từ API. Vui lòng đăng nhập hoặc kiểm tra kết nối.</td></tr>';
+            // ensure analytics see empty dataset
+            window._allContracts = [];
+            if (typeof renderAnalytics === 'function') renderAnalytics([]);
+            return; // stop further processing
+          }
+          // store master list and populate status filter
+          window._allContracts = arr.slice();
+          if (typeof populateStatusFilter === 'function') populateStatusFilter(arr);
+          // render customers (summary, rows) inside the customers card
+          if (typeof renderCustomers === 'function') renderCustomers(arr);
+          // render analytics based on the same array
+          if (typeof renderAnalytics === 'function') renderAnalytics(arr);
+        } catch (err) { console.warn('Không thể load customers:', err); }
+      }
+
+      // --- Analytics rendering (status pie, revenue time-series, tenor distribution, top contracts) ---
+      let statusChartAll = null, statusChartMC = null, statusChartDL = null, revenueChart = null, tenorChart = null, topChart = null;
+
+      function monthKey(d) { const dt = new Date(d); return dt.getFullYear() + '-' + pad(dt.getMonth() + 1); }
+
+      function fmtShort(v) { return v.toLocaleString('vi-VN') + ' ₫'; }
+
+      // Compact formatter for tight spaces (mobile) e.g. '1,2 triệu'
+      function fmtCompact(v) {
+        try {
+          const n = Number(v) || 0;
+          const nf = new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 });
+          // append currency symbol for clarity
+          return nf.format(n) + ' ₫';
+        } catch (e) { return fmtShort(v); }
+      }
+
+      function buildStatusCounts(arr) { const m = {}; arr.forEach(c => { const s = (c.indusStatus || c.status || c.statusName || 'UNKNOWN').toString(); m[s] = (m[s] || 0) + 1; }); return m; }
+      // Map status for a contract using user-defined mappings (stored in localStorage)
+      function getStatusMappings() {
+        try {
+          const raw = localStorage.getItem('statusMappings');
+          if (!raw) return [];
+          const j = JSON.parse(raw);
+          if (!Array.isArray(j)) return [];
+          return j.map(o => ({ code: String(o.code || '').trim(), label: String(o.label || '').trim(), color: String(o.color || '').trim() }));
+        } catch (e) { return []; }
+      }
+
+      function saveStatusMappings(mappings) { try { localStorage.setItem('statusMappings', JSON.stringify(mappings || [])); } catch (e) { console.warn('saveStatusMappings failed', e); } }
+
+      function mapStatusForContract(c) {
+        const mappings = getStatusMappings();
+        // check statusCodes field first
+        const scRaw = (c.statusCodes || c.statusCode || '');
+        let codes = [];
+        if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
+        else if (typeof scRaw === 'string' && scRaw.trim()) codes = scRaw.split(/[,;|\s]+/).map(x => x.trim()).filter(Boolean);
+        else if (scRaw) codes = [String(scRaw).trim()];
+        for (const code of codes) {
+          const found = mappings.find(m => m.code && String(m.code).toLowerCase() === String(code).toLowerCase());
+          if (found) return { label: found.label || code, color: found.color || null };
+        }
+        // fallback: try indusStatus/status/statusName normalized
+        const raw = (c.indusStatus || c.status || c.statusName || '').toString();
+        const mapped = mappings.find(m => m.code && String(m.code).toLowerCase() === String(raw).toLowerCase());
+        if (mapped) return { label: mapped.label || raw, color: mapped.color || null };
+        // no mapping found -> use existing display
+        const display = getStatusText(c) || raw || 'UNKNOWN';
+        return { label: display, color: null };
+      }
+
+      // Rebuild status counts using mapped labels
+      function buildStatusCounts(arr) { const m = {}; (arr || []).forEach(c => { const mapped = mapStatusForContract(c); const s = (mapped && mapped.label) ? mapped.label : ((c.indusStatus || c.status || c.statusName || 'UNKNOWN').toString()); m[s] = (m[s] || 0) + 1; }); return m; }
+
+      function buildMonthlyRevenue(arr) { const m = {}; arr.forEach(c => { const d = c.disbursementDate || c.createdDate || c.approvedDate; if (!d) return; const k = monthKey(d); m[k] = (m[k] || 0) + Number(c.financedAmount || c.totalPurchase || 0); }); return m; }
+
+      function buildTenorDist(arr) { const m = {}; arr.forEach(c => { const t = Number(c.tenorInMonths || c.tenor || 0); if (!t) return; m[t] = (m[t] || 0) + 1; }); return m; }
+
+      function buildTopContracts(arr, n = 5) { const copy = arr.slice().filter(c => Number(c.financedAmount || 0) > 0); copy.sort((a, b) => Number(b.financedAmount || 0) - Number(a.financedAmount || 0)); return copy.slice(0, n); }
+
+      function renderAnalytics(arr) {
+        try {
+          // KPIs
+          const totalContracts = arr.length;
+          const liveContracts = arr.filter(c => (c.indusStatus || '').toString().toLowerCase() === 'live' || (c.indusStatus || '').toString().toLowerCase() === 'dbd').length;
+          const totalFinanced = arr.reduce((s, c) => s + (c.result === "APPROVE_STATUS" ? Number(c.financedAmount || c.totalPurchase || 0) : 0), 0);
+          const totalDisbursed = arr.reduce((s, c) => s + (c.disbursementDate && (c.indusStatus === "LIVE" || c.indusStatus === "DBD") ? Number(c.financedAmount || 0) : 0), 0);
+          const kpiRow = document.getElementById('kpiRow');
+          kpiRow.innerHTML = `
+          <div class="kpi-card"><div class="label">Tổng HĐ</div><div class="value">${totalContracts}</div></div>
+          <div class="kpi-card"><div class="label">HĐ LIVE</div><div class="value">${liveContracts}</div></div>
+          <div class="kpi-card"><div class="label">Tổng giải ngân</div><div class="value">${fmtShort(totalDisbursed)}</div></div>
+          <div class="kpi-card"><div class="label">Tổng vay</div><div class="value">${fmtShort(totalFinanced)}</div></div>
+        `;
+
+          const isSmall = (window.innerWidth || document.documentElement.clientWidth) <= 576;
+          // Status pies: All, MC, DL
+          const statusCountsAll = buildStatusCounts(arr);
+          const labelsAll = Object.keys(statusCountsAll);
+          const dataAll = labelsAll.map(l => statusCountsAll[l]);
+          // build a consistent label list (use labelsAll order) and render legend
+          const uniqueLabels = labelsAll.slice();
+          const legendEl = document.getElementById('statusLegend');
+          if (legendEl) {
+            legendEl.innerHTML = '';
+            const mappings = getStatusMappings();
+            uniqueLabels.forEach((lab, idx) => {
+              const chip = document.createElement('div');
+              chip.style.display = 'inline-flex'; chip.style.alignItems = 'center'; chip.style.gap = '8px';
+              chip.className = 'small';
+              const sw = document.createElement('span');
+              sw.style.width = '12px'; sw.style.height = '12px'; sw.style.display = 'inline-block'; sw.style.borderRadius = '3px';
+              // prefer mapping color if available
+              const mapByLabel = mappings.find(m => String(m.label || '').toLowerCase() === String(lab || '').toLowerCase());
+              sw.style.background = (mapByLabel && mapByLabel.color) ? mapByLabel.color : PALETTE[idx % PALETTE.length];
+              chip.innerHTML = '';
+              chip.appendChild(sw);
+              const labelText = document.createElement('span'); labelText.textContent = ' ' + lab;
+              chip.appendChild(labelText);
+              legendEl.appendChild(chip);
+            });
+          }
+          const mcArr = (arr || []).filter(c => ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'MC');
+          const dlArr = (arr || []).filter(c => ((c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null)) === 'DL');
+          const statusCountsMC = buildStatusCounts(mcArr);
+          const statusCountsDL = buildStatusCounts(dlArr);
+          const labelsMC = uniqueLabels; // use same order
+          const labelsDL = uniqueLabels; // use same order
+          // All
+          if (statusChartAll) statusChartAll.destroy();
+          const ctxAll = document.getElementById('statusChartAll').getContext('2d');
+          // determine colors for each label using mappings when available
+          const mappings = getStatusMappings();
+          const colorsAll = labelsAll.map((lab, i) => {
+            const m = mappings.find(mm => String(mm.label || '').toLowerCase() === String(lab || '').toLowerCase());
+            return (m && m.color) ? m.color : PALETTE[i % PALETTE.length];
+          });
+          statusChartAll = new Chart(ctxAll, {
+            type: 'pie',
+            data: { labels: labelsAll, datasets: [{ data: dataAll, backgroundColor: colorsAll }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 6 } }
+          });
+          // MC
+          if (statusChartMC) statusChartMC.destroy();
+          const ctxMC = document.getElementById('statusChartMC').getContext('2d');
+          const colorsMC = labelsMC.map((lab, i) => { const m = mappings.find(mm => String(mm.label || '').toLowerCase() === String(lab || '').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
+          statusChartMC = new Chart(ctxMC, {
+            type: 'pie',
+            data: { labels: labelsMC, datasets: [{ data: labelsMC.map(l => statusCountsMC[l] || 0), backgroundColor: colorsMC }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 6 } }
+          });
+          // DL
+          if (statusChartDL) statusChartDL.destroy();
+          const ctxDL = document.getElementById('statusChartDL').getContext('2d');
+          const colorsDL = labelsDL.map((lab, i) => { const m = mappings.find(mm => String(mm.label || '').toLowerCase() === String(lab || '').toLowerCase()); return (m && m.color) ? m.color : PALETTE[i % PALETTE.length]; });
+          statusChartDL = new Chart(ctxDL, {
+            type: 'pie',
+            data: { labels: labelsDL, datasets: [{ data: labelsDL.map(l => statusCountsDL[l] || 0), backgroundColor: colorsDL }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 6 } }
+          });
+
+          // Prepare filtered set: only contracts that are LIVE or have APPROVED_HARD_COPY_STATUS
+          const filteredForCharts = arr.filter(c => {
+            const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
+            const isLive = ind.includes('live') || ind === 'l' || ind === 'dbd';
+            const scRaw = (c.statusCodes || c.statusCode || '');
+            let codes = [];
+            if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
+            else if (typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x => x.trim()).filter(Boolean);
+            else if (scRaw) codes = [String(scRaw).trim()];
+            const hasApproved = codes.some(code => String(code).toUpperCase() === 'APPROVED_HARD_COPY_STATUS');
+            return isLive || hasApproved;
+          });
+
+          // Revenue time series (monthly) - use filtered data
+          const rev = buildMonthlyRevenue(filteredForCharts);
+          const revKeys = Object.keys(rev).sort();
+          const revValues = revKeys.map(k => rev[k]);
+          if (revenueChart) revenueChart.destroy();
+          const ctxR = document.getElementById('revenueChart').getContext('2d');
+          revenueChart = new Chart(ctxR, {
+            type: 'bar',
+            data: { labels: revKeys, datasets: [{ label: 'Doanh số (financed)', data: revValues, backgroundColor: PALETTE[0], borderRadius: 8, barThickness: 'flex' }] },
+            plugins: [],
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: { padding: 8 },
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.y) } },
+
+              },
+              scales: { y: { ticks: { callback: v => v.toLocaleString('vi-VN') } } }
+            }
+          });
+
+          // Tenor distribution
+          const tenor = buildTenorDist(filteredForCharts);
+          const tenorKeys = Object.keys(tenor).map(Number).sort((a, b) => a - b).map(String);
+          const tenorVals = tenorKeys.map(k => tenor[k]);
+          if (tenorChart) tenorChart.destroy();
+          const ctxT = document.getElementById('tenorChart').getContext('2d');
+          tenorChart = new Chart(ctxT, {
+            type: 'bar',
+            data: { labels: tenorKeys, datasets: [{ label: 'Số HĐ', data: tenorVals, backgroundColor: PALETTE[3], borderRadius: 6 }] },
+            plugins: [],
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } },
+              layout: { padding: 6 }
+            }
+          });
+
+          // Top contracts by financedAmount
+          const top = buildTopContracts(filteredForCharts, 5);
+          const topLabels = top.map(c => (c.number || c.code || ('HĐ#' + c.id)));
+          const topVals = top.map(c => Number(c.financedAmount || c.totalPurchase || 0));
+          if (topChart) topChart.destroy();
+          const ctxP = document.getElementById('topChart').getContext('2d');
+          topChart = new Chart(ctxP, {
+            type: 'bar',
+            data: { labels: topLabels, datasets: [{ label: 'Số tiền', data: topVals, backgroundColor: PALETTE[2], borderRadius: 6 }] },
+            plugins: [],
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtShort(ctx.parsed.x) } } },
+              indexAxis: 'y',
+              scales: { x: { ticks: { callback: v => v.toLocaleString('vi-VN') } } },
+              layout: { padding: 6 }
+            }
+          });
+          // when clicking a bar, show the corresponding customer name
+          try {
+            const topCanvasEl = document.getElementById('topChart');
+            if (topCanvasEl) {
+              topCanvasEl.onclick = function (evt) {
+                try {
+                  const points = topChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                  if (points && points.length) {
+                    const idx = points[0].index;
+                    const contract = top[idx];
+                    // open the existing product modal with this contract (it will show details)
+                    if (typeof showProductsForContract === 'function') {
+                      showProductsForContract(contract);
+                    } else {
+                      const cust = contract && contract.customer ? contract.customer : {};
+                      const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || '—';
+                      alert('Khách hàng: ' + name);
+                    }
+                  }
+                } catch (e) { console.warn('Top chart click handler error', e); }
+              };
+            }
+          } catch (e) { console.warn('Attach click handler failed', e); }
+
+        } catch (e) { console.warn('Analytics render error', e); }
+      }
+
+      // -------- Filtering & CSV export support --------
+      window._allContracts = [];
+      window._displayedContracts = [];
+
+      function getStatusText(c) {
+        const statusRaw = (c.indusStatus || c.status || c.statusName || '').toString();
+        const s = statusRaw.toLowerCase();
+        if (s === 'live' || s === 'l' || s === 'dbd') return 'LIVE';
+        if (s.includes('active') || s.includes('hoạt') || s.includes('approved')) return 'APPROVED';
+        if (s.includes('wait') || s.includes('pending') || s.includes('chờ')) return 'PENDING';
+        if (s.includes('reject') || s.includes('cancel') || s.includes('hủy') || s.includes('rej')) return 'REJECT';
+        return statusRaw || '';
+      }
+
+      // Populate the status filter dropdown from the contracts list
+      function populateStatusFilter(arr) {
+        try {
+          const sel = document.getElementById('filterStatus');
+          if (!sel) return;
+          const set = new Set();
+          (arr || []).forEach(c => {
+            // collect both normalized display and raw codes when present
+            const disp = getStatusText(c) || '';
+            if (disp) set.add(disp);
+            const scRaw = (c.statusCodes || c.statusCode || '');
+            if (Array.isArray(scRaw)) scRaw.forEach(s => s && set.add(String(s)));
+            else if (typeof scRaw === 'string' && scRaw.trim()) scRaw.split(/[,;|\s]+/).forEach(s => s && set.add(String(s.trim())));
+          });
+          const opts = Array.from(set).filter(Boolean).sort((a, b) => String(a).localeCompare(String(b)));
+          sel.innerHTML = '<option value="">Tất cả</option>' + opts.map(o => {
+            const v = String(o).toLowerCase();
+            return `<option value="${v}">${o}</option>`;
+          }).join('');
+        } catch (e) { console.warn('populateStatusFilter error', e); }
+      }
+
+      // Compute tenor suggestions to reach a threshold average (only MC, LIVE/approved considered)
+      function computeTenorSuggestion(arr, threshold) {
+        const list = (arr || []).filter(c => { const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null); return ty === 'MC' && isLiveOrApproved(c); }).map(c => ({ id: c.id || c.number || c.code || '', number: c.number || c.code || (c.id ? ('HĐ#' + c.id) : ''), tenor: Number(c.tenorInMonths || c.tenor || 0) || 0 }));
+        const n = list.length;
+        let sum = list.reduce((s, x) => s + Number(x.tenor || 0), 0);
+        const missingTotal = Math.max(0, Math.round((threshold * (n + 1)) - sum));
+        const perContractAvg = n ? Math.round((missingTotal / n) * 100) / 100 : 0;
+        // prepare assignments: distribute evenly (base + remainder to shortest contracts)
+        const assignments = [];
+        if (missingTotal > 0 && n > 0) {
+          const base = Math.floor(missingTotal / n);
+          let rem = missingTotal % n;
+          // sort by current tenor asc so shortest get remainder
+          const sorted = list.slice().sort((a, b) => a.tenor - b.tenor);
+          sorted.forEach((c, idx) => {
+            const add = base + (rem > 0 ? 1 : 0);
+            if (rem > 0) rem--;
+            assignments.push({ id: c.id, number: c.number, currentTenor: c.tenor, addMonths: add, newTenor: c.tenor + add });
+          });
+        } else {
+          // no changes needed
+          list.forEach(c => assignments.push({ id: c.id, number: c.number, currentTenor: c.tenor, addMonths: 0, newTenor: c.tenor }));
+        }
+        return { missingTotal, perContractAvg, assignments };
+      }
+
+      function openTenorSuggestionModal() {
+        try {
+          const dlg = document.getElementById('tenorSuggestionModal');
+          const body = document.getElementById('tenorSuggestionBody');
+          if (!window._tenorSuggestion || !dlg || !body) return;
+          const s = window._tenorSuggestion;
+          body.innerHTML = '';
+          const info = document.createElement('div');
+          info.className = 'mb-2';
+          info.innerHTML = `<div>Thiếu tổng: <strong>${s.missingTotal}</strong> tháng tối thiểu.</div>`;
+          body.appendChild(info);
+          const table = document.createElement('table'); table.className = 'table table-sm';
+          const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>HĐ</th><th>Hiện tại (tháng)</th></tr>'; table.appendChild(thead);
+          const tb = document.createElement('tbody');
+          (s.assignments || []).forEach(a => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${a.number}</td><td>${a.currentTenor}</td>`; tb.appendChild(tr); });
+          table.appendChild(tb); body.appendChild(table);
+          const modal = new bootstrap.Modal(dlg); modal.show();
+        } catch (e) { console.warn('openTenorSuggestionModal error', e); }
+      }
+
+      // helper: returns true if contract is LIVE (indusStatus) or has APPROVED_HARD_COPY_STATUS in statusCodes
+      function isLiveOrApproved(c) {
+        const ind = (c.indusStatus || c.status || c.statusName || '').toString().toLowerCase();
+        if (ind.includes('live') || ind.includes('request for disbursement') || ind.includes('dbd') || ind === 'l') return true;
+        const scRaw = (c.statusCodes || c.statusCode || '');
+        let codes = [];
+        if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').trim()).filter(Boolean);
+        else if (typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x => x.trim()).filter(Boolean);
+        else if (scRaw) codes = [String(scRaw).trim()];
+        return codes.some(code => String(code).toUpperCase() === 'APPROVED_HARD_COPY_STATUS');
+      }
+
+      function applyFilters(arr) {
+        const statusFilter = (document.getElementById('filterStatus').value || '').toLowerCase();
+        return arr.filter(c => {
+          const st = getStatusText(c).toLowerCase();
+          if (statusFilter) {
+            if (st.includes(statusFilter)) {
+              // ok
+            } else {
+              const scRaw = (c.statusCodes || c.statusCode || '');
+              let codes = [];
+              if (Array.isArray(scRaw)) codes = scRaw.map(x => String(x || '').toLowerCase()).filter(Boolean);
+              else if (typeof scRaw === 'string') codes = scRaw.split(/[,;|\s]+/).map(x => x.trim().toLowerCase()).filter(Boolean);
+              else if (scRaw) codes = [String(scRaw).toLowerCase()];
+              if (!codes.some(code => code.includes(statusFilter))) return false;
+            }
+          }
+          return true;
+        });
+      }
+
+      function formatCustomerCopyDate(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('vi-VN');
+      }
+
+      async function copyCustomerInfo(contract, button) {
+        const customer = contract.customer || {};
+        const name = [customer.lastName, customer.middleName, customer.firstName]
+          .filter(Boolean)
+          .join(' ') || contract.customerName || contract.customer_fullname || '';
+        const content = [
+          `Họ tên : ${name}`,
+          `Số cccd : ${customer.nationalId || contract.nationalId || ''}`,
+          `Số điện thoại : ${customer.phoneNumber || contract.customerPhone || ''}`,
+          `Khoản vay : ${Number(contract.financedAmount || contract.totalPurchase || 0).toLocaleString('vi-VN')}`,
+          `Ngày giải ngân : ${formatCustomerCopyDate(contract.disbursementDate || contract.disbursedDate)}`
+        ].join('\n');
+
+        try {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(content);
+            } catch (clipboardError) {
+              console.warn('Không thể dùng clipboard API, thử cách sao chép dự phòng:', clipboardError);
+              const textArea = document.createElement('textarea');
+              textArea.value = content;
+              textArea.style.position = 'fixed';
+              textArea.style.opacity = '0';
+              document.body.appendChild(textArea);
+              textArea.select();
+              const copied = document.execCommand('copy');
+              textArea.remove();
+              if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+            }
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = content;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            const copied = document.execCommand('copy');
+            textArea.remove();
+            if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+          }
+
+          const originalText = button.textContent;
+          button.textContent = 'Đã sao chép';
+          setTimeout(() => { button.textContent = originalText; }, 1500);
+        } catch (error) {
+          console.error('Lỗi sao chép thông tin khách hàng:', error);
+          alert('Không thể sao chép thông tin. Vui lòng thử lại.');
+        }
+      }
+
+      async function showCustomerInfo(contract, button) {
+        const customer = contract.customer || {};
+        const product = contract.submittedProducts || {}
+        const name = [customer.lastName, customer.middleName, customer.firstName]
+          .filter(Boolean)
+          .join(' ') || contract.customerName || contract.customer_fullname || '';
+        // 80-CTH-Thành phố Cần Thơ lấy từ địa chỉ sổ hộ khẩu, ví dụ: "80-CTH-Thành phố Cần Thơ" -> "Thành phố Cần Thơ"
+        const city = (customer.familyBookAddressProvince || '').split('-').slice(2).join('-').trim();
+        const phone = customer.phoneNumber;
+        const address = [
+          customer.familyBookNumber, customer.familyBookNumber == null ? '' : ',',
+          customer.familyBookAddressStreet, ',',
+          customer.familyBookAddressWard, ',',
+          city
+        ]
+          .filter(Boolean)
+          .join(' ')
+        const modelDesc = product[0]?.modelDesc;
+        // Prepare content for display
+        /*
+          HDSAISON
+          Tên: name
+          SDT: phone
+          ĐC: ${customer.address || contract.customerAddress || ''}
+          Xe: ${modelDesc}, Trả trước: ${Number(contract.downPaymentAmount || 0).toLocaleString('vi-VN')} ₫, Giá trị xe: ${Number(contract.totalPurchase || 0).toLocaleString('vi-VN')} ₫
+          BH: ABC
+          Hồ sơ: if contract.status == reject ? Hồ sơ rớt: Hồ sơ duyệt
+        */
+        const content = [
+          'HDSAISON',
+          `Tên: ${name}`,
+          `Sđt: ${phone}`,
+          `Đc: ${address}`,
+          `Xe: ${modelDesc}, Trả trước: ${Number(contract.downPaymentAmount || 0).toLocaleString('vi-VN')}`,
+          `BH: Tên BH`,
+          `Hồ sơ: ${(contract.status || '').toString().toLowerCase().includes('reject') ? 'Hồ sơ rớt' : 'Hồ sơ duyệt'}`
+        ].join('\n');
+        try {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(content);
+            } catch (clipboardError) {
+              console.warn('Không thể dùng clipboard API, thử cách sao chép dự phòng:', clipboardError);
+              const textArea = document.createElement('textarea');
+              textArea.value = content;
+              textArea.style.position = 'fixed';
+              textArea.style.opacity = '0';
+              document.body.appendChild(textArea);
+              textArea.select();
+              const copied = document.execCommand('copy');
+              textArea.remove();
+              if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+            }
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = content;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            const copied = document.execCommand('copy');
+            textArea.remove();
+            if (!copied) throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+          }
+
+          const originalText = button.textContent;
+          button.textContent = 'Đã lấy thông tin';
+          setTimeout(() => { button.textContent = originalText; }, 1500);
+        } catch (error) {
+          console.error('Lỗi lấy thông tin khách hàng:', error);
+          alert('Không thể lấy thông tin. Vui lòng thử lại.');
+        }
+      }
+
+      function renderCustomers(arr) {
+        const tbody = document.getElementById('customersTbody'); tbody.innerHTML = '';
+        let sumTenor = 0, countTenor = 0;
+        arr.forEach((c, idx) => {
+          const cust = c.customer || {};
+          const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
+          const phone = cust.phoneNumber || '';
+          const nid = cust.nationalId || '';
+          const contractNo = c.number || c.code || '';
+          const type = c.type || '';
+          const amount = c.financedAmount || c.totalPurchase || 0;
+          const tr = document.createElement('tr'); tr.style.cursor = 'pointer';
+          const statusDisplay = getStatusText(c);
+          const sd = statusDisplay.toLowerCase();
+          const badgeClass = sd === 'live' ? 'badge bg-success' : (sd.includes('pend') ? 'badge bg-warning text-dark' : ((sd.includes('reject') || sd.includes('rej') || sd.includes('cancel')) ? 'badge bg-danger' : 'badge bg-secondary'));
+          const amountText = Number(amount).toLocaleString('vi-VN') + ' ₫';
+          const cols = [String(idx + 1), name, phone, nid, contractNo, type, amountText, `<span class="${badgeClass}" style="font-weight:600;">${statusDisplay}</span>`];
+          const colLabels = ['#', 'Tên khách', 'SĐT', 'CMND', 'Hợp đồng', 'Loại', 'Số tiền', 'Trạng thái'];
+          cols.forEach((val, i) => { const td = document.createElement('td'); td.setAttribute('data-label', colLabels[i]); if (i === 6) td.style.textAlign = 'right'; if (i === 7) td.innerHTML = val; else td.textContent = val; tr.appendChild(td); });
+          const actionCell = document.createElement('td');
+          actionCell.setAttribute('data-label', 'Thao tác');
+          const copyButton = document.createElement('button');
+          copyButton.type = 'button';
+          copyButton.className = 'btn btn-sm btn-outline-primary';
+          copyButton.textContent = 'Sao chép';
+          copyButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            copyCustomerInfo(c, copyButton);
+          });
+
+          const infoButton = document.createElement('button');
+          infoButton.type = 'button';
+          infoButton.className = 'btn btn-sm btn-outline-primary';
+          infoButton.textContent = 'Thông tin';
+          infoButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            showCustomerInfo(c, infoButton);
+          });
+
+
+
+          actionCell.appendChild(copyButton);
+          actionCell.appendChild(infoButton);
+          if (!(c.status && c.status.toString().toLowerCase().includes('reject') || c.status.toString().toLowerCase().includes('additional_info'))) {
+            const cardButton = document.createElement('button');
+            cardButton.type = 'button';
+            cardButton.className = 'btn btn-sm btn-outline-danger ms-1';
+            cardButton.innerHTML = '<i class="bi bi-card-heading"></i> Thẻ TT';
+            cardButton.addEventListener('click', (event) => {
+              event.stopPropagation();
+              openCustomerCardModal(c);
+            });
+            actionCell.appendChild(cardButton);
+          }
+          tr.appendChild(actionCell);
+          tr.addEventListener('click', () => showProductsForContract(c));
+          tbody.appendChild(tr);
+          // tenor stats (only count MC contracts that are LIVE or APPROVED_HARD_COPY_STATUS)
+          const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null);
+          if (ty === 'MC' && isLiveOrApproved(c)) {
+            const t = Number(c.tenorInMonths || c.tenor || 0); if (t > 0) { sumTenor += t; countTenor++; }
+          }
+        });
+        const avgTenor = countTenor ? Math.round((sumTenor / countTenor) * 100) / 100 : 0;
+        const summaryEl = document.getElementById('customersSummary');
+        let summaryHtml = `Trung bình kỳ hạn vay (MC): ${avgTenor} tháng (dựa trên ${countTenor} hợp đồng MC)`;
+        if (countTenor && avgTenor < 15) { summaryHtml += ' <div class="text-danger mt-1">Cảnh báo: kỳ hạn trung bình nhỏ hơn 15 tháng.</div>'; }
+        try {
+          const suggestion = computeTenorSuggestion(arr, 15);
+          if (suggestion.missingTotal > 0) {
+            window._tenorSuggestion = suggestion;
+            summaryHtml += ` <span class="small text-muted">Gợi ý: cần thêm <strong>${suggestion.missingTotal}</strong> tháng cho hợp đồng tiếp theo</span> <button class="btn btn-sm btn-outline-primary ms-2" onclick="openTenorSuggestionModal()">Chi tiết</button>`;
+          } else { window._tenorSuggestion = null; }
+        } catch (e) { console.warn('tenor suggestion failed', e); }
+        summaryEl.innerHTML = summaryHtml;
+        window._displayedContracts = arr.slice();
+      }
+
+      function debounce(fn, ms = 250) { let t = null; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+      function initFilters() {
+        const sel = document.getElementById('filterStatus');
+        const reload = debounce(() => { if (!window._allContracts) return; const filtered = applyFilters(window._allContracts); renderCustomers(filtered); });
+        if (sel) sel.addEventListener('change', reload);
+        const exportBtn = document.getElementById('exportCsvBtn'); if (exportBtn) exportBtn.addEventListener('click', exportCsv);
+        // wire up status manager button
+        const manageBtn = document.getElementById('manageStatusBtn');
+        if (manageBtn) {
+          manageBtn.addEventListener('click', () => {
+            const modalEl = document.getElementById('statusManagerModal');
+            const modal = new bootstrap.Modal(modalEl);
+            renderStatusMappingsTable();
+            modal.show();
+          });
+        }
+        const addBtn = document.getElementById('addStatusBtn');
+        if (addBtn) addBtn.addEventListener('click', () => {
+          const code = (document.getElementById('newStatusCode').value || '').trim();
+          const label = (document.getElementById('newStatusLabel').value || '').trim();
+          const color = (document.getElementById('newStatusColor').value || '').trim() || '#2b8be6';
+          if (!code) return alert('Nhập mã trạng thái');
+          const list = getStatusMappings();
+          list.push({ code, label: label || code, color });
+          saveStatusMappings(list);
+          renderStatusMappingsTable();
+          document.getElementById('newStatusCode').value = ''; document.getElementById('newStatusLabel').value = '';
+        });
+        const saveBtnMap = document.getElementById('saveStatusMappingsBtn');
+        if (saveBtnMap) saveBtnMap.addEventListener('click', () => { const mappings = collectStatusMappingsFromTable(); saveStatusMappings(mappings); if (typeof renderAnalytics === 'function') renderAnalytics(window._allContracts || []); const modalEl = document.getElementById('statusManagerModal'); const m = bootstrap.Modal.getInstance(modalEl); if (m) m.hide(); });
+      }
+
+      // Render mappings table inside modal
+      function renderStatusMappingsTable() {
+        const tbody = document.querySelector('#statusMappingsTable tbody'); if (!tbody) return;
+        const mappings = getStatusMappings(); tbody.innerHTML = '';
+        mappings.forEach((m, idx) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><input class="form-control form-control-sm status-code" value="${escapeHtml(m.code)}" /></td>
+                        <td><input class="form-control form-control-sm status-label" value="${escapeHtml(m.label)}" /></td>
+                        <td><input type="color" class="form-control form-control-sm status-color" value="${escapeHtml(m.color || '#2b8be6')}" style="width:56px;" /></td>
+                        <td><button class="btn btn-sm btn-danger remove-mapping">Xóa</button></td>`;
+          tbody.appendChild(tr);
+        });
+        // attach remove handlers
+        tbody.querySelectorAll('.remove-mapping').forEach(btn => btn.addEventListener('click', (e) => { const row = e.target.closest('tr'); if (row) row.remove(); }));
+      }
+
+      function collectStatusMappingsFromTable() {
+        const rows = Array.from(document.querySelectorAll('#statusMappingsTable tbody tr'));
+        const out = rows.map(r => {
+          const code = (r.querySelector('.status-code').value || '').trim();
+          const label = (r.querySelector('.status-label').value || '').trim() || code;
+          const color = (r.querySelector('.status-color').value || '').trim() || '#2b8be6';
+          return { code, label, color };
+        }).filter(x => x.code);
+        return out;
+      }
+
+      function escapeHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+      function exportCsv() {
+        const rows = window._displayedContracts || [];
+        if (!rows.length) return alert('Không có dữ liệu để xuất');
+        const cols = ['Mã HĐ', 'Tên khách', 'SĐT', 'CCCD/CMND', 'Loại', 'Số tiền', 'Trạng thái'];
+        const lines = [cols.join(',')];
+        rows.forEach(c => {
+          const cust = c.customer || {}; const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ');
+          const vals = [(c.number || c.code || ''), name, (cust.phoneNumber || ''), (cust.nationalId || ''), (c.type || ''), Number(c.financedAmount || c.totalPurchase || 0), getStatusText(c)];
+          lines.push(vals.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(','));
+        });
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'contracts.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      }
+
+      // initialize after DOM elements exist
+      document.addEventListener('DOMContentLoaded', () => { initFilters(); });
+
+      // Global resize handler: re-render overview chart (debounced)
+      (function () {
+        let _globalResizeTimer = null;
+        window.addEventListener('resize', () => {
+          clearTimeout(_globalResizeTimer);
+          _globalResizeTimer = setTimeout(() => {
+            try { const stored = getStoredTargets(); renderChart(stored.mcTarget, stored.dlTarget); } catch (e) { }
+          }, 250);
+        });
+      })();
+
+      function openCustomerCardModal(contract) {
+        const modalEl = document.getElementById('customerCardModal');
+        if (!modalEl) return;
+
+        const modal = new bootstrap.Modal(modalEl);
+        const customer = contract.customer || {};
+        const name = [customer.lastName, customer.middleName, customer.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || 'KHACH HANG';
+        const cardContractNumber = contract.number || contract.code || '---';
+        const monthlyInstallment = Number(contract.monthlyInstallment || 0);
+        const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
+        const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
+
+        function fmtDate(d) {
+          try {
+            if (!d) return '---';
+            const dt = new Date(d);
+            return isNaN(dt.getTime()) ? d : dt.toLocaleDateString('vi-VN');
+          } catch (e) { return d; }
+        }
+
+        function computeEndDate(start, months) {
+          try {
+            if (!start || !months) return null;
+            const dt = new Date(start);
+            const end = new Date(dt);
+            end.setMonth(end.getMonth() + Number(months));
+            return end;
+          } catch (e) { return null; }
+        }
+
+        const startDateStr = fmtDate(startingInstallmentDate);
+        const endDateObj = computeEndDate(startingInstallmentDate, tenorInMonths - 1);
+        const endDateStr = endDateObj ? fmtDate(endDateObj) : '---';
+
+        document.getElementById('cardCustName').textContent = name;
+        document.getElementById('cardContractNumber').textContent = cardContractNumber;
+        document.getElementById('cardMonthlyInstallment').textContent = `${Number(monthlyInstallment).toLocaleString('vi-VN')} ₫ / tháng`;
+        document.getElementById('cardBankName').textContent = 'HD BANK';
+        document.getElementById('cardBankAccNo').textContent = '---';
+        document.getElementById('cardStartDate').textContent = startDateStr;
+        document.getElementById('cardEndDate').textContent = endDateStr;
+        document.getElementById('cardTransferSyntax').textContent = '---';
+        document.getElementById('cardQrCodeImg').src = '';
+
+        const bankSelect = document.getElementById('selectBankAcc');
+        const customBankInput = document.getElementById('customBankAcc');
+        const defaultAccount = '002704070014601';
+        bankSelect.value = defaultAccount;
+        customBankInput.value = '';
+        customBankInput.classList.add('d-none');
+
+        const updateSelectedBank = () => {
+          const selectedValue = bankSelect.value;
+          const accountNo = selectedValue === 'custom' ? (customBankInput.value.trim() || defaultAccount) : selectedValue;
+          const displayAcc = accountNo || defaultAccount;
+          document.getElementById('cardBankAccNo').textContent = displayAcc;
+          const cleanName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toUpperCase();
+          const transferContent = `${cardContractNumber} ${cleanName}`.trim();
+          document.getElementById('cardTransferSyntax').textContent = transferContent;
+          const bankId = 'HDB';
+          const template = 'compact2';
+          const accountName = 'CONG TY TAI CHINH HD SAISON';
+          const amountValue = Number(monthlyInstallment || 0);
+          const qrUrl = `https://img.vietqr.io/image/${bankId}-${displayAcc}-${template}.png?amount=${amountValue}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(accountName)}`;
+          document.getElementById('cardQrCodeImg').src = qrUrl;
+        };
+
+        bankSelect.onchange = () => {
+          const isCustom = bankSelect.value === 'custom';
+          customBankInput.classList.toggle('d-none', !isCustom);
+          if (!isCustom) {
+            customBankInput.value = '';
+            updateSelectedBank();
+          } else {
+            customBankInput.focus();
+          }
+        };
+
+        customBankInput.oninput = () => {
+          if (bankSelect.value === 'custom') {
+            updateSelectedBank();
+          }
+        };
+
+        updateSelectedBank();
+        modal.show();
+      }
+
+      function showProductsForContract(contract) {
+        const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
+        const token = getAuthToken();
+        const modalEl = document.getElementById('productModal');
+        const modal = new bootstrap.Modal(modalEl);
+        const container = document.getElementById('productList');
+        // set modal title to include customer name and phone
+        try {
+          const cust = contract && contract.customer ? contract.customer : {};
+          const name = [cust.lastName, cust.middleName, cust.firstName].filter(Boolean).join(' ') || contract.customerName || contract.customer_fullname || '—';
+          const phone = cust.phoneNumber || contract.customerPhone || '';
+          const titleEl = modalEl.querySelector('.modal-title');
+          if (titleEl) titleEl.textContent = `Chi tiết sản phẩm — ${name}` + (phone ? (' (' + phone + ')') : '');
+        } catch (e) { }
+        container.innerHTML = '';
+        // try to fetch and show customer image (if available)
+        (function () {
+          const imgWrap = document.createElement('div'); imgWrap.style.marginBottom = '12px';
+          const img = document.createElement('img');
+          img.style.maxWidth = '160px'; img.style.borderRadius = '8px'; img.style.display = 'none'; img.style.cursor = 'pointer';
+          imgWrap.appendChild(img);
+          container.appendChild(imgWrap);
+
+          async function tryLoadImage() {
+            try {
+              // const baseApi = 'https://hpo.hdsaison.com.vn/hpo/api/v1';
+              // const token = getAuthToken();
+              // prefer explicit download paths returned by API fields
+              const candidates = [];
+              const pick = v => { if (!v) return; if (Array.isArray(v)) v.forEach(x => pick(x)); else if (typeof v === 'string') candidates.push(v); };
+              pick(contract.billImageUrls || contract.billImageUrl);
+              pick(contract.contractImageUrls || contract.contractImageUrl);
+              pick(contract.mortgageContractImageUrls || contract.mortgageContractImageUrl);
+              pick(contract.billImagePath || contract.personalImagePath);
+              // normalize candidates to full URLs
+              let url = null;
+              for (const p of candidates) {
+                const s = String(p || '').trim();
+                if (!s) continue;
+                // if it's already a full URL
+                if (s.startsWith('http')) { url = s; break; }
+                // if path starts with /downloadfile -> prefix baseApi
+                if (s.indexOf('/downloadfile/') !== -1) { url = baseApi + s.replace(/^\/+/, '/'); break; }
+                // if path starts with 'downloadfile/'
+                if (s.indexOf('downloadfile/') === 0) { url = baseApi + '/' + s; break; }
+              }
+              // if no explicit path, try constructing personal image path from contract code/number
+              if (!url) {
+                const code = contract.code || contract.number || contract.id || '';
+                if (code) url = `${baseApi}/downloadfile/${code}/0/personal/0.jpeg`;
+              }
+              if (!url) return;
+              const resp = await fetch(url, { headers: token ? { 'Authorization': 'Bearer ' + token } : {} });
+              if (!resp.ok) return;
+              const blob = await resp.blob();
+              const blobUrl = URL.createObjectURL(blob);
+              // show image
+              img.src = blobUrl; img.style.display = 'block';
+              // open large in new tab on click
+              img.addEventListener('click', () => window.open(blobUrl, '_blank'));
+              // remember to revoke when modal hidden
+              modalEl._customerImageUrl = blobUrl;
+            } catch (e) { console.warn('load customer image failed', e); }
+          }
+          tryLoadImage();
+        })();
+
+        // Financial/detail fields to show
+        const totalPurchase = Number(contract.totalPurchase || 0);
+        const downPaymentAmount = Number(contract.downPaymentAmount || 0);
+        const downPaymentRate = contract.downPaymentRate || 0;
+        const financedAmount = Number(contract.financedAmount || 0);
+        const tenorInMonths = contract.tenorInMonths || contract.tenor || 0;
+        const monthlyInstallment = Number(contract.monthlyInstallment || 0);
+        const startingInstallmentDate = contract.startingInstallmentDate || contract.startingInstallment || '';
+        const disbursementDate = contract.disbursementDate || contract.disbursedDate || '';
+
+        function fmtDate(d) { try { if (!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('vi-VN'); } catch (e) { return d; } }
+
+        // compute end date by adding tenor months to startingInstallmentDate and subtracting one day
+        function computeEndDate(start, months) {
+          try {
+            if (!start || !months) return null;
+            const dt = new Date(start);
+            const end = new Date(dt);
+            end.setMonth(end.getMonth() + Number(months));
+            // subtract one day to make the end date the day before the next-month equivalent
+            end.setDate(end.getDate());
+            return end;
+          } catch (e) { return null; }
+        }
+
+        // Build details HTML
+        const detailsHtml = `
+        <div class="mb-3 contract-details">
+          <div class="row"><div class="label">Tổng mua</div><div class="value amount">${fmt(totalPurchase)}</div></div>
+          <div class="row"><div class="label">Tiền trả trước</div><div class="value">${fmt(downPaymentAmount)}<span class="muted"> (${Number(downPaymentRate).toFixed(2)}%)</span></div></div>
+          <div class="row"><div class="label">Số tiền vay</div><div class="value amount">${fmt(financedAmount)}</div></div>
+          <div class="row"><div class="label">Kỳ hạn (tháng)</div><div class="value">${tenorInMonths}</div></div>
+          <div class="row"><div class="label">Tiền trả mỗi tháng</div><div class="value amount">${fmt(monthlyInstallment)}</div></div>
+          <div class="row"><div class="label">Ngày giải ngân</div><div class="value">${fmtDate(disbursementDate)}</div></div>
+          <div class="row"><div class="label">Thời gian góp</div><div class="value"><span class="pill">${fmtDate(startingInstallmentDate)}</span><span class="arrow"> -> </span><span class="pill">${(function () { const e = computeEndDate(startingInstallmentDate, tenorInMonths - 1); return e ? fmtDate(e) : '—'; })()}</span></div></div>
+        </div>
+      `;
+        container.insertAdjacentHTML('beforeend', detailsHtml);
+
+        // Nút tạo yêu cầu huỷ hồ sơ
+        const btnCancelRequest = document.createElement('button');
+        btnCancelRequest.className = 'btn btn-danger mb-3';
+        btnCancelRequest.innerHTML = '<i class="bi bi-file-earmark-x"></i> Tạo yêu cầu huỷ';
+
+        btnCancelRequest.onclick = () => {
+          generateCancelRequest(contract);
+        };
+
+        container.appendChild(btnCancelRequest);
+
+        // Products list (may be empty)
+        const prods = (contract.submittedProducts && contract.submittedProducts.length) ? contract.submittedProducts : (contract.contractProducts || []);
+        if (!prods || prods.length === 0) {
+          const msg = document.createElement('div');
+          msg.className = 'text-muted';
+          msg.textContent = 'Không có sản phẩm.';
+          container.appendChild(msg);
+          modal.show();
+          // revoke object URL when modal closes
+          modalEl.addEventListener('hidden.bs.modal', function () { try { if (modalEl._customerImageUrl) { URL.revokeObjectURL(modalEl._customerImageUrl); modalEl._customerImageUrl = null; } } catch (e) { } });
+          return;
+        }
+
+        // also compute suggestions for future contracts (if current cannot be changed)
+        try {
+          const arr = window._allContracts || [];
+          const currentList = (arr || []).filter(c => { const ty = (c.type === '2W') ? 'MC' : (c.type === 'DL' ? 'DL' : null); return ty === 'MC' && isLiveOrApproved(c); });
+          const S = currentList.reduce((s, x) => s + Number(x.tenorInMonths || x.tenor || 0), 0);
+          const N = currentList.length;
+          const futDiv = document.createElement('div'); futDiv.className = 'mt-3';
+          futDiv.innerHTML = '<strong>Gợi ý cho hợp đồng tương lai</strong><div class="small text-muted">(n = số hợp đồng MC tương lai)</div>';
+          const ftable = document.createElement('table'); ftable.className = 'table table-sm mt-2';
+          const fthead = document.createElement('thead'); fthead.innerHTML = '<tr><th>số HĐ mới (m)</th><th>kỳ hạn cần thiết mỗi HĐ (tháng)</th></tr>'; ftable.appendChild(fthead);
+          const ftb = document.createElement('tbody');
+          for (let m = 1; m <= 5; m++) {
+            const required = Math.ceil(((15 * (N + m)) - S) / m);
+            const reqDisplay = required <= 0 ? 0 : required;
+            const tr = document.createElement('tr'); tr.innerHTML = `<td>${m}</td><td>${reqDisplay} tháng</td>`; ftb.appendChild(tr);
+          }
+          ftable.appendChild(ftb); futDiv.appendChild(ftable); body.appendChild(futDiv);
+        } catch (e) { console.warn('future tenor compute failed', e); }
+        const table = document.createElement('table'); table.className = 'table table-sm';
+        const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>Mã/Model</th></tr>'; table.appendChild(thead);
+        const tb = document.createElement('tbody');
+        prods.forEach((p) => {
+          const tr = document.createElement('tr');
+          const name = p.modelDesc || p.name || p.productName || '';
+          tr.innerHTML = `<td>${name}</td>`;
+          tb.appendChild(tr);
+        });
+        table.appendChild(tb);
+        container.appendChild(table);
+        modal.show();
+      }
+
+      async function generateCancelRequest(contract) {
+
+        const token = getAuthToken();
+
+        const res = await fetch(
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/contractnumber/${contract.number}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data = await res.json();
+
+        const modal = new bootstrap.Modal(
+          document.getElementById('cancelRequestModal')
+        );
+
+        modal.show();
+
+        const reasonInput =
+          document.getElementById('cancelReason');
+
+        const preview =
+          document.getElementById('cancelPreview');
+
+        const copyBtn =
+          document.getElementById('btnCopyCancelRequest');
+
+        reasonInput.value = '';
+        preview.style.display = 'none';
+
+        copyBtn.onclick = () => {
+
+          const reason = reasonInput.value.trim();
+
+          if (!reason) {
+            alert('Vui lòng nhập lý do huỷ');
+            return;
+          }
+
+          const customerName = [
+            data.customer?.lastName,
+            data.customer?.middleName,
+            data.customer?.firstName
+          ]
+            .filter(Boolean)
+            .join(' ');
+          const STATUS_MAP = {
+            APPROVE_STATUS: 'Contract Printing',
+            APPROVED_HARD_COPY_STATUS: 'Live',
+            WAIT_FOR_CHECKING_DISBURSEMENT_STATUS: 'Request for Disbursement'
+          };
+
+          const statusText = STATUS_MAP[data.status] || 'Trạng thái khác';
+          const content =
+            `Dear anh/chị, huỷ giúp em hồ sơ
+
+Số hợp đồng: ${data.number}
+Tên khách hàng: ${customerName}
+Code SI: HPO00001
+POScode: ${data.submittedPosScheme?.posCode || ''}
+Ngày tạo: ${new Date(data.createdDate).toLocaleDateString('vi-VN')}
+Trạng thái indus: ${statusText}
+Lý do huỷ: ${reason}`;
+
+          navigator.clipboard.writeText(content);
+
+          preview.innerText = content;
+          preview.style.display = 'block';
+
+          copyBtn.innerHTML =
+            '<i class="bi bi-check-circle"></i> Đã copy rồi nhé!';
+        };
+      }
+
+      async function generateDailyReport() {
+        try {
+          const contracts = await handleDailyReport();
+          if (contracts === null) {
+            alert('Không thể lấy báo cáo. Vui lòng kiểm tra đăng nhập và thử lại.');
+            return;
+          }
+
+          let reportText = '';
+          const reportsByDate = new Map();
+          const today = new Date();
+          const todayKey = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, '0'),
+            String(today.getDate()).padStart(2, '0')
+          ].join('-');
+
+          const getReportDate = (contract, details) => {
+            const value = details.createdDate || details.created_date ||
+              contract.createdDate || contract.created_date;
+            if (!value) return todayKey;
+
+            const datePrefix = String(value).match(/^(\d{4}-\d{2}-\d{2})/);
+            if (datePrefix) return datePrefix[1];
+
+            const parsedDate = new Date(value);
+            if (Number.isNaN(parsedDate.getTime())) return todayKey;
+            return [
+              parsedDate.getFullYear(),
+              String(parsedDate.getMonth() + 1).padStart(2, '0'),
+              String(parsedDate.getDate()).padStart(2, '0')
+            ].join('-');
+          };
+
+          const createPosReport = (posCode, posName = '') => ({
+            posCode,
+            posName,
+            tm: 0,
+            mc: { total: 0, input: 0, approve: 0, reject: 0, loanTotal: 0, insurance: 0 },
+            dl: { total: 0, input: 0, approve: 0, reject: 0, loanTotal: 0, insurance: 0 },
+            cards: 0,
+            cardLimit: 0,
+            competitors: { total: 0, ppf: 0, fe: 0, mc: 0, jaccs: 0 }
+          });
+
+          const getDateReport = (date) => {
+            if (!reportsByDate.has(date)) {
+              reportsByDate.set(date, { posReports: new Map(), dl: createPosReport('') });
+            }
+            return reportsByDate.get(date);
+          };
+
+          if (contracts.length === 0) {
+            getDateReport(todayKey);
+          }
+
+          for (const contract of contracts) {
+            try {
+              const contractDetails = await getDataNumber(contract);
+              if (!contractDetails) continue;
+
+              const type = contractDetails.type || contract.type;
+              if (type !== '2W' && type !== 'DL') continue;
+
+              const dateReport = getDateReport(getReportDate(contract, contractDetails));
+              const status = String(contractDetails.status || contract.status || '');
+              const isRejected = status.includes('REJECT');
+              const isApproved = status.includes('APPROVE');
+              const amountValue = Number(contractDetails.financedAmount ?? contract.financedAmount ?? 0);
+              const amount = Number.isFinite(amountValue) ? amountValue : 0;
+              const posScheme = contractDetails.submittedPosScheme || contract.submittedPosScheme;
+              const hasInsurance = posScheme?.schemeLiCode !== null &&
+                posScheme?.schemeLiCode !== undefined;
+
+              if (type === '2W') {
+                const posCode = contractDetails.submittedPosScheme?.posCode ||
+                  contract.submittedPosScheme?.posCode || 'UNKNOWN_POS';
+                const posName = contractDetails.submittedPosScheme?.posName ||
+                  contract.submittedPosScheme?.posName || '';
+                if (!dateReport.posReports.has(posCode)) {
+                  dateReport.posReports.set(posCode, createPosReport(posCode, posName));
+                }
+
+                const mc = dateReport.posReports.get(posCode).mc;
+                mc.total++;
+                mc.input++;
+                if (isRejected) {
+                  mc.reject++;
+                } else if (isApproved) {
+                  mc.approve++;
+                  mc.loanTotal += amount;
+                  if (hasInsurance) mc.insurance++;
+                }
+              } else {
+                const dl = dateReport.dl.dl;
+                dl.total++;
+                dl.input++;
+                if (isRejected) {
+                  dl.reject++;
+                } else if (isApproved) {
+                  dl.approve++;
+                  dl.loanTotal += amount;
+                  if (hasInsurance) dl.insurance++;
+
+                  const cardLimitValue = Number(contractDetails.cardCreditLimit || 0);
+                  const cardLimit = Number.isFinite(cardLimitValue) ? cardLimitValue : 0;
+                  if (cardLimit > 0) {
+                    dateReport.dl.cards++;
+                    dateReport.dl.cardLimit += cardLimit;
+                  }
+                }
+              }
+            } catch (innerError) {
+              console.error('Lỗi khi xử lý contract cụ thể:', contract, innerError);
+            }
+          }
+
+          if (reportsByDate.size === 0) {
+            alert('Không có dữ liệu hợp lệ để lập báo cáo.');
+            return;
+          }
+
+          const formatAmount = (amount) => amount.toLocaleString('vi-VN');
+
+
+          for (const date of [...reportsByDate.keys()].sort().reverse()) {
+            const dateReport = reportsByDate.get(date);
+            const posReports = [...dateReport.posReports.values()];
+            if (posReports.length === 0) {
+              posReports.push(createPosReport('UNKNOWN_POS'));
+            }
+
+            const firstPos = posReports[0];
+            firstPos.dl = dateReport.dl.dl;
+            firstPos.cards = dateReport.dl.cards;
+            firstPos.cardLimit = dateReport.dl.cardLimit;
+
+            reportText += `Em B/C ngày ${date}\n\n`;
+            for (const report of posReports) {
+              reportText += `${report.posCode}${report.posName ? ` - ${report.posName}` : ''}\n`;
+              reportText += `TM : ${report.tm}\n`;
+              reportText += '---------------------------\n';
+              reportText += `MC : ${report.mc.total}\n`;
+              reportText += `Nhập : ${report.mc.input}\n`;
+              reportText += `Duyệt : ${report.mc.approve}\n`;
+              reportText += `Rớt : ${report.mc.reject}\n`;
+              reportText += `Doanh số : ${formatAmount(report.mc.loanTotal)}\n`;
+              reportText += `BHKV : ${report.mc.insurance}\n`;
+              reportText += '---------------------------\n';
+              reportText += `DL : ${report.dl.total}\n`;
+              reportText += `Thực hiện : ${report.dl.input}\n`;
+              reportText += `Duyệt : ${report.dl.approve}\n`;
+              reportText += `Rớt : ${report.dl.reject}\n`;
+              reportText += `Doanh số : ${formatAmount(report.dl.loanTotal)}\n`;
+              reportText += `BHKV : ${report.dl.insurance}\n`;
+              reportText += '---------------------------\n';
+              reportText += `Thẻ : ${report.cards}\n`;
+              reportText += `Hạn mức : ${formatAmount(report.cardLimit)}\n`;
+              reportText += '---------------------------\n';
+              reportText += `Đối thủ : ${report.competitors.total}\n`;
+              reportText += `PPF : ${report.competitors.ppf}\n`;
+              reportText += `FE : ${report.competitors.fe}\n`;
+              reportText += `MC : ${report.competitors.mc}\n`;
+              reportText += `JACCS : ${report.competitors.jaccs}\n`;
+              reportText += '\n===================\n\n';
+            }
+          }
+
+          document.getElementById('dailyReportText').value = reportText.trimEnd();
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('dailyReportModal')).show();
+        } catch (e) {
+          console.error('Lỗi tạo báo cáo:', e);
+          alert('Đã xảy ra lỗi khi tạo báo cáo. Vui lòng thử lại.');
+        }
+      }
+
+      document.getElementById('copyDailyReportBtn').addEventListener('click', async () => {
+        const reportText = document.getElementById('dailyReportText');
+        try {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(reportText.value);
+              alert('Đã sao chép báo cáo.');
+              return;
+            } catch (clipboardError) {
+              console.warn('Không thể dùng clipboard API, thử cách sao chép dự phòng:', clipboardError);
+            }
+          }
+
+          reportText.focus();
+          reportText.select();
+          if (!document.execCommand('copy')) {
+            throw new Error('Trình duyệt không hỗ trợ sao chép nội dung.');
+          }
+          alert('Đã sao chép báo cáo.');
+        } catch (error) {
+          console.error('Lỗi sao chép báo cáo:', error);
+          alert('Không thể sao chép báo cáo. Vui lòng chọn và sao chép nội dung thủ công.');
+        }
+      });
+
+      async function handleDailyReport() {
+
+        const token = getAuthToken();
+        const authUser = getStoredAuthUser();
+
+        if (!token || !isTokenValid(token) || !(authUser && authUser.id)) {
+          return null;
+        }
+
+        const id = authUser.id;
+
+        const today = new Date();
+
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate());
+
+        const toDay = formatApiDateFromInput(
+          today.toISOString().split('T')[0]
+        );
+
+        const fromDay = formatApiDateFromInput(
+          yesterday.toISOString().split('T')[0]
+        );
+
+        const res = await fetch(
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/usercreated/${id}?page=0&size=1000&sort=created_date,desc&statusCodes=WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS-REJECT_STATUS-AMEND_STATUS-APPROVE_DISBURSEMENT_STATUS&fromDate=${encodeURIComponent(fromDay)}&toDate=${encodeURIComponent(toDay)}&contractNumber=`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data = await res.json();
+
+        return Array.isArray(data.contracts)
+          ? data.contracts
+          : [];
+      }
+
+      async function getDataNumber(contract) {
+        const token = getAuthToken();
+
+        const res = await fetch(
+          `https://hpo.hdsaison.com.vn/hpo/api/v1/contracts/contractnumber/${contract.number}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        // Kiểm tra nếu API trả về lỗi HTTP (ví dụ: 404, 500...)
+        if (!res.ok) {
+          console.warn(`API lỗi cho hợp đồng ${contract.number}: Status ${res.status}`);
+          return null;
+        }
+
+        // Lấy dữ liệu dưới dạng text trước để phòng trường hợp body trống
+        const text = await res.text();
+
+        // Nếu có nội dung thì parse JSON, ngược lại trả về null
+        return text ? JSON.parse(text) : null;
+      }
+
+      async function outputCustomerCardPDF() {
+        try {
+          const element = document.getElementById('printableCustomerCard');
+          if (!element) {
+            alert('Không tìm thấy nội dung thẻ thông tin khách hàng!');
+            return;
+          }
+
+          // Hiển thị thông báo đang xử lý nếu cần
+          const { jsPDF } = window.jspdf;
+
+          // Dùng html2canvas để render element thành canvas sau đó đưa vào jsPDF
+          if (typeof html2canvas === 'undefined') {
+            alert('Thư viện html2canvas chưa được tải!');
+            return;
+          }
+
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            logging: false
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          // Canh giữa trang PDF hoặc đặt lề đẹp mắt
+          const margin = 10;
+          const renderWidth = pdfWidth - (margin * 2);
+          const renderHeight = (canvas.height * renderWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', margin, margin, renderWidth, renderHeight);
+
+          const cardContractNumber = document.getElementById('cardContractNumber').textContent || 'card';
+          pdf.save(`The_Thong_Tin_${cardContractNumber.trim()}.pdf`);
+        } catch (error) {
+          console.error('Lỗi xuất PDF bằng jsPDF:', error);
+          alert('Có lỗi xảy ra khi xuất file PDF. Vui lòng thử lại.');
+        }
+      }
+
+
+      // load on script end
+      loadCustomersTable();
+    </script>
+</body>
+
+</html>

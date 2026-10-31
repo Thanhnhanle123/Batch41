@@ -1,0 +1,349 @@
+﻿<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tính Thưởng MC & DL</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./assets/css/batch41-ui.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Roboto, sans-serif;
+        }
+
+        #loginScreen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: #fff;
+            padding: 30px;
+            width: 320px;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+        }
+
+        .container-custom {
+            max-width: 1100px;
+            margin: auto;
+            margin-top: 2.5rem;
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="date"] {
+            max-width: 100% !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen p-4 md:p-8 pt-16">
+    <div id="batch41-header"></div>
+    <script src="./assets/js/batch41-common.js"></script>
+
+    <div class="container-custom max-w-6xl mx-auto space-y-6">
+        <!-- Form nhập thông số -->
+        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-md overflow-hidden">
+            <h2 class="text-2xl font-bold text-slate-800 text-center mb-6">Tính Thưởng MC & SI</h2>
+
+            <!-- Hàng 1: Chọn khoảng thời gian -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b border-slate-200">
+                <div class="w-full min-w-0">
+                    <label for="fromDate" class="block text-sm font-semibold text-slate-600 mb-1">Từ ngày</label>
+                    <input type="date" id="fromDate"
+                        class="w-full max-w-full box-border px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-slate-700 text-sm">
+                </div>
+
+                <div class="w-full min-w-0">
+                    <label for="toDate" class="block text-sm font-semibold text-slate-600 mb-1">Đến ngày</label>
+                    <input type="date" id="toDate"
+                        class="w-full max-w-full box-border px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-slate-700 text-sm">
+                </div>
+            </div>
+
+            <!-- Hàng 2: Các chỉ tiêu và phần trăm PR -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="chitieuDL" class="block text-sm font-semibold text-slate-600 mb-1">Chỉ tiêu DL (VNĐ)</label>
+                    <input type="text" id="chitieuDL" value="100.000.000" placeholder="Nhập chỉ tiêu DL..."
+                        class="currency-input w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+
+                <div>
+                    <label for="chitieuMC" class="block text-sm font-semibold text-slate-600 mb-1">Chỉ tiêu MC (VNĐ)</label>
+                    <input type="text" id="chitieuMC" value="100.000.000" placeholder="Nhập chỉ tiêu MC..."
+                        class="currency-input w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+
+                <div>
+                    <label for="pr3" class="block text-sm font-semibold text-slate-600 mb-1">Phần trăm đạt PR3 (%)</label>
+                    <input type="text" id="pr3" value="90" placeholder="Nhập % PR3..."
+                        class="percent-input w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+
+                <div>
+                    <label for="pr6" class="block text-sm font-semibold text-slate-600 mb-1">Phần trăm đạt PR6 (%)</label>
+                    <input type="text" id="pr6" value="90" placeholder="Nhập % PR6..."
+                        class="percent-input w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+            </div>
+
+            <button id="btnCalculate"
+                class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition shadow-md hover:shadow-lg active:scale-[0.98]">
+                Tính Thưởng
+            </button>
+        </div>
+
+        <!-- Tổng thưởng & Các Block A, B, C, D -->
+        <div id="resultCards" class="space-y-4">
+            <!-- Thẻ Tổng thưởng SI -->
+            <div class="bg-indigo-900 text-white p-6 rounded-2xl shadow-lg text-center">
+                <h3 class="text-lg font-medium text-indigo-200">Tổng Thưởng SI</h3>
+                <p id="totalSIBounty" class="text-4xl font-extrabold text-amber-400 mt-2">0 VNĐ</p>
+                <p class="text-xs text-indigo-300 mt-1">Công thức: A + B + C</p>
+            </div>
+
+            <!-- Grid 4 Block -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-blue-500">
+                    <p class="text-sm font-medium text-slate-500">Block A (Thưởng Doanh Số)</p>
+                    <p id="blockA" class="text-xl font-bold text-slate-800 mt-1">0 VNĐ</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-green-500">
+                    <p class="text-sm font-medium text-slate-500">Block B (Thưởng CT MC)</p>
+                    <p id="blockB" class="text-xl font-bold text-slate-800 mt-1">0 VNĐ</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-purple-500">
+                    <p class="text-sm font-medium text-slate-500">Block C (Hệ Số Ngành Hàng)</p>
+                    <p id="blockC" class="text-xl font-bold text-slate-800 mt-1">0</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-amber-500">
+                    <p class="text-sm font-medium text-slate-500">Block D (Thưởng Bảo Hiểm)</p>
+                    <p id="blockD" class="text-xl font-bold text-slate-800 mt-1">0 VNĐ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bảng Chi Tiết Từng Hợp Đồng -->
+        <div class="bg-white p-6 rounded-2xl shadow-md overflow-hidden">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <h3 class="text-lg font-bold text-slate-800">Chi Tiết Từng Hợp Đồng</h3>
+                <button id="btnExportExcel"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+                    <i class="bi bi-file-earmark-excel-fill"></i> Tải File Excel
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-600">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">Mã HĐ (Contract No)</th>
+                            <th scope="col" class="px-4 py-3">Kỳ Hạn (Tenure)</th>
+                            <th scope="col" class="px-4 py-3">DS Giải Ngân (DSGN)</th>
+                            <th scope="col" class="px-4 py-3 text-center">Group (Scheme Group)</th>
+                            <th scope="col" class="px-4 py-3 text-center">Hệ Số (%) (Coefficient)</th>
+                            <th scope="col" class="px-4 py-3 text-end">Thưởng Doanh Số (Sale Bonus)</th>
+                            <th scope="col" class="px-4 py-3 text-end">Thưởng BH (Insurance Bonus)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractTableBody">
+                        <!-- Dữ liệu được render từ JS -->
+                    </tbody>
+                    <tfoot class="bg-slate-100 font-bold text-slate-800 border-t-2 border-slate-300">
+                        <tr>
+                            <td colspan="2" class="px-4 py-3 text-right">Tổng cộng:</td>
+                            <td id="totalDSGN" class="px-4 py-3 text-indigo-700">0 VNĐ</td>
+                            <td colspan="2"></td>
+                            <td id="sumSaleBonus" class="px-4 py-3 text-end">0 VNĐ</td>
+                            <td id="sumInsuranceBonus" class="px-4 py-3 text-end text-emerald-600">0 VNĐ</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button id="closeModalBtn" type="button"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-xl px-2">
+                &times;
+            </button>
+
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">Phiên đăng nhập hết hạn</h3>
+                <p class="text-sm text-gray-500 mt-1">Vui lòng đăng nhập lại để tiếp tục thao tác</p>
+            </div>
+
+            <div id="loginModalError"
+                class="hidden mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md border border-red-200 text-center">
+            </div>
+
+            <!-- Form Đăng Nhập -->
+            <form id="reLoginForm" class="space-y-4">
+                <div>
+                    <label for="modalUsername" class="block text-sm font-medium text-gray-700 mb-1">Tài khoản</label>
+                    <input type="text" id="modalUsername" autocomplete="username" required
+                        placeholder="Nhập tên tài khoản..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="modalPassword" class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                    <div class="relative">
+                        <input type="password" id="modalPassword" autocomplete="current-password" required
+                            placeholder="Nhập mật khẩu..."
+                            class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" id="toggleModalPassword"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                            <svg id="eyeIconClosed" class="h-5 w-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.02 10.02 0 013.682-.863c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21f-3-3m-3-3l-3-3m-2-2l-3-3m-3-3L3 3" />
+                            </svg>
+                            <svg id="eyeIconOpen" class="h-5 w-5 hidden" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow transition-colors">
+                        Đăng nhập lại
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts phụ trợ giao diện -->
+    <script>
+        function logout() {
+            sessionStorage.clear();
+            localStorage.clear();
+            location.reload();
+        }
+
+        const dlInput = document.getElementById('chitieuDL');
+        const mcInput = document.getElementById('chitieuMC');
+
+        if (sessionStorage.getItem('chitieuDL')) {
+            dlInput.value = sessionStorage.getItem('chitieuDL');
+        }
+        if (sessionStorage.getItem('chitieuMC')) {
+            mcInput.value = sessionStorage.getItem('chitieuMC');
+        }
+
+        dlInput.addEventListener('input', (e) => {
+            sessionStorage.setItem('chitieuDL', e.target.value);
+        });
+        mcInput.addEventListener('input', (e) => {
+            sessionStorage.setItem('chitieuMC', e.target.value);
+        });
+
+        function setDefaultDates() {
+            const now = new Date();
+            const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const lastDayPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+            const formatDateForInput = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.getElementById('fromDate').value = formatDateForInput(firstDayPrevMonth);
+            document.getElementById('toDate').value = formatDateForInput(lastDayPrevMonth);
+        }
+
+        function formatNumberInput(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value) {
+                e.target.value = new Intl.NumberFormat('vi-VN').format(Number(value));
+            } else {
+                e.target.value = '';
+            }
+        }
+
+        document.querySelectorAll('.currency-input').forEach(input => {
+            input.addEventListener('input', formatNumberInput);
+        });
+
+        document.querySelectorAll('.percent-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9.]/g, '');
+            });
+        });
+
+        window.getNumericValue = function (elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return 0;
+            const rawValue = element.value.replace(/\./g, '').replace(/,/g, '.');
+            return parseFloat(rawValue) || 0;
+        };
+
+        window.getDateValue = function (elementId) {
+            const element = document.getElementById(elementId);
+            if (!element || !element.value) return '';
+            const [year, month, day] = element.value.split('-');
+            return `${day}-${month}-${year}`;
+        };
+
+        setDefaultDates();
+    </script>
+
+    <!-- Thư viện ExcelJS và Bootstrap JS Bundle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Main Logic Script (ES Module) -->
+    <script type="module" src="./index.js"></script>
+</body>
+
+</html>
