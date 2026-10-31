@@ -29,7 +29,7 @@ export const getContractNumbers = async (fromDate, toDate, statusCodes, type="2W
 // ==========================================
 // HÀM 2: Nhận danh sách numbers -> Lấy chi tiết
 // ==========================================
-export const getContractDetailsByNumbers = async (numbers = [], type = '2W') => {
+export const getContractDetailsByNumbers = async (numbers = []) => {
   if (!numbers.length) return []
 
   try {
@@ -42,14 +42,14 @@ export const getContractDetailsByNumbers = async (numbers = [], type = '2W') => 
     // Map lại cấu trúc dữ liệu an toàn với Optional Chaining (?.)
     const data = contractDetails
       .filter(Boolean) // Loại bỏ các item bị null/undefined nếu API chi tiết lỗi
-      .filter(d => d.type === type)
       .map(d => ({
         contractNo: d.number ?? null,
         schemeName: d.submittedPosScheme?.schemeName ?? null,
         schemeCode: d.submittedPosScheme?.schemeCode ?? null,
         tenure: d.tenorInMonths ?? 0,
         dsgn: d.financedAmount ?? 0,
-        Li: d.submittedPosScheme?.schemeLiCode ? 'YES' : 'NO'
+        Li: d.submittedPosScheme?.schemeLiCode ? 'YES' : 'NO',
+        type: d.type
       }))
 
     return data

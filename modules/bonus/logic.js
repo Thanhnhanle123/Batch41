@@ -6,7 +6,7 @@ import {
 // ==========================================
 // HÀM 1: Lấy danh sách mã hợp đồng (numbers)
 // ==========================================
-export const getContractNumbers = async (fromDate, toDate, statusCodes) => {
+export const getContractNumbers = async (fromDate, toDate, statusCodes, type="2W") => {
   try {
     const data = await fetchContractsApi(fromDate, toDate, statusCodes)
 
@@ -18,7 +18,8 @@ export const getContractNumbers = async (fromDate, toDate, statusCodes) => {
         : []
 
     // Trả về mảng chứa danh sách các number
-    return arr.map(item => item.number).filter(num => num !== undefined)
+    return arr.map(item => item.number).filter(num => num !== undefined &&  type === type)
+
   } catch (err) {
     console.warn('API load contract numbers failed:', err)
     return []
@@ -47,7 +48,8 @@ export const getContractDetailsByNumbers = async (numbers = []) => {
         schemeCode: d.submittedPosScheme?.schemeCode ?? null,
         tenure: d.tenorInMonths ?? 0,
         dsgn: d.financedAmount ?? 0,
-        Li: d.submittedPosScheme?.schemeLiCode ? 'YES' : 'NO'
+        Li: d.submittedPosScheme?.schemeLiCode ? 'YES' : 'NO',
+        type: d.type
       }))
 
     return data

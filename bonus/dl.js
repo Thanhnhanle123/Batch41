@@ -1,19 +1,5 @@
-// import { exportToExcel } from './exportExcel.js';
-// import { getContractDetailsByNumbers, getContractNumbers } from './logic.js';
-// import { schemeIncentives } from './scheme.js';
-
-// // Dữ liệu mock giả lập danh sách hợp đồng
-// const mockContracts = [
-
-// ];
-
-// let actualContracts = []
-
-// // Lưu trữ dữ liệu bảng hợp đồng hiện tại để xuất Excel
-// let currentCalculatedContracts = [];
-
-// 1. Trọng số rủi ro (PR3, PR6)
-const getRiskFactor = (pr3, pr6) => {
+// 1. Trọng số rủi ro (PR3, PR6) DL
+const getRiskFactorDL = (pr3, pr6) => {
   const val3 = typeof pr3 === 'number' && pr3 <= 1 && pr3 > 0 ? pr3 * 100 : pr3
   const val6 = typeof pr6 === 'number' && pr6 <= 1 && pr6 > 0 ? pr6 * 100 : pr6
 
@@ -42,8 +28,8 @@ const getRiskFactor = (pr3, pr6) => {
   return riskMatrix[rowKey]?.[colKey] ?? 0
 }
 
-// 2. Hệ số Scheme & Kỳ hạn
-const getCoefficient = (schemeGroup, term) => {
+// 2. Hệ số Scheme & Kỳ hạn DL
+const getCoefficientDL = (schemeGroup, term) => {
   let rowKey = 'NA'
   if (schemeGroup === 'E') rowKey = 'E'
   else if (schemeGroup == 'D') rowKey = 'D'
@@ -68,319 +54,140 @@ const getCoefficient = (schemeGroup, term) => {
   const riskMatrix = {
     D: { '<12': 0, '>=12': 0, '>=15': 0, '>=18': 0, '>24': 0 },
     C: { '<12': 0, '>=12': 0.1, '>=15': 0.3, '>=18': 0.4, '>24': 0.5 },
-    B: { '<12': 0.7, '>=12': 1, '>=15': 1.1, '>=18': 1.3, '>24': 1.4},
+    B: { '<12': 0.7, '>=12': 1, '>=15': 1.1, '>=18': 1.3, '>24': 1.4 },
     A: { '<12': 0.9, '>=12': 1.2, '>=15': 1.3, '>=18': 1.5, '>24': 1.6 },
   }
 
   return riskMatrix[rowKey]?.[colKey] / 100 ?? 0
 }
 
-// // 3. Tiền thưởng bảo hiểm
-// const calculateInsuranceBonus = (dsgnInVnd, tenure) => {
-//   let dsgnKey = '<12';
-//   if (dsgnInVnd >= 50000000) dsgnKey = '>=50';
-//   else if (dsgnInVnd >= 25000000) dsgnKey = '>=25';
-//   else if (dsgnInVnd >= 12000000) dsgnKey = '>=12';
+// 3. Thưởng đạt chỉ tiêu DL
+const TargetDL = targetDL => {
+  let targetMCKey = '<100';
 
-//   let tenureKey = '<12';
-//   if (tenure >= 12) tenureKey = '>=12';
+  if (targetDL >= 1000000000) targetMCKey = '>=1000';
+  else if (targetDL >= 700000000) targetMCKey = '>=700';
+  else if (targetDL >= 500000000) targetMCKey = '>=500';
+  else if (targetDL >= 300000000) targetMCKey = '>=300';
+  else if (targetDL >= 200000000) targetMCKey = '>=200';
+  else if (targetDL >= 170000000) targetMCKey = '>=170';
+  else if (targetDL >= 150000000) targetMCKey = '>=150';
+  else if (targetDL >= 120000000) targetMCKey = '>=120';
+  else if (targetDL >= 100000000) targetMCKey = '>=100';
 
-//   const bonusMatrix = {
-//     '<12': { '<12': 18, '>=12': 25 },
-//     '>=12': { '<12': 30, '>=12': 35 },
-//     '>=25': { '<12': 35, '>=12': 40 },
-//     '>=50': { '<12': 45, '>=12': 55 }
-//   };
+  const targetMatrix = {
+    '<100': 0,
+    '>=100': 500000,
+    '>=120': 600000,
+    '>=150': 800000,
+    '>=170': 1100000,
+    '>=200': 1300000,
+    '>=300': 1800000,
+    '>=500': 2500000,
+    '>=700': 4000000,
+    '>=1000': 5000000
+  };
 
-//   return (bonusMatrix[dsgnKey]?.[tenureKey] ?? 0) * 1000;
-// };
+  return targetMatrix[targetMCKey] ?? 0;
+};
 
-// // 4. Thưởng đạt chỉ tiêu MC
-// const TargetMC = targetMC => {
-//   let targetMCKey = '<120';
+const BonusDL = bonusDL => {
+  let bonusDLKey = '<90';
 
-//   if (targetMC >= 820000000) targetMCKey = '>=820';
-//   else if (targetMC >= 720000000) targetMCKey = '>=720';
-//   else if (targetMC >= 620000000) targetMCKey = '>=620';
-//   else if (targetMC >= 520000000) targetMCKey = '>=520';
-//   else if (targetMC >= 420000000) targetMCKey = '>=420';
-//   else if (targetMC >= 320000000) targetMCKey = '>=320';
-//   else if (targetMC >= 220000000) targetMCKey = '>=220';
-//   else if (targetMC >= 180000000) targetMCKey = '>=180';
-//   else if (targetMC >= 120000000) targetMCKey = '>=120';
+  if (bonusDL >= 160) bonusDLKey = '>=160';
+  else if (bonusDL >= 150) bonusDLKey = '>=150';
+  else if (bonusDL >= 140) bonusDLKey = '>=140';
+  else if (bonusDL >= 130) bonusDLKey = '>=130';
+  else if (bonusDL >= 120) bonusDLKey = '>=120';
+  else if (bonusDL >= 110) bonusDLKey = '>=110';
+  else if (bonusDL >= 100) bonusDLKey = '>=100';
+  else if (bonusDL >= 90) bonusDLKey = '>=90';
 
-//   const targetMatrix = {
-//     '<120': 0,
-//     '>=120': 800000,
-//     '>=180': 900000,
-//     '>=220': 1200000,
-//     '>=320': 1500000,
-//     '>=420': 2000000,
-//     '>=520': 2500000,
-//     '>=620': 3000000,
-//     '>=720': 3500000,
-//     '>=820': 4000000
-//   };
+  const bonusMatrix = {
+    '<90': 0,
+    '>=90': 0.7,
+    '>=100': 0.1,
+    '>=110': 1.1,
+    '>=120': 1.2,
+    '>=130': 1.3,
+    '>=140': 1.4,
+    '>=150': 1.5,
+    '>=160': 1.6
+  };
 
-//   return targetMatrix[targetMCKey] ?? 0;
-// };
+  return bonusMatrix[bonusDLKey] ?? 0;
+};
 
-// const BonusMC = bonusMC => {
-//   let bonusMCKey = '<80';
+// Hệ số đạt chỉ tiêu hàng hàng chính và tổng
+// Hệ số đạt chỉ tiêu ngành hàng chính và tổng
+const getBonusDL = (targetMC, targetTong) => {
+  // 1. Xác định chỉ số hàng dựa vào %Target MC/ED (từ cao xuống thấp)
+  let rowIndex = 0;
+  if (targetMC >= 120) {
+    rowIndex = 4; // >=120%
+  } else if (targetMC >= 100) {
+    rowIndex = 3; // >=100%
+  } else if (targetMC >= 75) {
+    rowIndex = 2; // >=75%
+  } else if (targetMC >= 50) {
+    rowIndex = 1; // >=50%
+  } else {
+    rowIndex = 0; // <50%
+  }
 
-//   if (bonusMC >= 140) bonusMCKey = '>=140';
-//   else if (bonusMC >= 130) bonusMCKey = '>=130';
-//   else if (bonusMC >= 120) bonusMCKey = '>=120';
-//   else if (bonusMC >= 110) bonusMCKey = '>=110';
-//   else if (bonusMC >= 100) bonusMCKey = '>=100';
-//   else if (bonusMC >= 95) bonusMCKey = '>=95';
-//   else if (bonusMC >= 90) bonusMCKey = '>=90';
-//   else if (bonusMC >= 80) bonusMCKey = '>=80';
+  // 2. Xác định chỉ số cột dựa vào %Target tổng (từ cao xuống thấp)
+  let colIndex = 0;
+  if (targetTong >= 115) {
+    colIndex = 4; // >=115%
+  } else if (targetTong >= 100) {
+    colIndex = 3; // >=100%
+  } else if (targetTong >= 90) {
+    colIndex = 2; // >=90%
+  } else if (targetTong >= 75) {
+    colIndex = 1; // >=75%
+  } else {
+    colIndex = 0; // <=75%
+  }
 
-//   const bonusMatrix = {
-//     '<80': 0,
-//     '>=80': 0.5,
-//     '>=90': 0.8,
-//     '>=95': 0.85,
-//     '>=100': 1,
-//     '>=110': 1.1,
-//     '>=120': 1.15,
-//     '>=130': 1.2,
-//     '>=140': 1.3
-//   };
+  // 3. Ma trận giá trị tương ứng từ bảng trong hình
+  const bonusMatrix = [
+    // <=75%  >=75%  >=90%  >=100%  >=115%
+    [  0.2,   0.3,   0.5,    0.6,    0.7 ], // <50%
+    [  0.2,   0.6,   0.8,    1.0,    1.3 ], // >=50%
+    [  0.2,   0.7,   0.8,    1.2,    1.5 ], // >=75%
+    [  0.5,   1.0,   1.1,    1.4,    1.8 ], // >=100%
+    [  1.0,   1.2,   1.4,    1.5,    2.0 ]  // >=120%
+  ];
 
-//   return bonusMatrix[bonusMCKey] ?? 0;
-// };
+  // Trả về giá trị hệ số tương ứng trong ma trận
+  return bonusMatrix[rowIndex][colIndex];
+};
 
-// // 5. Tính toán từng hợp đồng
-// function calculateContractBonuses(contracts, schemeIncentives) {
-//   let totalSalesBonus = 0;
-//   let totalInsuranceBonus = 0;
-//   const listContractBonus = [];
+// Tiền thưởng bảo hiểm
+const calculateInsuranceBonusDL = (dsgnInVnd, tenure) => {
+  // 1. Xác định mức doanh số giải ngân (DSGN)
+  let dsgnKey = '<12';
+  if (dsgnInVnd >= 50000000) dsgnKey = '>=50';
+  else if (dsgnInVnd >= 25000000) dsgnKey = '>=25';
+  else if (dsgnInVnd >= 12000000) dsgnKey = '>=12';
 
-//   for (const contract of contracts) {
-//     const dsgnInVnd = Number(contract.dsgn) || 0;
-//     const schemeName = contract.schemeName || '';
-//     const schemeCode = contract.schemeCode || '';
-//     const tenure = Number(contract.tenure) || 0;
+  // 2. Xác định kỳ hạn tương ứng (>= 18 sẽ tự động lấy mốc cao nhất là '18')
+  let tenureKey = '12';
+  if (tenure >= 18) {
+    tenureKey = '18'; // Lấy mốc cao nhất cho các kỳ hạn từ 18 tháng trở lên
+  } else if (tenure >= 15) {
+    tenureKey = '15';
+  } else {
+    tenureKey = '12'; // Dưới 15 tháng (hoặc < 12) lấy mốc thấp nhất là 12
+  }
 
-//     const schemeObj = schemeIncentives.find(
-//       s => s.schemeName === schemeName || s.scheme === schemeCode
-//     );
-//     let schemeGroup = schemeObj
-//       ? schemeObj.SchemeGroup || schemeObj.getSchemeGroup
-//       : 'D';
+  // 3. Ma trận tiền thưởng dựa theo bảng (Đơn vị: VNĐ)
+  const bonusMatrix = {
+    '<12':  { '12': 100, '15': 150, '18': 200 },
+    '>=12': { '12': 180, '15': 230, '18': 280 },
+    '>=25': { '12': 260, '15': 310, '18': 360 },
+    '>=50': { '12': 340, '15': 390, '18': 440 }
+  };
 
-//     if (schemeName.length > 0 && schemeName.at(-1) !== schemeGroup && schemeGroup === 'D') {
-//       schemeGroup = schemeName.at(-1);
-//     }
-
-//     const coefficient = getCoefficient(schemeGroup, tenure);
-//     const saleBonus = dsgnInVnd * coefficient;
-//     totalSalesBonus += saleBonus;
-
-//     const insuranceBonus =
-//       contract.Li === 'YES' ? calculateInsuranceBonus(dsgnInVnd, tenure) : 0;
-//     totalInsuranceBonus += insuranceBonus;
-
-//     listContractBonus.push({
-//       contractNo: contract.contractNo || 'N/A',
-//       tenure,
-//       dsgn: dsgnInVnd,
-//       dsgnInVnd,
-//       dsgnInMil: (dsgnInVnd / 1000000).toFixed(1),
-//       schemeGroup,
-//       insuranceBonus,
-//       coefficient: coefficient * 100, // Hiển thị dạng phần trăm (%)
-//       saleBonus
-//     });
-//   }
-
-//   return {
-//     salesBonus: totalSalesBonus,
-//     insuranceBonus: totalInsuranceBonus,
-//     listContractBonus
-//   };
-// }
-
-// // 6. Tính Tổng Thưởng SI
-// function calculateTotalSIBounty(data) {
-//   const { contracts, schemeIncentives, pr3, pr6, targetMC } = data;
-
-//   const bonusData = calculateContractBonuses(contracts, schemeIncentives);
-
-//   // A. Thưởng doanh số
-//   const riskFactor = getRiskFactor(pr3, pr6);
-//   const salesBonus_A = bonusData.salesBonus * riskFactor;
-
-//   // B. Thưởng đạt chỉ tiêu MC
-//   const targetMCAchieve = bonusData.listContractBonus
-//     .filter(c => c.contractNo && c.contractNo.startsWith('2W'))
-//     .reduce((sum, c) => sum + c.dsgnInVnd, 0);
-
-//   const salesBonus_B =
-//     BonusMC((targetMCAchieve / targetMC) * 100) * TargetMC(targetMCAchieve);
-
-//   // C. Thưởng bảo hiểm khoản vay
-//   const salesBonus_C = bonusData.insuranceBonus;
-
-//   const totalSIBounty = salesBonus_A + salesBonus_B + salesBonus_C;
-
-//   return {
-//     totalSIBounty,
-//     details: {
-//       salesBonus_A,
-//       salesBonus_B,
-//       mainCoefficient_C: riskFactor, // Hoặc giá trị hệ số phù hợp hiển thị Block C
-//       salesBonus_C,
-//       listContractBonus: bonusData.listContractBonus
-//     }
-//   };
-// }
-
-// const formatCurrency = amount => {
-//   return new Intl.NumberFormat('vi-VN', {
-//     style: 'currency',
-//     currency: 'VND'
-//   }).format(amount);
-// };
-
-// // 7. Hàm Render kết quả lên giao diện
-// function renderResults() {
-//   const targetMC = window.getNumericValue ? window.getNumericValue('chitieuMC') : 100000000;
-//   const pr3 = window.getNumericValue ? window.getNumericValue('pr3') : 90;
-//   const pr6 = window.getNumericValue ? window.getNumericValue('pr6') : 90;
-
-//   // Sử dụng trực tiếp mockContracts không cần gọi API đăng nhập
-//   const contractsToCalculate =
-//     actualContracts.length > 0 ? actualContracts : mockContracts
-//   const result = calculateTotalSIBounty({
-//     contracts: contractsToCalculate,
-//     schemeIncentives,
-//     pr3,
-//     pr6,
-//     targetMC
-//   });
-
-//   const { totalSIBounty, details } = result;
-
-//   // Cập nhật biến dữ liệu để dùng cho việc xuất file Excel
-//   currentCalculatedContracts = details.listContractBonus;
-
-//   if (document.getElementById('totalSIBounty'))
-//     document.getElementById('totalSIBounty').innerText = formatCurrency(totalSIBounty);
-//   if (document.getElementById('blockA'))
-//     document.getElementById('blockA').innerText = formatCurrency(details.salesBonus_A);
-//   if (document.getElementById('blockB'))
-//     document.getElementById('blockB').innerText = formatCurrency(details.salesBonus_B);
-//   if (document.getElementById('blockC'))
-//     document.getElementById('blockC').innerText = details.mainCoefficient_C;
-//   if (document.getElementById('blockD'))
-//     document.getElementById('blockD').innerText = formatCurrency(details.salesBonus_C);
-
-//   const tableBody = document.getElementById('contractTableBody');
-//   if (tableBody) {
-//     tableBody.innerHTML = details.listContractBonus
-//       .map(
-//         contract => `
-//       <tr class="bg-white border-b hover:bg-slate-50">
-//         <td class="px-4 py-3 font-medium text-slate-900">${contract.contractNo}</td>
-//         <td class="px-4 py-3">${contract.tenure} tháng</td>
-//         <td class="px-4 py-3">${formatCurrency(contract.dsgnInVnd)} (${contract.dsgnInMil} Tr)</td>
-//         <td class="px-4 py-3 text-center"><span class="badge-group">${contract.schemeGroup}</span></td>
-//         <td class="px-4 py-3 text-center">${contract.coefficient.toFixed(2)}%</td>
-//         <td class="px-4 py-3 text-end font-semibold text-slate-700">${formatCurrency(contract.saleBonus)}</td>
-//         <td class="px-4 py-3 text-end text-emerald-600 font-semibold">${formatCurrency(contract.insuranceBonus)}</td>
-//       </tr>
-//     `
-//       )
-//       .join('');
-//   }
-
-//   const totalDsgnInVnd = details.listContractBonus.reduce(
-//     (sum, c) => sum + c.dsgnInVnd,
-//     0
-//   );
-//   const totalSaleBonusTable = details.listContractBonus.reduce(
-//     (sum, c) => sum + c.saleBonus,
-//     0
-//   );
-//   const totalInsBonusTable = details.listContractBonus.reduce(
-//     (sum, c) => sum + c.insuranceBonus,
-//     0
-//   );
-
-//   const totalDsgnElement = document.getElementById('totalDSGN');
-//   if (totalDsgnElement) {
-//     totalDsgnElement.innerText = `${formatCurrency(totalDsgnInVnd)} (${(totalDsgnInVnd / 1000000).toFixed(1)} Tr)`;
-//   }
-//   const sumSaleBonusElement = document.getElementById('sumSaleBonus');
-//   if (sumSaleBonusElement) {
-//     sumSaleBonusElement.innerText = formatCurrency(totalSaleBonusTable);
-//   }
-//   const sumInsuranceBonusElement = document.getElementById('sumInsuranceBonus');
-//   if (sumInsuranceBonusElement) {
-//     sumInsuranceBonusElement.innerText = formatCurrency(totalInsBonusTable);
-//   }
-// }
-
-// function getDefaultPrevMonthRange () {
-//   const now = new Date()
-//   const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-//   const lastDay = new Date(now.getFullYear(), now.getMonth(), 0)
-
-//   const format = d => {
-//     const day = String(d.getDate()).padStart(2, '0')
-//     const month = String(d.getMonth() + 1).padStart(2, '0')
-//     const year = d.getFullYear()
-//     return `${day}-${month}-${year}`
-//   }
-
-//   return {
-//     startDate: format(firstDay),
-//     endDate: format(lastDay)
-//   }
-// }
-
-// async function main () {
-//   try {
-//     const defaultRange = getDefaultPrevMonthRange()
-//     const startDate =
-//       (typeof window.getDateValue === 'function' &&
-//         window.getDateValue('fromDate')) ||
-//       defaultRange.startDate
-//     const endDate =
-//       (typeof window.getDateValue === 'function' &&
-//         window.getDateValue('toDate')) ||
-//       defaultRange.endDate
-
-//     const numbers = await getContractNumbers(
-//       startDate,
-//       endDate,
-//       'WAIT_FOR_CHECKING_DISBURSEMENT_STATUS-APPROVE_DISBURSEMENT_STATUS-APPROVED_HARD_COPY_STATUS'
-//     )
-
-//     const contractDetails = await getContractDetailsByNumbers(numbers, "2W")
-//     actualContracts = contractDetails || []
-
-//     renderResults()
-//   } catch (error) {
-//     console.error('Lỗi API, dùng Mock Data:', error)
-//     renderResults()
-//   }
-// }
-
-// // Bắt sự kiện khi bấm nút "Tính Thưởng"
-// document.getElementById('btnCalculate')?.addEventListener('click', () => {
-//   main();
-// });
-
-// // Bắt sự kiện khi bấm nút "Tải File Excel"
-// document.getElementById('btnExportExcel')?.addEventListener('click', () => {
-//   exportToExcel(currentCalculatedContracts);
-// });
-
-// // Khởi chạy khi trang load
-// window.onload = () => {
-//   renderResults();
-// };
+  return (bonusMatrix[dsgnKey]?.[tenureKey] || 0) * 1000;
+};
