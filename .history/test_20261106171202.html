@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quét mã QR</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+  <h3>Quét mã QR</h3>
+
+  <div id="reader" style="width:300px"></div>
+
+  <p>Kết quả: <span id="result"></span></p>
+
+  <script>
+    const scanner = new Html5Qrcode("reader");
+
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      (decodedText) => {
+        document.getElementById("result").innerText =
+          decodedText;
+
+        scanner.stop();
+      }
+    );
+  </script>
+
+</body>
+</html>

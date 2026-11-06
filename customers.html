@@ -226,6 +226,41 @@
       color: var(--muted);
     }
 
+    .contract-end-date {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      padding: 5px 8px;
+      border-left: 3px solid transparent;
+      border-radius: 4px;
+      background: #f8fafc;
+    }
+
+    .contract-end-date.is-expired {
+      border-left-color: #dc3545;
+      background: #fff0f1;
+      color: #b02a37;
+      font-weight: 700;
+    }
+
+    .contract-end-date.is-expired .contract-end-label {
+      color: #b02a37;
+    }
+
+    .installments-remaining {
+      display: inline-block;
+      margin-top: 2px;
+      color: #0a58ca;
+      font-weight: 600;
+    }
+
+    .btn-copy-message {
+      display: block;
+      margin: 3px 0;
+    }
+
     .center {
       text-align: center;
     }
@@ -400,6 +435,10 @@
           <input id="filterContract" class="filter-input" placeholder="Tìm theo Số HĐ" />
           <input id="filterPhone" class="filter-input" placeholder="Tìm theo Số điện thoại" />
           <input id="filterCmnd" class="filter-input" placeholder="Tìm theo CMND/CCCD" />
+          <select id="filterRemainingInstallments" class="filter-select" aria-label="Lọc theo số lần góp còn lại">
+            <option value="">Tất cả số lần góp</option>
+            <option value="1">Còn đúng 1 lần góp</option>
+          </select>
           <input id="apiId" type="hidden" />
         </div>
       </div>
@@ -531,6 +570,88 @@
         .join(" ");
     }
 
+    function escapeHtml(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, (char) => {
+        const entities = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        };
+        return entities[char];
+      });
+    }
+
+    function computeContractEndDate(start, tenor) {
+      const startDate = start ? new Date(start) : null;
+      const tenorMonths = Number(tenor);
+      if (
+        !startDate ||
+        Number.isNaN(startDate.getTime()) ||
+        !Number.isInteger(tenorMonths) ||
+        tenorMonths <= 0
+      ) {
+        return null;
+      }
+
+      const endMonth = new Date(startDate);
+      endMonth.setDate(1);
+      endMonth.setMonth(endMonth.getMonth() + tenorMonths - 1);
+      const lastDayOfEndMonth = new Date(
+        endMonth.getFullYear(),
+        endMonth.getMonth() + 1,
+        0,
+      ).getDate();
+      endMonth.setDate(Math.min(startDate.getDate(), lastDayOfEndMonth));
+      endMonth.setHours(0, 0, 0, 0);
+      return endMonth;
+    }
+
+    function countRemainingInstallments(start, tenor, referenceDate = new Date()) {
+      const startDate = start ? new Date(start) : null;
+      const tenorMonths = Number(tenor);
+      if (
+        !startDate ||
+        Number.isNaN(startDate.getTime()) ||
+        !Number.isInteger(tenorMonths) ||
+        tenorMonths <= 0 ||
+        Number.isNaN(referenceDate.getTime())
+      ) {
+        return null;
+      }
+
+      const today = new Date(referenceDate);
+      today.setHours(0, 0, 0, 0);
+      const paymentDay = startDate.getDate();
+      let remaining = 0;
+
+      for (let month = 0; month < tenorMonths; month += 1) {
+        const paymentDate = new Date(startDate);
+        paymentDate.setDate(1);
+        paymentDate.setMonth(paymentDate.getMonth() + month);
+        const lastDayOfMonth = new Date(
+          paymentDate.getFullYear(),
+          paymentDate.getMonth() + 1,
+          0,
+        ).getDate();
+        paymentDate.setDate(Math.min(paymentDay, lastDayOfMonth));
+        paymentDate.setHours(0, 0, 0, 0);
+        if (paymentDate >= today) remaining += 1;
+      }
+
+      return remaining;
+    }
+
+    function buildFinalInstallmentMessage(customerName, contractNumber, endDate) {
+      const customer = customerName || "anh/chị";
+      const contract = contractNumber || "của anh/chị";
+      const lastPaymentDate = endDate
+        ? endDate.toLocaleDateString("vi-VN")
+        : "theo lịch thanh toán";
+      return `Chào anh/chị ${customer}, theo lịch thanh toán hiện tại, hợp đồng ${contract} dự kiến còn 01 kỳ góp cuối vào ngày ${lastPaymentDate}. Sau khi hoàn tất kỳ thanh toán này, hợp đồng dự kiến hoàn tất. Anh/chị vui lòng kiểm tra và thanh toán theo thông báo chính thức. Nếu đã thanh toán kỳ cuối, anh/chị vui lòng bỏ qua tin nhắn này. Cảm ơn anh/chị!`;
+    }
+
     // Cập nhật xem trước chuỗi sẽ được chép
     function updateCopyPreview() {
       if (!window._currentCopyData) return;
@@ -561,6 +682,8 @@
       const container = document.getElementById("listContainer");
       if (!customers || customers.length === 0) {
         container.innerHTML = "<p>Không có khách hàng để hiển thị.</p>";
+        const countNum = document.getElementById("countNum");
+        if (countNum) countNum.textContent = "0";
         return;
       }
       // remember last filtered set for pagination actions
@@ -587,11 +710,27 @@
       table.id = "customersListTable";
       const thead = document.createElement("thead");
       thead.innerHTML =
-        "<tr><th>#</th><th>Họ tên</th><th>Số HĐ</th><th>Số điện thoại</th><th>CMND/CCCD</th><th>Địa chỉ</th><th>Ngày đóng tiền</th><th>Tra cứu</th><th>Sao chép</th></tr>";
+        "<tr><th>#</th><th>Họ tên</th><th>Số HĐ</th><th>Số điện thoại</th><th>CMND/CCCD</th><th>Địa chỉ</th><th>Ngày đóng tiền</th><th>Ngày kết thúc</th><th>Tra cứu</th><th>Sao chép</th></tr>";
       table.appendChild(thead);
       const tbody = document.createElement("tbody");
       pageItems.forEach((c, idx) => {
         const tr = document.createElement("tr");
+        const onlyOneInstallment = document.getElementById(
+          "filterRemainingInstallments",
+        ).value === "1";
+        const allContracts = c._contracts || [];
+        const contractsToRender = onlyOneInstallment
+          ? allContracts.filter(
+              (contract) =>
+                countRemainingInstallments(
+                  contract.startingInstallmentDate,
+                  contract.tenorInMonths,
+                ) === 1,
+            )
+          : allContracts;
+        const contractNumbersToRender = contractsToRender
+          .map((contract) => contract.number)
+          .filter(Boolean);
         const addr =
           (c.familyBookAddressStreet ||
             c.temporaryResidentAddressStreet ||
@@ -607,11 +746,48 @@
           ? startDate.toLocaleDateString("vi-VN")
           : "";
         const dueDay = startDate ? startDate.getDate() : "";
-
-        const contractCell =
-          c._contractNumbers && c._contractNumbers.length
-            ? c._contractNumbers.join(", ")
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const contractEndDates = contractsToRender.map((contract) => {
+          const endDate = computeContractEndDate(
+            contract.startingInstallmentDate,
+            contract.tenorInMonths,
+          );
+          return {
+            number: contract.number,
+            endDate,
+            remainingInstallments: countRemainingInstallments(
+              contract.startingInstallmentDate,
+              contract.tenorInMonths,
+              today,
+            ),
+            expired: endDate ? endDate < today : false,
+          };
+        });
+        const renderContractEndDate = (contract) => {
+          const contractLabel = contract.number
+            ? `${escapeHtml(contract.number)}: `
             : "";
+          const endDateLabel = contract.endDate
+            ? contract.endDate.toLocaleDateString("vi-VN")
+            : "—";
+          return `<div class="contract-end-date${contract.expired ? " is-expired" : ""}">
+            <span class="contract-end-label">${contractLabel}${endDateLabel}</span>
+            ${contract.expired ? '<span class="badge text-bg-danger">Đã kết thúc</span>' : ""}
+            ${!contract.expired && contract.remainingInstallments !== null ? `<span class="installments-remaining">Còn góp ${contract.remainingInstallments} lần</span>` : ""}
+          </div>`;
+        };
+        const contractEndDatesHtml = contractEndDates
+          .map(renderContractEndDate)
+          .join("");
+
+        const contractNumbers =
+          contractsToRender.length > 0
+            ? contractNumbersToRender
+            : onlyOneInstallment
+              ? []
+              : c._contractNumbers || [];
+        const contractCell = contractNumbers.join(", ");
 
         const nameStr = fullname(c);
         const phoneStr = c.phoneNumber || "";
@@ -620,10 +796,10 @@
         // Build HTML Tra cứu & Sao chép per contract number
         let lookupHtml = "";
         let copyHtml = "";
-        if (c._contractNumbers && c._contractNumbers.length) {
+        if (contractNumbers.length) {
           const cmnd = encodeURIComponent(nationalIdStr);
 
-          lookupHtml = c._contractNumbers
+          lookupHtml = contractNumbers
             .map((no) => {
               const contract = encodeURIComponent(no);
               const href = `https://www.hdsaison.com.vn/vn/khach-hang/tra-cuu-khoan-vay.html?contract_code=${contract}&cmnd=${cmnd}`;
@@ -631,8 +807,11 @@
             })
             .join("");
 
-          copyHtml = c._contractNumbers
+          copyHtml = contractNumbers
             .map((no) => {
+              const contractDetails = contractsToRender.find(
+                (contract) => String(contract.number) === String(no),
+              );
               const itemData = {
                 mrcHd: `MRC_${no}_${nameStr}`,
                 fullname: nameStr,
@@ -643,7 +822,26 @@
                 dueDay: dueDay
               };
               const safeJson = JSON.stringify(itemData).replace(/"/g, '&quot;');
-              return `<button type="button" class="btn-copy small" data-json="${safeJson}" style="display: block; margin-bottom: 2px;">Sao chép</button>`;
+              const remainingInstallments = contractDetails
+                ? countRemainingInstallments(
+                    contractDetails.startingInstallmentDate,
+                    contractDetails.tenorInMonths,
+                  )
+                : null;
+              const messageButton =
+                remainingInstallments === 1
+                  ? `<button type="button" class="btn-copy btn-copy-message small" data-message="${escapeHtml(
+                      buildFinalInstallmentMessage(
+                        nameStr,
+                        no,
+                        computeContractEndDate(
+                          contractDetails.startingInstallmentDate,
+                          contractDetails.tenorInMonths,
+                        ),
+                      ),
+                    )}">Sao chép tin nhắn</button>`
+                  : "";
+              return `<button type="button" class="btn-copy small" data-json="${safeJson}" style="display: block; margin-bottom: 2px;">Sao chép</button>${messageButton}`;
             })
             .join("");
         }
@@ -655,6 +853,7 @@
               <td data-label="CMND/CCCD">${nationalIdStr}</td>
               <td data-label="Địa chỉ" class="small">${addr}</td>
               <td data-label="Ngày đóng tiền" class="small">${startLabel}</td>
+              <td data-label="Ngày kết thúc" class="small">${contractEndDatesHtml}</td>
               <td data-label="Tra cứu">${lookupHtml}</td>
               <td data-label="Sao chép">${copyHtml}</td>`;
         tbody.appendChild(tr);
@@ -662,9 +861,30 @@
       table.appendChild(tbody);
 
       // Bắt sự kiện click nút Sao Chép trên từng dòng -> Mở Modal
-      tbody.addEventListener("click", (e) => {
-        if (e.target && e.target.classList.contains("btn-copy")) {
-          const rawJson = e.target.getAttribute("data-json");
+      tbody.addEventListener("click", async (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        const messageButton = target.closest(".btn-copy-message");
+        if (messageButton instanceof HTMLButtonElement) {
+          const message = messageButton.getAttribute("data-message");
+          if (!message) return;
+          try {
+            await navigator.clipboard.writeText(message);
+            const originalText = messageButton.textContent;
+            messageButton.textContent = "Đã sao chép tin nhắn";
+            messageButton.classList.add("btn-success");
+            setTimeout(() => {
+              messageButton.textContent = originalText;
+              messageButton.classList.remove("btn-success");
+            }, 1500);
+          } catch (err) {
+            console.error("Lỗi khi sao chép tin nhắn:", err);
+            messageButton.textContent = "Không thể sao chép";
+          }
+          return;
+        }
+        if (target.classList.contains("btn-copy")) {
+          const rawJson = target.getAttribute("data-json");
           if (rawJson) {
             try {
               const dataObj = JSON.parse(rawJson);
@@ -811,6 +1031,9 @@
       const filterContract = document.getElementById("filterContract");
       const filterPhone = document.getElementById("filterPhone");
       const filterCmnd = document.getElementById("filterCmnd");
+      const filterRemainingInstallments = document.getElementById(
+        "filterRemainingInstallments",
+      );
       const apiIdInput = document.getElementById("apiId");
 
       // Auto-fill API user id from localStorage.authUser if available
@@ -840,10 +1063,16 @@
           const start =
             ct.startingInstallmentDate || ct.disbursementDate || null;
           const contractNo = ct.number || ct.code || null;
+          const contractDetails = {
+            number: contractNo,
+            startingInstallmentDate: start,
+            tenorInMonths: ct.tenorInMonths || ct.tenor || 0,
+          };
           const key = c.nationalId || c.id || JSON.stringify(c);
           if (!seen.has(key)) {
             c._startingInstallmentDate = start;
             c._contractNumbers = contractNo ? [contractNo] : [];
+            c._contracts = [contractDetails];
             seen.set(key, true);
             uniq.push(c);
           } else {
@@ -851,6 +1080,12 @@
               (x) => (x.nationalId || x.id) === (c.nationalId || c.id),
             );
             if (existing) {
+              if (
+                !contractNo ||
+                !existing._contracts.some((contract) => contract.number === contractNo)
+              ) {
+                existing._contracts.push(contractDetails);
+              }
               const prev = existing._startingInstallmentDate;
               if (start && (!prev || new Date(start) < new Date(prev)))
                 existing._startingInstallmentDate = start;
@@ -958,8 +1193,21 @@
         const contractVal = (filterContract.value || "").trim().toLowerCase();
         const phoneVal = (filterPhone.value || "").trim();
         const cmndVal = (filterCmnd.value || "").trim();
+        const remainingInstallmentsVal = filterRemainingInstallments.value;
 
         const filtered = window._customersAll.filter((c) => {
+          if (
+            remainingInstallmentsVal === "1" &&
+            !(c._contracts || []).some(
+              (contract) =>
+                countRemainingInstallments(
+                  contract.startingInstallmentDate,
+                  contract.tenorInMonths,
+                ) === 1,
+            )
+          ) {
+            return false;
+          }
           if (dayVal) {
             if (!c._startingInstallmentDate) return false;
             const d = new Date(c._startingInstallmentDate);
@@ -970,7 +1218,19 @@
             if (!full.includes(nameVal)) return false;
           }
           if (contractVal) {
-            const contracts = (c._contractNumbers || [])
+            const contractsForSearch =
+              remainingInstallmentsVal === "1"
+                ? (c._contracts || [])
+                    .filter(
+                      (contract) =>
+                        countRemainingInstallments(
+                          contract.startingInstallmentDate,
+                          contract.tenorInMonths,
+                        ) === 1,
+                    )
+                    .map((contract) => contract.number)
+                : c._contractNumbers || [];
+            const contracts = contractsForSearch
               .join(" ")
               .toLowerCase();
             if (!contracts.includes(contractVal.toLowerCase())) return false;
@@ -991,6 +1251,7 @@
 
       // events
       daySelect.addEventListener("change", applyFilters);
+      filterRemainingInstallments.addEventListener("change", applyFilters);
       const searchBtn = document.getElementById("searchBtn");
       if (searchBtn) {
         searchBtn.addEventListener("click", async () => {
@@ -1037,8 +1298,9 @@
         filterContract.value = "";
         filterPhone.value = "";
         filterCmnd.value = "";
+        filterRemainingInstallments.value = "";
         if (!apiIdInput.disabled) apiIdInput.value = "";
-        renderTable(window._customersAll);
+        applyFilters();
       });
 
       // Login modal handlers
