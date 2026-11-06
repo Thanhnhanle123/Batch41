@@ -62,6 +62,16 @@
         border-radius: 8px;
       }
 
+      #reader video {
+        object-fit: cover;
+      }
+
+      .scan-tip {
+        color: #526170;
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+
       .actions {
         display: flex;
         flex-wrap: wrap;
@@ -160,7 +170,10 @@
         <div class="actions">
           <button type="button" id="startScan">Bật camera quét</button>
           <button type="button" id="stopScan" class="secondary" disabled>Dừng camera</button>
+          <button type="button" id="choosePhoto" class="secondary">Chụp / chọn ảnh CCCD</button>
+          <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
         </div>
+        <p class="scan-tip">Đưa mã QR lại gần camera, để mã chiếm phần lớn khung hình, giữ CCCD yên và tránh ánh sáng phản chiếu. Nếu vẫn không đọc được, chụp hoặc chọn ảnh CCCD để quét.</p>
         <p id="status" role="status" aria-live="polite">Đang chuẩn bị camera để tự động tìm mã QR CCCD...</p>
       </section>
 
@@ -209,9 +222,13 @@
     </main>
 
     <script>
-      const scanner = new Html5Qrcode("reader");
+      const scanner = new Html5Qrcode("reader", {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      });
       const startButton = document.getElementById("startScan");
       const stopButton = document.getElementById("stopScan");
+      const photoInput = document.getElementById("photoInput");
       const statusElement = document.getElementById("status");
       const outputFields = {
         idNumber: document.getElementById("idNumber"),
@@ -291,7 +308,23 @@
         try {
           await scanner.start(
             { facingMode: "environment" },
-            { fps: 10, disableFlip: false },
+            {
+              fps: 15,
+              disableFlip: false,
+              videoConstraints: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+              },
+              qrbox: (viewfinderWidth, viewfinderHeight) => {
+                const size = Math.min(
+                  Math.floor(viewfinderWidth * 0.9),
+                  Math.floor(viewfinderHeight * 0.75),
+                  600,
+                );
+                return { width: size, height: size };
+              },
+            },
             async (decodedText) => {
               try {
                 parseCitizenQr(decodedText);
@@ -334,6 +367,28 @@
           setStatus("Đã dừng camera.");
         } catch (error) {
           setStatus(`Không dừng được camera: ${error.message || error}`, "error");
+        }
+      });
+
+      document.getElementById("choosePhoto").addEventListener("click", () => {
+        photoInput.click();
+      });
+
+      photoInput.addEventListener("change", async () => {
+        const image = photoInput.files && photoInput.files[0];
+        if (!image) return;
+        try {
+          await stopScanner();
+          setStatus("Đang quét mã QR trong ảnh...");
+          const decodedText = await scanner.scanFile(image, true);
+          showCitizenInfo(decodedText);
+        } catch (error) {
+          setStatus(
+            `Không đọc được QR trong ảnh. Hãy chụp rõ, đủ sáng và để mã QR nằm trọn trong ảnh. ${error.message || ""}`,
+            "error",
+          );
+        } finally {
+          photoInput.value = "";
         }
       });
 
