@@ -64,7 +64,7 @@
         color: #333;
       }
       .page {
-        max-width: 520px;
+        max-width: 1400px;
         margin: 0 auto;
         padding-top: 24px;
         padding-left: 18px;
@@ -211,33 +211,91 @@
       .result-actions {
         margin-top: 8px;
       }
+      .qr-scanner {
+        margin-bottom: 16px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #f8fbff;
+      }
+      #qrReader {
+        width: min(100%, 440px);
+        margin: 12px auto;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+      #qrReader video {
+        object-fit: cover;
+      }
+      .qr-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .result-table-wrap {
+        margin-top: 14px;
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+      }
+      .result-table {
+        min-width: 1200px;
+        margin-bottom: 0;
+        white-space: nowrap;
+      }
+      .result-table thead th {
+        background: #e9ecef;
+        color: #495057;
+      }
+      .result-table tbody td {
+        font-weight: 600;
+      }
+      .result-table tfoot td {
+        color: #6c757d;
+        font-weight: 600;
+      }
     </style>
   </head>
   <body>
     <div id="batch41-header"></div>
     <script src="./assets/js/batch41-common.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <div class="page">
       <div class="card-search">
         <h5 class="text-center mb-3">TÌM THÔNG TIN KHÁCH HÀNG</h5>
+        <section class="qr-scanner" aria-label="Quét QR CCCD">
+          <strong>Quét mã QR CCCD để tra cứu</strong>
+          <div id="qrReader"></div>
+          <div class="qr-actions">
+            <button type="button" id="startQrScan" class="btn btn-primary">Bật camera quét</button>
+            <button type="button" id="stopQrScan" class="btn btn-outline-secondary" disabled>Dừng camera</button>
+            <button type="button" id="chooseQrPhoto" class="btn btn-outline-secondary">Chụp / chọn ảnh CCCD</button>
+            <input id="qrPhotoInput" type="file" accept="image/*" capture="environment" hidden />
+          </div>
+          <div id="qrStatus" class="small-muted mt-2" role="status" aria-live="polite">
+            Đang chuẩn bị camera để tự động tìm mã QR CCCD...
+          </div>
+        </section>
         <div class="form-row mb-3">
           <input
             id="qPhone"
             class="form-control"
-            placeholder="Số điện thoại"
+            placeholder="Số điện thoại (bắt buộc)"
             required
           />
           <input
             id="qName"
             class="form-control"
-            placeholder="Họ và tên"
+            placeholder="Họ và tên (bắt buộc)"
             required
           />
           <input
             id="qNid"
             class="form-control"
-            placeholder="CMND/CCCD"
+            placeholder="CMND/CCCD (bắt buộc hoặc quét QR)"
             required
           />
           <select
@@ -251,14 +309,6 @@
           </select>
           <button id="searchBtn" class="btn btn-primary">Tìm</button>
           <button id="clearBtn" class="btn btn-outline-secondary">Xóa</button>
-        </div>
-        <div class="mb-2">
-          <textarea
-            id="pasteBlock"
-            class="form-control"
-            placeholder="Dán đoạn thông tin khách hàng ở đây (tự động lấy Họ tên + CCCD/CMND khi dán)"
-            rows="4"
-          ></textarea>
         </div>
         <div id="status" class="mb-2 small-muted"></div>
         <div id="result"></div>
@@ -393,16 +443,17 @@
         m.show();
       }
 
+      let qrSearchPending = false;
+
       // Validate input fields before searching
       function validateInputs() {
         const phone = (document.getElementById("qPhone").value || "").trim();
         const name = (document.getElementById("qName").value || "").trim();
         const nid = (document.getElementById("qNid").value || "").trim();
-        // require all three fields
         if (!phone || !name || !nid)
           return {
             ok: false,
-            msg: "Vui lòng nhập Số điện thoại, Họ và tên và CMND/CCCD.",
+            msg: "Vui lòng nhập đầy đủ Số điện thoại, Họ và tên và CMND/CCCD.",
           };
         if (phone) {
           const p = phone.replace(/\s|\+|-/g, "");
@@ -421,42 +472,6 @@
           if (name.length < 3) return { ok: false, msg: "Tên quá ngắn." };
         }
         return { ok: true };
-      }
-
-      // Parse a pasted text block to extract name and IDs (CCCD or CMND)
-      function parseIdentityBlock(text) {
-        if (!text) return {};
-        const out = { name: "", cccd: "", cmnd: "" };
-        // labeled patterns
-        const nameMatch =
-          text.match(/Họ\s*và\s*tên\s*[:\-]?\s*(.+)/i) ||
-          text.match(/Tên\s*[:\-]?\s*(.+)/i);
-        if (nameMatch) out.name = nameMatch[1].trim();
-        const cccdMatch =
-          text.match(/(?:Số\s*)?CCCD\s*[:\-]?\s*(\d{12})/i) ||
-          text.match(/\b(\d{12})\b/);
-        if (cccdMatch) out.cccd = cccdMatch[1];
-        const cmndMatch =
-          text.match(/(?:Số\s*)?CMND\s*[:\-]?\s*(\d{9})/i) ||
-          text.match(/\b(\d{9})\b/);
-        if (cmndMatch) out.cmnd = cmndMatch[1];
-        if (!out.name) {
-          const lines = text
-            .split(/\r?\n/)
-            .map((l) => l.trim())
-            .filter(Boolean);
-          for (const l of lines) {
-            if (
-              /[A-Za-zÀ-ỹ\s\'\-]+$/.test(l) &&
-              !/\d/.test(l) &&
-              l.length > 3
-            ) {
-              out.name = l;
-              break;
-            }
-          }
-        }
-        return out;
       }
 
       // login flow
@@ -523,6 +538,7 @@
               document.getElementById("loginModal"),
             );
             if (modal) modal.hide();
+            if (qrSearchPending) performSearch();
           } catch (err) {
             errEl.style.display = "block";
             errEl.textContent = "Lỗi kết nối: " + (err.message || err);
@@ -554,6 +570,7 @@
           showLogin();
           return;
         }
+        qrSearchPending = false;
         document.getElementById("status").textContent = "Đang tìm...";
         try {
           const res = await fetch(url, {
@@ -594,74 +611,128 @@
           out.innerHTML = '<div class="small-muted">Không có dữ liệu.</div>';
           return;
         }
-        // handle v2 wrapper where data.data exists but is an empty array
-        if (data && Array.isArray(data.data) && data.data.length === 0) {
-          out.innerHTML = '<div class="small-muted">Không có dữ liệu.</div>';
-          return;
-        }
-
-        // prefer v2 wrapper: data.data is the array
         const arr = Array.isArray(data.data)
           ? data.data
           : Array.isArray(data)
             ? data
-            : null;
-        if (arr && arr.length) {
-          const list = document.createElement("div");
-          list.className = "result-list";
-          arr.forEach((item) => {
-            const card = document.createElement("div");
-            card.className = "result-card";
-            const left = document.createElement("div");
-            left.className = "left";
-            left.innerHTML = `<h6>${escapeHtml(item.contractNumber || item.contract_number || "")}</h6><div class="meta-row">${escapeHtml(item.prospectDate || item.prospect_date || "")}</div>`;
-            const right = document.createElement("div");
-            right.className = "right";
-            const statusRaw = (
-              item.indusStatus ||
-              item.indus_status ||
-              ""
-            ).toString();
-            const badgeHtml =
-              statusRaw && statusRaw.toLowerCase().includes("live")
-                ? `<span class="badge-live">${escapeHtml(statusRaw)}</span>`
-                : `<span class="badge-other">${escapeHtml(statusRaw || "—")}</span>`;
-            const name = escapeHtml(
-              item.customerName || item.customer_name || "—",
-            );
-            const dob = escapeHtml(item.dob || "—");
-            const note = escapeHtml(
-              item.statusTranslate || item.status_translate || "",
-            );
-            const fa = escapeHtml(item.fa || "");
-            const emi = escapeHtml(item.emi || "");
-            right.innerHTML = `
-            <div class="meta-row">${badgeHtml} <span class="small-key">Tên:</span> ${name}</div>
-            <div class="meta-row"><span class="small-key">SN:</span> ${dob} <span class="small-key" style="margin-left:12px">Ghi chú:</span> ${note}</div>
-            <div class="meta-row"><span class="small-key">FA:</span> <strong>${fa}</strong> <span class="small-key" style="margin-left:12px">EMI:</span> <strong>${emi}</strong></div>
-          `;
-            // no copy action (kept layout simple)
-            card.appendChild(left);
-            card.appendChild(right);
-            list.appendChild(card);
-          });
-          out.appendChild(list);
+            : Array.isArray(data.contracts)
+              ? data.contracts
+              : [data];
+        if (!arr.length) {
+          out.innerHTML = '<div class="small-muted">Không tìm thấy hợp đồng theo CCCD này.</div>';
           return;
         }
 
-        // fallback: single object
-        const card = document.createElement("div");
-        card.className = "result-card";
-        const left = document.createElement("div");
-        left.className = "left";
-        left.innerHTML = `<h6>${escapeHtml(data.contractNumber || data.contract_number || "")}</h6><div class="meta-row">${escapeHtml(data.prospectDate || data.prospect_date || "")}</div>`;
-        const right = document.createElement("div");
-        right.className = "right";
-        right.innerHTML = `<div class="meta-row"><span class="small-key">Tên:</span> ${escapeHtml(data.customerName || data.customer_name || "")}</div><div class="meta-row"><span class="small-key">SN:</span> ${escapeHtml(data.dob || "")}</div><div class="meta-row"><span class="small-key">FA:</span> <strong>${escapeHtml(data.fa || "")}</strong> <span class="small-key" style="margin-left:12px">EMI:</span> <strong>${escapeHtml(data.emi || "")}</strong></div>`;
-        // no copy action for fallback — kept simple per request
-        card.appendChild(left);
-        card.appendChild(right);
-        out.appendChild(card);
+        const value = (item, ...keys) => {
+          for (const key of keys) {
+            if (item[key] !== null && item[key] !== undefined && item[key] !== "") {
+              return item[key];
+            }
+          }
+          return "—";
+        };
+        const formatDate = (raw) => {
+          if (raw === "—") return raw;
+          if (typeof raw === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+            return raw;
+          }
+          if (typeof raw === "string" && /^\d{8}$/.test(raw)) {
+            return `${raw.slice(0, 2)}/${raw.slice(2, 4)}/${raw.slice(4)}`;
+          }
+          const date = new Date(raw);
+          return Number.isNaN(date.getTime())
+            ? raw
+            : date.toLocaleDateString("vi-VN");
+        };
+        const formatAmount = (raw) => {
+          if (raw === "—" || raw === "") return "—";
+          const amount = Number(raw);
+          return Number.isFinite(amount)
+            ? amount.toLocaleString("vi-VN")
+            : raw;
+        };
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "result-table-wrap";
+        const table = document.createElement("table");
+        table.className = "table table-hover result-table";
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Số hợp đồng</th>
+              <th>Tên khách hàng</th>
+              <th>Ngày sinh</th>
+              <th>Khoản vay</th>
+              <th>EMI</th>
+              <th>Ngày tạo</th>
+              <th>Trạng thái</th>
+              <th>Peak ODD</th>
+              <th>ODD</th>
+              <th>Tra cứu</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot><tr><td colspan="10">${arr.length} total</td></tr></tfoot>`;
+        const tbody = table.querySelector("tbody");
+        arr.forEach((item) => {
+          const row = document.createElement("tr");
+          const contractNumber = value(
+            item,
+            "contractNumber",
+            "contract_number",
+            "contract_num",
+          );
+          const status = value(
+            item,
+            "indusStatus",
+            "indus_status",
+            "status",
+            "statusName",
+            "status_name",
+          );
+          const cells = [
+            contractNumber,
+            value(item, "customerName", "customer_name", "name"),
+            formatDate(value(item, "dob", "dateOfBirth", "date_of_birth")),
+            formatAmount(value(item, "fa", "financedAmount", "financed_amount", "loanAmount", "loan_amount")),
+            formatAmount(value(item, "emi", "monthlyInstallment", "monthly_installment")),
+            formatDate(value(item, "prospectDate", "prospect_date", "createdDate", "created_date")),
+            status,
+            value(item, "peakODD", "peakOdd", "peak_odd", "peakOddDays", "peak_odd_days"),
+            value(item, "ODD", "odd", "oddDays", "odd_days", "currentOdd", "current_odd"),
+          ];
+          cells.forEach((cell) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            row.appendChild(td);
+          });
+          const lookupCell = document.createElement("td");
+          const nationalId = (document.getElementById("qNid").value || "").trim();
+          if (
+            String(status).trim().toLowerCase() === "live" &&
+            contractNumber !== "—" &&
+            nationalId
+          ) {
+            const lookupLink = document.createElement("a");
+            const lookupUrl = new URL(
+              "https://www.hdsaison.com.vn/vn/khach-hang/tra-cuu-khoan-vay.html",
+            );
+            lookupUrl.searchParams.set("contract_code", contractNumber);
+            lookupUrl.searchParams.set("cmnd", nationalId);
+            lookupLink.href = lookupUrl.toString();
+            lookupLink.target = "_blank";
+            lookupLink.rel = "noopener noreferrer";
+            lookupLink.className = "btn btn-sm btn-outline-primary";
+            lookupLink.textContent = "Tra cứu";
+            lookupCell.appendChild(lookupLink);
+          } else {
+            lookupCell.textContent = "—";
+          }
+          row.appendChild(lookupCell);
+          tbody.appendChild(row);
+        });
+        wrapper.appendChild(table);
+        out.appendChild(wrapper);
       }
 
       function escapeHtml(s) {
@@ -670,6 +741,143 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
       }
+
+      const qrStatus = document.getElementById("qrStatus");
+      const qrStartButton = document.getElementById("startQrScan");
+      const qrStopButton = document.getElementById("stopQrScan");
+      const qrPhotoInput = document.getElementById("qrPhotoInput");
+      const qrScanner = new Html5Qrcode("qrReader", {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      });
+      let qrIsScanning = false;
+      let qrIsStarting = false;
+      let qrIsHandling = false;
+
+      function setQrStatus(message, isError = false) {
+        qrStatus.textContent = message;
+        qrStatus.classList.toggle("text-danger", isError);
+        qrStatus.classList.toggle("text-success", !isError);
+      }
+
+      function parseCitizenQr(value) {
+        const parts = value.trim().split("|").map((part) => part.trim());
+        if (parts.length < 7 || !/^\d{12}$/.test(parts[0])) {
+          throw new Error("QR không đúng định dạng CCCD hợp lệ.");
+        }
+        return {
+          nationalId: parts[0],
+          fullName: parts[2],
+        };
+      }
+
+      async function stopQrScanner() {
+        if (!qrIsScanning) return;
+        await qrScanner.stop();
+        qrIsScanning = false;
+        qrStartButton.disabled = false;
+        qrStopButton.disabled = true;
+      }
+
+      async function handleScannedQr(qrText) {
+        if (qrIsHandling) return;
+        qrIsHandling = true;
+        try {
+          const identity = parseCitizenQr(qrText);
+          await stopQrScanner();
+          document.getElementById("qNid").value = identity.nationalId;
+          document.getElementById("qName").value = identity.fullName;
+          document.getElementById("idTypeSelect").value = "cccd";
+          const validation = validateInputs();
+          if (!validation.ok) {
+            setQrStatus(
+              `Đã quét và điền tên, CCCD. ${validation.msg}`,
+              true,
+            );
+            return;
+          }
+          qrSearchPending = true;
+          setQrStatus(
+            `Đã quét CCCD ${identity.nationalId}${identity.fullName ? ` — ${identity.fullName}` : ""}. Đang tra cứu hợp đồng...`,
+          );
+          await performSearch();
+        } catch (error) {
+          if (qrIsScanning) {
+            setQrStatus("Mã vừa nhận không phải QR CCCD hợp lệ, camera tiếp tục quét.", true);
+          } else {
+            setQrStatus(error.message || "Không đọc được mã QR CCCD.", true);
+          }
+        } finally {
+          qrIsHandling = false;
+        }
+      }
+
+      async function startQrScanner() {
+        if (qrIsScanning || qrIsStarting) return;
+        qrIsStarting = true;
+        qrStartButton.disabled = true;
+        setQrStatus("Đang mở camera và tìm mã QR CCCD...");
+        try {
+          await qrScanner.start(
+            { facingMode: "environment" },
+            {
+              fps: 15,
+              disableFlip: false,
+              videoConstraints: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+              },
+              qrbox: (width, height) => {
+                const size = Math.min(Math.floor(width * 0.9), Math.floor(height * 0.75), 600);
+                return { width: size, height: size };
+              },
+            },
+            handleScannedQr,
+            () => {},
+          );
+          qrIsScanning = true;
+          qrStopButton.disabled = false;
+          setQrStatus("Camera đang tự động tìm mã QR CCCD. Đưa mặt có mã QR vào khung hình.");
+        } catch (error) {
+          qrStartButton.disabled = false;
+          setQrStatus(
+            `Không mở được camera: ${error.message || error}. Hãy cấp quyền camera và mở trang bằng HTTPS hoặc localhost.`,
+            true,
+          );
+        } finally {
+          qrIsStarting = false;
+        }
+      }
+
+      qrStartButton.addEventListener("click", startQrScanner);
+      qrStopButton.addEventListener("click", async () => {
+        try {
+          await stopQrScanner();
+          setQrStatus("Đã dừng camera.");
+        } catch (error) {
+          setQrStatus(`Không dừng được camera: ${error.message || error}`, true);
+        }
+      });
+      document.getElementById("chooseQrPhoto").addEventListener("click", () => {
+        qrPhotoInput.click();
+      });
+      qrPhotoInput.addEventListener("change", async () => {
+        const image = qrPhotoInput.files && qrPhotoInput.files[0];
+        if (!image) return;
+        try {
+          await stopQrScanner();
+          setQrStatus("Đang quét mã QR trong ảnh...");
+          await handleScannedQr(await qrScanner.scanFile(image, true));
+        } catch (error) {
+          setQrStatus(
+            `Không đọc được QR trong ảnh. Hãy chụp rõ, đủ sáng và để mã nằm trọn trong ảnh. ${error.message || ""}`,
+            true,
+          );
+        } finally {
+          qrPhotoInput.value = "";
+        }
+      });
 
       document
         .getElementById("searchBtn")
@@ -680,6 +888,8 @@
         document.getElementById("qNid").value = "";
         document.getElementById("result").innerHTML = "";
         document.getElementById("status").textContent = "";
+        setQrStatus("Đang chuẩn bị camera để tự động tìm mã QR CCCD...");
+        startQrScanner();
       });
       ["qPhone", "qName", "qNid"].forEach((id) => {
         const el = document.getElementById(id);
@@ -688,32 +898,7 @@
         });
       });
 
-      // auto-parse pasted block into fields (runs on paste and blur)
-      (function wireAutoParse() {
-        const pasteEl = document.getElementById("pasteBlock");
-        if (!pasteEl) return;
-        const doParse = () => {
-          const raw = pasteEl.value || "";
-          if (!raw) return;
-          const parsed = parseIdentityBlock(raw);
-          if (parsed.name) document.getElementById("qName").value = parsed.name;
-          const idTypeEl = document.getElementById("idTypeSelect");
-          const idType = idTypeEl ? idTypeEl.value || "auto" : "auto";
-          let chosen = "";
-          if (idType === "cccd") chosen = parsed.cccd || parsed.cmnd || "";
-          else if (idType === "cmnd") chosen = parsed.cmnd || parsed.cccd || "";
-          else chosen = parsed.cccd || parsed.cmnd || "";
-          if (chosen) document.getElementById("qNid").value = chosen;
-          const statusEl = document.getElementById("status");
-          if (statusEl)
-            statusEl.textContent =
-              parsed.name || chosen
-                ? "Đã lấy thông tin từ đoạn dán."
-                : "Không tìm thấy tên/CCCD/CMND trong đoạn dán.";
-        };
-        pasteEl.addEventListener("paste", () => setTimeout(doParse, 50));
-        pasteEl.addEventListener("blur", doParse);
-      })();
+      startQrScanner();
     </script>
 
     
